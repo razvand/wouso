@@ -1,5 +1,6 @@
-from wouso.core.magic.models import Artifact, Group
+from wouso.core.magic.models import Artifact, ArtifactGroup, SpellHistory, NoArtifactLevel
 from wouso.core.game import get_games
+from django.contrib.auth.models import Group as DjangoGroup
 
 class DefaultGod:
     """ A basic God implementation and also the base class for other gods.
@@ -43,17 +44,18 @@ class DefaultGod:
         If there is a group for player series, use it.
         """
         try:
-            group = Group.objects.get(name=player.series.name)
-        except (Group.DoesNotExist, AttributeError):
+            group = ArtifactGroup.objects.get(name=player.series.name)
+        except (ArtifactGroup.DoesNotExist, AttributeError):
             group = Artifact.DEFAULT()
 
         name = 'level-%d' % level_no
         try:
             artifact = Artifact.objects.get(name=name, group=group)
         except Artifact.DoesNotExist:
-            artifact = Artifact.objects.get(name=name, group=Artifact.DEFAULT())
-        except Artifact.DoesNotExist:
-            return None
+            try:
+                artifact = Artifact.objects.get(name=name, group=Artifact.DEFAULT())
+            except Artifact.DoesNotExist:
+                return NoArtifactLevel(level_no)
 
         return artifact
 
@@ -161,7 +163,6 @@ class DefaultGod:
         Returns True if action has been taken, False if not.
         """
         # Always executed, so log
-        from wouso.core.user.models import SpellHistory
         SpellHistory.used(psdue.source, psdue.spell, psdue.player)
         # Also trigger anonymous activiy
         from wouso.interface.activity import signals
@@ -191,19 +192,17 @@ class DefaultGod:
             return True
         return False
 
-    def user_is_eligible(self, user, game=None):
+    def user_is_eligible(self, player, game=None):
         if game is not None:
             game = str(game.__name__)
 
         if game == 'ChallengeGame':
-            from wouso.core.user import models
-            others, new = models.PlayerGroup.objects.get_or_create(name='Others')
-            if others in user.groups.all():
+            if not player.race or not player.race.can_play:
                 return False
 
         return True
 
-    def user_can_interact_with(self, user_from, user_to, game=None):
+    def user_can_interact_with(self, player_from, player_to, game=None):
         if game is not None:
             game = str(game.__name__)
 
@@ -213,14 +212,13 @@ class DefaultGod:
             from wouso.interface.top.models import TopUser
             from wouso.games.challenge.models import Challenge
 
-            lastch = Challenge.last_between(user_from, user_to)
+            lastch = Challenge.last_between(player_from, player_to)
             if lastch:
                 elapsed_days = (datetime.now() - lastch.date).days
-                position_diff = abs(user_from.get_extension(TopUser).position - user_to.get_extension(TopUser).position)
+                position_diff = abs(player_from.get_extension(TopUser).position - player_to.get_extension(TopUser).position)
                 rule = ceil(position_diff * 0.1)
                 if rule > 7:
                     rule = 7 # nu bloca mai mult de 7 zile
-                #print "AICI", user_from, user_to, lastch, elapsed_days,'days', rule,'rule'
                 if rule <= elapsed_days:
                     return True
                 return False

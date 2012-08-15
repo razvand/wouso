@@ -5,12 +5,12 @@
 DEBUG = True
 
 # Setup logging
-import logging
-from djangologdb.handlers import DjangoDatabaseHandler, add_handler
-logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
+#import logging
+#from djangologdb.handlers import DjangoDatabaseHandler, add_handler
+#logging.basicConfig(level=logging.DEBUG if DEBUG else logging.INFO)
 # This will get the default (root) logger; any further getLogger calls will inherit root
-logger = logging.getLogger()
-add_handler(logger, DjangoDatabaseHandler())
+#logger = logging.getLogger()
+#add_handler(logger, DjangoDatabaseHandler())
 
 # Configuration
 import os.path
@@ -126,7 +126,7 @@ INSTALLED_APPS = (
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
-    # 'django.contrib.sites',
+    'django.contrib.sites',
     'django.contrib.messages',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
@@ -142,19 +142,24 @@ INSTALLED_APPS = (
     'wouso.games.challenge',
     'wouso.games.quest',
     'wouso.games.specialquest',
+    'wouso.games.workshop',
+
     'wouso.interface',
-    'wouso.interface.pages',
     'wouso.interface.cpanel',
     'wouso.interface.top',
     'wouso.interface.activity',
-    'wouso.interface.messaging',
     'wouso.interface.chat',
-    'wouso.interface.statistics',
+    'wouso.interface.apps.pages',
+    'wouso.interface.apps.statistics',
+    'wouso.interface.apps.messaging',
 
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
-    'djangologdb',
+    # Needed for API Oauth
+    'piston',
+    'wouso.interface.api',
+
+    #'djangologdb',
     'django_nose',
+    'wouso.interface.api.c2dm',
 )
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
@@ -175,6 +180,11 @@ STARTING_POINTS = 15
 FINAL_QUEST_CHECKER_PATH = '/home/wouso/fqchecker/' # Folder containing task-01/check, task-02/, task-03/check etc
 
 FORCE_SCRIPT_NAME = '' # Change this in localsettings
+
+OAUTH_CALLBACK_VIEW = 'wouso.interface.api.views.request_token_ready'
+OAUTH_AUTH_VIEW = 'wouso.interface.api.views.oauth_auth_view'
+
+C2DM_AUTH_TOKEN = '' # Change this to a ClientLogin token from Google
 
 # please don't remove this yet
 if os.path.isfile(os.path.dirname(__file__) + "/localsettings.py"):

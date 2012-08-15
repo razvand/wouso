@@ -5,9 +5,11 @@ from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.utils.translation import ugettext_noop, ugettext as _
 from wouso.core.user.models import Player
 from wouso.core import scoring
 from wouso.core.qpool import get_questions_with_category
+from wouso.interface.activity import signals
 from models import SpecialQuestTask, SpecialQuestUser, SpecialQuestGame, SpecialQuestGroup
 from forms import TaskForm
 
@@ -104,13 +106,21 @@ def manage_player_set(request, player_id, task_id):
 
     if task not in player.done_tasks.all():
         if player.group:
-            members = player.group.members.all()
+            members = player.group.members
+            player.group.set_task_done(task)
         else:
             members = (player,)
+
         for member in members:
             if task not in member.done_tasks.all():
                 member.done_tasks.add(task)
                 scoring.score(member, SpecialQuestGame, 'specialquest-passed',external_id=task.id, value=task.value)
+
+                signal_msg = ugettext_noop('completed special quest {task_name}')
+                signals.addActivity.send(sender=None, user_from=member, \
+                                         user_to=member, \
+                                         message=signal_msg, arguments=dict(task_name=task.name), \
+                                         game=SpecialQuestGame.get_instance())
 
     return HttpResponseRedirect(reverse('specialquest_manage', args=(player.id,)))
 
@@ -122,5 +132,9 @@ def manage_player_unset(request, player_id, task_id):
     if task in player.done_tasks.all():
         player.done_tasks.remove(task)
         scoring.unset(player, SpecialQuestGame, 'specialquest-passed', external_id=task.id)
+        signal_msg = ugettext_noop('completed special quest {task_name}')
+        arguments = dict(task_name=task.name)
+        from wouso.interface.activity.models import Activity
+        Activity.delete(SpecialQuestGame.get_instance(), player, player, signal_msg, arguments)
 
     return HttpResponseRedirect(reverse('specialquest_manage', args=(player.id,)))

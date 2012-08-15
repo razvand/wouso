@@ -9,16 +9,16 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
-from wouso.core.user.models import Player, PlayerGroup
-from wouso.core.magic.models import Artifact, Group
+from wouso.core.user.models import Player, PlayerGroup, Race
+from wouso.core.magic.models import Artifact, ArtifactGroup
 from wouso.core.qpool.models import Schedule, Question, Tag, Category
 from wouso.core.qpool import get_questions_with_category
 from wouso.core.god import God
 from wouso.core import scoring
 from wouso.interface.cpanel.models import Customization, Switchboard, GamesSwitchboard
-from wouso.interface.qproposal import QUEST_GOLD, CHALLENGE_GOLD, QOTD_GOLD
+from wouso.interface.apps.qproposal import QUEST_GOLD, CHALLENGE_GOLD, QOTD_GOLD
 from wouso.utils.import_questions import import_from_file
-from forms import QuestionForm, TagsForm
+from forms import QuestionForm, TagsForm, UserForm
 
 
 @login_required
@@ -36,7 +36,7 @@ def dashboard(request):
     total_quests = Quest.objects.all().count()
 
     # artifacts
-    artifact_groups = Group.objects.all()
+    artifact_groups = ArtifactGroup.objects.all()
 
     # admins
     staff_group, new = auth.Group.objects.get_or_create(name='Staff')
@@ -88,17 +88,24 @@ def games(request):
                                'module': 'games'},
                               context_instance=RequestContext(request))
 
+# TODO: gather categories from db.
 # used by qpool and qpool_search
-CATEGORIES = (('Qotd', 'qotd'), ('Challenge', 'challenge'), ('Quest', 'quest'), ('Proposed', 'proposed'))
+CATEGORIES = (('Qotd', 'qotd'), ('Challenge', 'challenge'), ('Quest', 'quest'), ('Proposed', 'proposed'),
+    ('Workshop', 'workshop'))
 
 @login_required
-def qpool_home(request, cat=None, page=u'1'):
+def qpool_home(request, cat=None, page=u'1', tag=None):
     if cat is None:
         cat = 'qotd'
 
     questions = get_questions_with_category(str(cat), active_only=False, endorsed_only=False)
+    if tag:
+        tag = get_object_or_404(Tag, pk=tag, category__name=cat)
+        questions = questions.filter(tags=tag)
+
     if cat == 'qotd':
         questions = questions.order_by('schedule__day')
+
 
     tags = Tag.objects.all().exclude(name__in=['qotd', 'challenge', 'quest'])
     form = TagsForm(tags=tags)
@@ -301,12 +308,12 @@ def artifact_home(request, group=None):
     if group is None:
         group = 'Default'
 
-    group = get_object_or_404(Group, name=group)
+    group = get_object_or_404(ArtifactGroup, name=group)
     artifacts = group.artifact_set.all()
     modifiers = God.get_all_modifiers()
 
     return render_to_response('cpanel/artifact_home.html',
-                              {'groups': Group.objects.all(),
+                              {'groups': ArtifactGroup.objects.all(),
                                'artifacts': artifacts,
                                'module': 'artifacts',
                                'group': group,
@@ -403,13 +410,23 @@ def groupset(request, id):
     class GForm(ModelForm):
         class Meta:
             model = Player
-            fields = ('race', 'groups',)
+            fields = ('race',)
             widgets = {'groups': GSelect()}
+
+        group = forms.ChoiceField(choices=[(0, '')] + [(p.id, p) for p in PlayerGroup.objects.all()],
+                                initial=profile.group.id if profile.group else '')
 
     if request.method == 'POST':
         form = GForm(request.POST, instance=profile)
         if form.is_valid():
             form.save()
+            # First remove other group
+            if profile.group:
+                profile.group.players.remove(profile)
+            # Then update, if any
+            if form.cleaned_data['group'] != '0':
+                new_group = get_object_or_404(PlayerGroup, pk=form.cleaned_data['group'])
+                new_group.players.add(profile)
     else:
         form = GForm(instance=profile)
 
@@ -424,6 +441,7 @@ def stafftoggle(request, id):
 
     if profile != request.user.get_profile():
         staff_group, new = auth.Group.objects.get_or_create(name='Staff')
+        # TODO: fixme
         if staff_group in profile.user.groups.all():
             profile.user.groups.remove(staff_group)
         else:
@@ -438,7 +456,7 @@ def players(request):
     def qotdc(self):
         return History.objects.filter(user=self, game__name='QotdGame').count()
     def ac(self):
-        return Activity.objects.filter(user_from=self).count()
+        return Activity.get_player_activity(self).count()
     def cc(self):
         return History.objects.filter(user=self, game__name='ChallengeGame').count()
     Player.qotd_count = qotdc
@@ -447,6 +465,25 @@ def players(request):
     all = Player.objects.all().order_by('-user__date_joined')
 
     return render_to_response('cpanel/players.html', dict(players=all), context_instance=RequestContext(request))
+
+@login_required
+def add_player(request):
+    form = UserForm()
+    if request.method == "POST":
+        user = UserForm(data = request.POST)
+        if user.is_valid():
+            user.save()
+            return HttpResponseRedirect(reverse('wouso.interface.cpanel.views.players'))
+        else:
+            form = user
+    return render_to_response('cpanel/add_player.html', {'form': form}, context_instance=RequestContext(request))
+
+@login_required
+def races_groups(request):
+    return render_to_response('cpanel/races_groups.html', {'races': Race.objects.all()},
+        context_instance=RequestContext(request)
+    )
+
 
 # 'I am lazy' hack comes in
 import sys
