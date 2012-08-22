@@ -3,12 +3,14 @@ from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import login_required, permission_required
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django import forms
-from django.http import  HttpResponseRedirect
-from django.shortcuts import get_object_or_404
+from django.http import  HttpResponseRedirect, HttpResponse
+from django.shortcuts import get_object_or_404, redirect
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
+from django.template.defaultfilters import slugify
+from wouso.core.decorators import staff_required
 from wouso.core.user.models import Player, PlayerGroup
 from wouso.core.magic.models import Artifact, Group
 from wouso.core.qpool.models import Schedule, Question, Tag, Category
@@ -282,7 +284,59 @@ def import_from_upload(request):
     return render_to_response('cpanel/imported.html', {'module': 'qpool', 'nr': nr},
                               context_instance=RequestContext(request))
 
-@login_required
+@permission_required('config.change_setting')
+def qpool_tag_questions(request):
+    class TagForm(forms.Form):
+        questions = forms.MultipleChoiceField(choices=[(q.pk, q.text) for q in Question.objects.all()])
+        tag = forms.ChoiceField(choices=[(t.pk, t.name) for t in Tag.objects.all().exclude(name__in=['qotd', 'quest', 'challenge'])])
+
+    if request.method == 'POST':
+        form = TagForm(request.POST)
+        if form.is_valid():
+            q_pks = form.cleaned_data['questions']
+            tag_pk =  form.cleaned_data['tag']
+            tag = Tag.objects.get(pk=tag_pk)
+            for pk in q_pks:
+                q = Question.objects.get(pk=pk)
+                q.tags.add(tag)
+                q.save()
+            return render_to_response('cpanel/tagged.html',
+                    {'nr': len(q_pks)},
+                context_instance=RequestContext(request))
+    else:
+        form = TagForm()
+
+    return render_to_response('cpanel/tag_questions.html',
+            {'form': form},
+        context_instance=RequestContext(request))
+
+
+@permission_required('config.change_setting')
+def qpool_managetags(request):
+    tags = Tag.objects.all().order_by('category')
+
+    return render_to_response('cpanel/qpool_managetags.html',
+                            {'tags': tags},
+                            context_instance=RequestContext(request)
+    )
+
+@permission_required('config.change_setting')
+def qpool_export(request, cat):
+    category = get_object_or_404(Category, name=cat)
+    response = HttpResponse(mimetype='text/txt')
+    response['Content-Disposition'] = 'attachment; filename=question_%s_export.txt' % slugify(category.name)
+
+    for q in category.question_set.all():
+        response.write(u'? %s\n' % q.text)
+        for a in q.answers:
+            response.write(u'%s%s\n' % ('+' if a.correct else '-', a.text))
+        response.write('\n')
+
+    return response
+
+# End qpool
+
+@permission_required('config.change_setting')
 def artifactset(request, id):
     profile = get_object_or_404(Player, pk=id)
     artifacts = Artifact.objects.all()
@@ -452,7 +506,7 @@ def players(request):
 import sys
 import types
 except_functions = ('login_required', 'permission_required','render_to_response', 'get_object_or_404',
-    'reverse', 'get_questions_with_category', 'get_themes', 'import_from_file')
+    'reverse', 'get_questions_with_category', 'get_themes', 'import_from_file', 'slugify')
 module = sys.modules[__name__].__dict__
 for i in module.keys():
     if isinstance(module[i], types.FunctionType):

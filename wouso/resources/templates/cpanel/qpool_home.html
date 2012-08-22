@@ -36,6 +36,7 @@
 <div class="actions">
     <a class="button" href="{% url question_new %}">{% trans 'Add question' %}</a>
     <a class="button" href="{% url importer %}">Import</a>
+    <a class="button" href="{% url qpool_export cat %}">Export all</a>
     <a class="button" href="{% url tag_questions %}">{% trans 'Tag questions' %}</a>
 </div>
 
@@ -89,30 +90,11 @@
                         <p> <b>Tags</b>: {{ q.tag }}</p></div>
                 {% endif %}
             </td>
-            {% if cat != 'proposed' %}
-            <td>
-            <a class="button button-min" href="{% url switch_active q.id %}">{% if q.active %}<span class="ok">yes</span>
-            {% else %}<span class="wrong">no</span>
-            {% endif %}
-            </a>
-            </td>
-            {% else %}
-            <td>
-            <a class="button button-min" href="{% url switch_active q.id %}">{% if q.endorsed_by %}<span class="ok">yes</span>
-            {% else %}<span class="wrong">no</span>
-            {% endif %}
-            </a>
-            </td>
-            {% endif %}
-            <td class="actions" nowrap>
-                <a class="button-min" href="{% url question_edit q.id%}">✍</a>
-                <a class="button-min" href="{% url question_del q.id%}" onclick="return confirm('really?');">✕</a>
-            </td>
         </tr>
-
-    {% empty %}
-    <tr><td colspan=3>No questions</td></tr>
     {% endfor %}
+    </table>
+
+
     <div class="pagination">
         <span class="step-links">
             {% if q_page.has_previous %}
@@ -131,5 +113,4 @@
     </table>
     </div>
 </div>
-
 {% endblock %}
