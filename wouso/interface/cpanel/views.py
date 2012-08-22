@@ -10,7 +10,6 @@ from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.conf import settings
 from django.template.defaultfilters import slugify
-from wouso.core.decorators import staff_required
 from wouso.core.user.models import Player, PlayerGroup
 from wouso.core.magic.models import Artifact, Group
 from wouso.core.qpool.models import Schedule, Question, Tag, Category
