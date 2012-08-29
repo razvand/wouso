@@ -53,3 +53,6 @@ class Spell(Artifact):
     type = models.CharField(max_length=1, choices=TYPES, default='o')
     price = models.FloatField(default=10)       # Spell price in gold.
     due_days = models.IntegerField(default=3) # How many days may the spell be active
+    
+    def __unicode__(self):
+        return u"%s - %s [%s]" % (self.name, self.percents, self.get_type_display())
