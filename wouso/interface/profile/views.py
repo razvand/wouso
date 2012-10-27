@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core import serializers
 from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
 from wouso.core.user.models import Player, PlayerGroup, Race
 from wouso.core.scoring.models import History
@@ -12,6 +12,7 @@ from wouso.core.magic.models import Spell, PlayerSpellDue
 from wouso.interface.activity.models import Activity
 from wouso.interface.top.models import TopUser, GroupHistory, NewHistory
 from wouso.core.game import get_games
+from forms import PasswordForm
 
 
 @login_required
@@ -28,6 +29,20 @@ def set_profile(request):
             {'profile': user,
              },
         context_instance=RequestContext(request))
+
+@login_required
+def change_password(request):
+    if request.method == 'POST':
+        form = PasswordForm(request.POST)
+        if form.is_valid():
+            request.user.set_password(form.cleaned_data['new_password1'])
+            request.user.save()
+            return redirect('hub')
+    else:
+        form = PasswordForm()
+    return render_to_response('profile/change_password.html',
+                              {'form': form},
+                              context_instance=RequestContext(request))
 
 @login_required
 def save_profile(request):
@@ -106,9 +121,9 @@ def player_contact(request, player):
     player = get_object_or_404(Player, pk=player)
 
     return render_to_response('profile/contactbox.html',
-								{'contactbox': player},
-								context_instance=RequestContext(request)
-	)
+                                                                {'contactbox': player},
+                                                                context_instance=RequestContext(request)
+        )
 
 
 @login_required
