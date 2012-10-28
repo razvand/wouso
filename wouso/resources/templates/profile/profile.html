@@ -53,6 +53,9 @@
         {% if profile.user.id == user.id %}
             <a class="button button-min" href="{% url set_profile %}" title="{% trans 'Set your profile' %}">S</a>
         {% endif %}
+        {% if profile.user.id == user.id and user.has_usable_password %}
+                <a class="button button-min" href="{% url change_password %}" title="{% trans 'Change password' %}">passwd</a>
+        {% endif %}
 
         {% autoescape off %}{{ profile_actions }}{% endautoescape %}
         <a class="button" href="{% url wouso.interface.views.report profile.id%}">Report</a>
