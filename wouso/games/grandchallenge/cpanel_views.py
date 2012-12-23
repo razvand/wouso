@@ -62,7 +62,6 @@ def grandchalls_round(request):
 
         GrandChallengeGame.round_number += 1
     gchalls = sorted(GrandChallenge.get_challenges(), key=lambda gc:gc.branch)
-    print over
     return render_to_response('grandchallenge/cpanel/grandchallenge.html',
             {'gchalls': gchalls,
              'nr': GrandChallengeGame.round_number - 1,
@@ -76,12 +75,9 @@ def grandchalls_round(request):
 def grandchalls_start(request):
     """ Play the game """
     if GrandChallengeGame.started ==  False:
-        print "mazline"
         GrandChallengeGame()
         GrandChallengeGame.start()
         GrandChallengeGame.round_number += 1
-    else:
-        print GrandChallengeGame.round_number
     users = sorted(GrandChallengeGame.allUsers, key=lambda u: u.user)
     gchalls = sorted(GrandChallenge.get_challenges(), key=lambda gc: gc.branch)
 

@@ -98,13 +98,17 @@
                 {% if chall.round_number = None or chall.round_number > 9 %}
                 <tr><td>{% if chall.branch = 0 %} + {% else %} - {% endif %}</td>
                     <td><a href="{% url interface.profile.views.user_profile user.id %}">
-                        {% if chall.branch = 0 %}<span class="ok">{{chall.user_from}}</span>
-                        {% else %} <span class="warn">{{chall.user_from}}</span>
+                        {% if chall.branch = 0 %}
+                            <span class="ok">{{chall.user_from}}</span>
+                        {% else %}
+                            <span class="warn">{{chall.user_from}}</span>
                         {% endif %}
                     </a></td>
                     <td><a href="{% url interface.profile.views.user_profile user.id %}">
-                        {% if chall.branch = 0 %}<span class="ok">{{chall.user_to}}</span>
-                        {% else %} <span class="warn">{{chall.user_to}}</span>
+                        {% if chall.branch = 0 %}
+                            <span class="ok">{{chall.user_to}}</span>
+                        {% else %}
+                            <span class="warn">{{chall.user_to}}</span>
                         {% endif %}
                     </a></td>
                 </tr>

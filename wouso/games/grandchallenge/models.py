@@ -54,7 +54,7 @@ class GrandChallenge(models.Model):
             x = Challenge.objects.get(id = i)
             if x.status != "P":
                 print "not played"
-                return False
+                sw = False
         return sw
 
     def play(self, round_number):
@@ -197,8 +197,12 @@ class GrandChallengeGame(Game):
         return True
 
     @classmethod
-    def get_sidebar_widget(kls, request):
+    def get_sidebar_widget(cls, request):
         if not request.user.is_anonymous():
             from views import sidebar_widget
             return sidebar_widget(request)
         return None
+
+    @classmethod
+    def get_active(cls):
+        return cls.started
