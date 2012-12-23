@@ -16,12 +16,12 @@
 <p>
 <table>
     <tr><th>{% if nr == 0 %} Start List
-        {% else %} {% if nr < 10 %} Round {{ nr|add:"-1" }} results
+        {% else %} {% if nr < 10 %} Round {{ nr }} results
         {% else %} {% if nr == 10 %} Final Round results
         {% else %} Last final Round results
         {% endif %}{% endif %}{% endif %}</th>
         {% if over = 0 %}
-        <th>{% if nr < 9 %} Round {% if nr == 0 %} {{ nr|add:"1" }}{% else %} {{ nr }} {% endif %}
+        <th>{% if nr < 9 %} Round {% if nr == 0 %} {{ nr|add:"1" }}{% else %} {{ nr|add:"1" }} {% endif %}
             {% else %} {% if nr == 9 %} Final round
             {% else %} Last final round
             {% endif %}{% endif %}
@@ -45,7 +45,7 @@
                 <th>Challenged</th>
             </tr>
             {% for chall in gchalls %}
-            {% if chall.round_number == nr|add:"-1" %}
+            {% if chall.round_number == nr%}
             <tr><td>{% if nr < 10 %}
                 {% if chall.branch = 0%} + {% else %} - {% endif %}
                 {% else %} Final

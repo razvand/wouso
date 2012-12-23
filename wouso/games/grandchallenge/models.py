@@ -26,6 +26,9 @@ class GrandChallenge(models.Model):
         self.won, self.lost = None, None
         self.active = True
         self.round_number = None
+
+        ###Setez un joc de Challenge
+        # TODO: In loc de challenge trebuie sa fie grand Challenge
         challenge_user_to = user_to.user.get_profile().get_extension(ChallengeUser)
         challenge_user_from = user_from.user.get_profile().get_extension(ChallengeUser)
         chall = Challenge.create(challenge_user_from, challenge_user_to)
@@ -46,12 +49,13 @@ class GrandChallenge(models.Model):
 
     @classmethod
     def all_done(cls):
+        sw = True
         for i in cls.CHALLENGES:
             x = Challenge.objects.get(id = i)
             if x.status != "P":
                 print "not played"
                 return False
-        return True
+        return sw
 
     def play(self, round_number):
         winner = Challenge.objects.get(id= self.challenge_id).winner #trebuie generat de joc
@@ -132,6 +136,7 @@ class GrandChallengeGame(Game):
     NUM_USERS = 8
     round_number = 0
     ALL = []
+    started = False
     #Iulian - primii 16
     base_query = TopUser.objects.exclude(user__is_superuser=True)
     allUsers = base_query.order_by('-points')[:NUM_USERS]
@@ -158,6 +163,8 @@ class GrandChallengeGame(Game):
             else:
                 GrandChallenge(u, last)
                 last = None
+
+        GrandChallengeGame.started = True
 
     @classmethod
     def eligible(cls, result):

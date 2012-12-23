@@ -6,8 +6,13 @@ from wouso.games.grandchallenge.models import GrandChallenge, GrandChallengeGame
 
 @staff_required
 def grandchalls(request):
+    users = sorted(GrandChallengeGame.allUsers, key=lambda u: u.user)
+    gchalls = sorted(GrandChallenge.get_challenges(), key=lambda gc: gc.branch)
     return render_to_response('grandchallenge/cpanel/grandchallenge.html',
-        { 'nr': -1},
+        { 'gchalls': gchalls,
+          'nr': GrandChallengeGame.round_number - 1,
+          'users': users,
+          'over': 0},
         context_instance=RequestContext(request))
 
 
@@ -24,6 +29,7 @@ def grandchalls_round(request):
     """ Play a round """
 
     """ regular round """
+    users = sorted(GrandChallengeGame.allUsers, key=lambda u: u.user)
     over = 0
     done = GrandChallenge.all_done()
     if not GrandChallengeGame.is_final():
@@ -35,6 +41,8 @@ def grandchalls_round(request):
             else:
                 GrandChallenge.play_round(1)
             GrandChallengeGame.round_number += 1
+
+
     else:
         """ final 2 players
             they may have to play 2 rounds if the winners finalist lose
@@ -54,11 +62,12 @@ def grandchalls_round(request):
 
         GrandChallengeGame.round_number += 1
     gchalls = sorted(GrandChallenge.get_challenges(), key=lambda gc:gc.branch)
-
+    print over
     return render_to_response('grandchallenge/cpanel/grandchallenge.html',
             {'gchalls': gchalls,
-             'nr': GrandChallengeGame.round_number,
+             'nr': GrandChallengeGame.round_number - 1,
              'done': done,
+             'users': users,
              'over': over},
         context_instance=RequestContext(request))
 
@@ -66,10 +75,15 @@ def grandchalls_round(request):
 @staff_required
 def grandchalls_start(request):
     """ Play the game """
-    GrandChallengeGame.start()
+    if GrandChallengeGame.started ==  False:
+        print "mazline"
+        GrandChallengeGame()
+        GrandChallengeGame.start()
+        GrandChallengeGame.round_number += 1
+    else:
+        print GrandChallengeGame.round_number
     users = sorted(GrandChallengeGame.allUsers, key=lambda u: u.user)
     gchalls = sorted(GrandChallenge.get_challenges(), key=lambda gc: gc.branch)
-    GrandChallengeGame.round_number += 1
 
     return render_to_response('grandchallenge/cpanel/grandchallenge.html',
             {'gchalls': gchalls,
