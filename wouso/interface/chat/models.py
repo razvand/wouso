@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from wouso.core.user.models import Player
-from wouso.core.app import App
+from wouso.core.common import App
 from wouso.core.config.models import BoolSetting
 
 
@@ -72,11 +72,7 @@ class ChatMessage(models.Model):
         return mesaj
 
 class Chat(App):
-
-    @classmethod
-    def get_header_link(kls, request):
-        return ''
-
+    pass
 
 # admin interface
 admin.site.register(ChatRoom)

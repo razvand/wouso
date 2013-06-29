@@ -1,0 +1,36 @@
+{% extends 'interface/section_base.html' %}
+{% load i18n %}
+{% load user %}
+
+{% block sectiontitle %}{% trans 'Special Challenge' %}{% endblock %}
+
+{% block sectioncontent %}
+
+    <h3>{% trans 'My challenges' %}</h3>
+    <table>
+        <tr>
+            <th>{% trans 'Challenge' %}</th>
+            <th>{% trans 'Status' %}</th>
+            <th>{% trans 'Amount' %}</th>
+            <th>{% trans 'Questions' %}</th>
+            <th colspan="2">{% trans 'Actions' %}</th>
+        </tr>
+        {% for c in player.specialchallenges_from.all %}
+        <tr>
+            <td>{{ c }}</td>
+            <td>{% trans c.get_status_display %}</td>
+            <td>{% coin_amount c.amount %}</td>
+            <td>{{ c.questions.all.count }}</td>
+            <td><a class="button button-min" href="{% url specialchallenge_challenge c.id %}">{% trans 'view' %}</a></td>
+            <td><a class="button button-min" href="{% url specialchallenge_configure c.id %}">{% trans 'conf' %}</a></td>
+            <td>{% if c.is_editable %}
+                <a class="button button-min" href="{% url specialchallenge_launch c.id %}">{% trans 'launch' %}</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h3>{% trans 'Actions' %}</h3>
+    <a class="button" href="{% url specialchallenge_create %}">{% trans 'Create new' %}</a>
+{% endblock %}

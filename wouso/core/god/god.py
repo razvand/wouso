@@ -1,4 +1,4 @@
-from wouso.core import signals
+from django.utils.translation import ugettext as _
 from wouso.core.magic.models import Artifact, ArtifactGroup, SpellHistory, NoArtifactLevel
 from wouso.core.game import get_games
 
@@ -15,52 +15,50 @@ class DefaultGod:
         If inherited, should not override super's result, but extend it.
         """
         fs = [
-            dict(id='start-points', formula='points=420', owner=None,
+            dict(name='start-points', definition='points=420', owner=None,
                 description='Points received at the start of the game'),
-            dict(id='buy-spell', formula='gold=-{price}', owner=None,
+            dict(name='buy-spell', definition='gold=-{price}', owner=None,
                 description='Gold spent on spells'),
-            dict(id='gold-points-rate', formula='points={gold}*3;gold=-{gold}', owner=None,
+            dict(name='gold-points-rate', definition='points={gold}*3;gold=-{gold}', owner=None,
                 description='Exchange gold in points'),
-            dict(id='points-gold-rate', formula='points=-{points};gold={points}*0.1', owner=None,
+            dict(name='points-gold-rate', definition='points=-{points};gold={points}*0.1', owner=None,
                 description='Exchange points in gold'),
-            dict(id='bonus-gold', formula='gold={gold}', owner=None,
+            dict(name='bonus-gold', definition='gold={gold}', owner=None,
                 description='Give bonus gold to the poor people'),
-            dict(id='bonus-points', formula='points={points}', owner=None,
+            dict(name='bonus-points', definition='points={points}', owner=None,
                 description='Give bonus points'),
-            dict(id='steal-points', formula='points={points}', owner=None,
+            dict(name='steal-points', definition='points={points}', owner=None,
                 description='Steal points using spells'),
-            dict(id='penalty-points', formula='points=-{points}', owner=None,
+            dict(name='penalty-points', definition='points=-{points}', owner=None,
                 description='Take back points from user'),
-            dict(id='level-gold', formula='gold=10*{level}', owner=None,
+            dict(name='level-gold', definition='gold=10*{level}', owner=None,
                 description='Bonus gold on level upgrade'),
-            dict(id='general-infraction', formula='penalty=10', owner=None,
+            dict(name='general-infraction', definition='penalty=10', owner=None,
                 description='Give penalty points to suspicious users'),
-            dict(id='chall-was-set-up-infraction', formula='penalty=20', owner=None,
+            dict(name='chall-was-set-up-infraction', definition='penalty=20', owner=None,
                 description='Give penalty points for losing a challenge on purpose')
         ]
         return fs
 
     def get_race_level(self, level_no, race):
-        try:
-            group = ArtifactGroup.objects.get(name=race.name)
-        except (ArtifactGroup.DoesNotExist, AttributeError):
-            group = Artifact.DEFAULT()
+        if isinstance(race, unicode):
+            group = ArtifactGroup.get(race)
+        elif race:
+            group = ArtifactGroup.get(race.name)
+        else:
+            group = None
 
         name = 'level-%d' % level_no
-        try:
-            return Artifact.objects.get(name=name, group=group)
-        except Artifact.DoesNotExist:
-            try:
-                return Artifact.objects.get(name=name, group=Artifact.DEFAULT())
-            except Artifact.DoesNotExist:
-                return NoArtifactLevel(level_no)
+        full_name = '%s-%s-%s' % (group.name if group else 'default', name, 100)
+        full_fallback = '%s-%s-%s' % ('default', name, 100)
+        return Artifact.get(full_name) or Artifact.get(full_fallback) or NoArtifactLevel(level_no)
 
     def get_user_level(self, level_no, player):
         """
         Return the artifact object for the given level_no.
         If there is a group for player series, use it.
         """
-        return self.get_race_level(level_no, player.race)
+        return self.get_race_level(level_no, player.race_name)
 
     def get_level_for_points(self, points, player=None):
         """ Implement points limits, for passing a level points must be in an interval.
@@ -115,7 +113,7 @@ class DefaultGod:
         for g in get_games():
             ms.extend(g.get_modifiers())
 
-        from wouso.interface import get_apps
+        from wouso.interface.apps import get_apps
         for a in get_apps():
             ms.extend(a.get_modifiers())
 
@@ -124,7 +122,7 @@ class DefaultGod:
     def get_artifact_for_modifier(self, modifier, player):
         """ Return the race-specific artifact object for given modifier """
         try:
-            return Artifact.objects.get(group__name="Default", name=modifier)
+            return Artifact.objects.get(group=None, name=modifier)
         except Artifact.DoesNotExist:
             return None
 
@@ -140,17 +138,22 @@ class DefaultGod:
             # This prevents Others from casting spells on actual players.
             return False, 'Different world races'
 
-        if destination.has_modifier('immunity'):
+        if (spell.type == 'p') and (source.race != destination.race):
+            return False, 'Different race player'
+
+        if (spell.type == 'n') and (source.race == destination.race):
+            return False, 'Player is the same race as you'
+
+        if destination.magic.has_modifier('immunity'):
             return False, 'Player has immunity'
 
-        if destination.has_modifier(spell.name):
-                return False, 'Player already has this spell casted on him'
+        if destination.magic.has_modifier(spell.name):
+                return False, 'Player already has this spell cast on him'
 
-
-        if destination.has_modifier('curse') and (spell.type != 'n'):
+        if destination.magic.has_modifier('curse') and (spell.type != 'n'):
             return False, 'Player is cursed'
 
-        if source.has_modifier('curse'):
+        if source.magic.has_modifier('curse'):
             return False, 'Player is cursed'
 
         if (spell.name == 'steal') and (destination.points < spell.percents):
@@ -160,10 +163,10 @@ class DefaultGod:
             return False, 'Cannot steal from self'
 
         if spell.name == 'challenge-affect-scoring':
-           if spell_cleanup(spell, destination, spell.name) == False:
+           if not spell_cleanup(spell, destination, spell.name):
                return False, 'Something wrong'
         if spell.name == 'challenge-affect-scoring-won':
-            if spell_cleanup(spell, destination, spell.name) == False:
+            if not spell_cleanup(spell, destination, spell.name):
                 return False, 'Something wrong'
         return True, None
 
@@ -173,21 +176,9 @@ class DefaultGod:
 
         Returns True if action has been taken, False if not.
         """
-        # Always executed, so log
+        # Log usage to SpellHistory
         SpellHistory.used(psdue.source, psdue.spell, psdue.player)
-        # Also trigger anonymous activiy
-        if psdue.source == psdue.player:
-            signal_msg = 'a facut o vraja asupra sa.'
-        else:
-            signal_msg = 'a facut o vraja asupra {to}.'
-        action_msg = 'cast'
-        signals.addActivity.send(sender=None, user_from=psdue.source,
-                                 user_to=psdue.player,
-                                 message=signal_msg,
-                                 arguments=dict(to=psdue.player),
-                                 action=action_msg,
-                                 game=None)
-
+        # Special actions
         if psdue.spell.name == 'dispell':
             for psd in psdue.player.magic.spells:
                 self.post_expire(psd)

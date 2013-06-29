@@ -71,17 +71,25 @@ class SpecialQuestTask(models.Model):
             today = date.today()
         return self.end_date < today
 
+    @classmethod
+    def active(cls):
+        today = date.today()
+        return cls.objects.filter(end_date__lte=today)
+
     @property
     def completed_teams(self):
         return GroupCompletion.objects.filter(task=self).order_by('-date')
 
     def __unicode__(self):
-            return unicode(self.name)
+        return unicode(self.name)
+
 
 class SpecialQuestUser(Player):
     group = models.ForeignKey('SpecialQuestGroup', blank=True, default=None, null=True)
     done_tasks = models.ManyToManyField(SpecialQuestTask, blank=True, default=None, null=True,
                                         related_name="%(app_label)s_%(class)s_done")
+
+    _active_tasks = None
 
     @property
     def active(self):
@@ -94,8 +102,18 @@ class SpecialQuestUser(Player):
             return None
         return gs[0]
 
+    @property
+    def active_tasks(self):
+        if self._active_tasks is not None:
+            return self._active_tasks
+        tasks = SpecialQuestTask.active()
+        today = date.today()
+        self._active_tasks = [t for t in tasks if t not in self.done_tasks.all() and t.start_date <= today <= t.end_date]
+        return self._active_tasks
+
     def invitations(self):
         return self.invitation_set.all()
+
 
 class SpecialQuestGame(Game):
     """ Each game must extend Game """
@@ -124,6 +142,10 @@ class SpecialQuestGame(Game):
         return tasks_done, tasks_not_done
 
     @classmethod
+    def get_staff_and_permissions(cls):
+        return [{'name': 'Specialquest Staff', 'permissions': ['change_specialquestuser']}]
+
+    @classmethod
     def get_sidebar_widget(kls, request):
         if not request.user.is_anonymous():
             from views import sidebar_widget
@@ -145,7 +167,7 @@ class SpecialQuestGame(Game):
     def get_formulas(kls):
         fs = []
         quest_game = kls.get_instance()
-        fs.append(dict(id='specialquest-passed', formula='gold={value}',
+        fs.append(dict(name='specialquest-passed', definition='gold={value}',
             owner=quest_game.game,
             description='Points earned when finishing a task. Arguments: value.')
         )

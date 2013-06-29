@@ -3,16 +3,19 @@ import unittest
 from datetime import datetime,timedelta
 from mock import patch
 
-from django.test import TestCase
 from django.contrib.auth.models import User
 from wouso.core.qpool.models import Question, Answer, Category
+from wouso.core.tests import WousoTest
 from wouso.games.challenge.models import ChallengeUser, Challenge, ChallengeGame
 from wouso.core.user.models import Player
 from wouso.core import scoring
 from wouso.core.scoring.models import Formula
 
-class ChallengeTestCase(TestCase):
+Challenge.LIMIT = 5
+
+class ChallengeTestCase(WousoTest):
     def setUp(self):
+        super(ChallengeTestCase, self).setUp()
         self.user = User.objects.create(username='_test')
         self.user.save()
         self.chall_user = self.user.get_profile().get_extension(ChallengeUser)
@@ -20,6 +23,7 @@ class ChallengeTestCase(TestCase):
         self.user2.save()
         self.chall_user2 = self.user2.get_profile().get_extension(ChallengeUser)
         scoring.setup_scoring()
+        ChallengeGame.get_instance().save()
 
     def tearDown(self):
         self.user.delete()
@@ -49,6 +53,7 @@ class ChallengeTestCase(TestCase):
         user.delete()
 
     def testLaunch(self):
+        Challenge.WARRANTY = False
         chall = Challenge.create(user_from=self.chall_user, user_to=self.chall_user2, ignore_questions=True)
 
         self.assertTrue(isinstance(chall, Challenge))
@@ -123,31 +128,34 @@ class ChallengeTestCase(TestCase):
         chall.user_to.save()
 
         # TODO: improve usage of formulas inside tests.
-        formula = Formula.objects.get(id='chall-won')
-        formula.formula = 'points=10 + min(10, int(3 * {winner_points}/{loser_points}))'
+        formula = Formula.get('chall-won')
+        formula.definition = 'points=10 + min(10, int(3 * {winner_points}/{loser_points}))'
         formula.save()
         chall.played()
 
     def test_variable_timer(self):
-        formula = Formula.objects.get_or_create(id='chall-timer')[0]
-        formula.formula = 'tlimit=10'
+        formula = Formula.add('chall-timer')
+        formula.definition = 'tlimit=10'
         formula.save()
 
         self.assertEqual(scoring.timer(self.chall_user, ChallengeGame, 'chall-timer', level=self.chall_user.level_no), 10)
 
-        formula.formula = 'tlimit={level}'
+        formula.definition = 'tlimit={level}'
         formula.save()
 
         self.assertEqual(scoring.timer(self.chall_user, ChallengeGame, 'chall-timer', level=self.chall_user.level_no), self.chall_user.level_no)
 
-class ChallengeApi(TestCase):
+class ChallengeApi(WousoTest):
     def setUp(self):
+        super(ChallengeApi, self).setUp()
+        Challenge.LIMIT = 5
         self.user = User.objects.create_user('_test', '', password='test')
         self.client.login(username='_test', password='test')
 
         self.user2 = User.objects.create_user('_test2', '', password='test')
         self.challuser = self.user.get_profile().get_extension(ChallengeUser)
         self.challuser2 = self.user2.get_profile().get_extension(ChallengeUser)
+        ChallengeGame.get_instance().save()
 
     def test_list_active(self):
         response = self.client.get('/api/challenge/list/')
@@ -158,7 +166,7 @@ class ChallengeApi(TestCase):
         self.assertFalse(data)
 
         # create an active challenge
-        Formula.objects.create(id='chall-warranty')
+        Formula.add('chall-warranty')
         chall = Challenge.create(user_from=self.challuser2, user_to=self.challuser, ignore_questions=True)
         response = self.client.get('/api/challenge/list/')
         data = json.loads(response.content)
@@ -169,8 +177,8 @@ class ChallengeApi(TestCase):
 
     def test_get_challenge(self):
         # create an active challenge
-        Formula.objects.create(id='chall-warranty')
-        Formula.objects.create(id='chall-timer')
+        Formula.add('chall-warranty')
+        Formula.add('chall-timer')
         chall = Challenge.create(user_from=self.challuser2, user_to=self.challuser, ignore_questions=True)
         chall.accept()
         response = self.client.get('/api/challenge/{id}/'.format(id=chall.id))
@@ -182,10 +190,10 @@ class ChallengeApi(TestCase):
 
     def test_post_challenge(self):
         # create an active challenge, with fake questions
-        Formula.objects.create(id='chall-warranty')
-        Formula.objects.create(id='chall-timer')
-        category = Category.objects.create(name='challenge')
-        for i in range(5):
+        Formula.add('chall-warranty')
+        Formula.add('chall-timer')
+        category = Category.add('challenge')
+        for i in range(Challenge.LIMIT + 1):
             q = Question.objects.create(text='text %s' % i, category=category, active=True)
             for j in range(5):
                 Answer.objects.create(correct=j==1, question=q)
@@ -197,7 +205,7 @@ class ChallengeApi(TestCase):
         self.assertTrue(data)
         self.assertEqual(data['status'], 'A')
         self.assertEqual(data['to'], self.challuser.user.username)
-        self.assertEqual(len(data['questions']), 5)
+        self.assertEqual(len(data['questions']), Challenge.LIMIT)
 
         # attempt post
         data = {}
@@ -214,4 +222,87 @@ class ChallengeApi(TestCase):
         data = json.loads(response.content)
 
         self.assertTrue(data['success'])
-        self.assertEqual(data['result']['points'], 500)
+        self.assertEqual(data['result']['points'], Challenge.LIMIT * 100)
+
+
+class TestCalculatePoints(WousoTest):
+    def get_question(self, correct_answers, wrong_answers):
+        """ Create a question object with specific answers, first correct, then wrong
+        """
+        q = Question.objects.create(text='')
+        for i in range(correct_answers):
+            Answer.objects.create(question=q, correct=True, text='correct %d' % i)
+        for i in range(wrong_answers):
+            Answer.objects.create(question=q, correct=False, text='wrong %d' % i)
+        return q
+
+    def fake_answers(self, question, correct_answers, wrong_answers):
+        """ Return a fake answers response, in the same format it is received with POST
+        """
+        post = {question.id: []}
+        correct_answers_count = question.correct_answers.count()
+        for i in range(correct_answers):
+            post[question.id].append(question.answers[i].id)
+        for i in range(wrong_answers):
+            post[question.id].append(question.answers[i + correct_answers_count].id)
+        return post
+
+    def test_partial_correct_no_wrong(self):
+        q = self.get_question(4, 3)
+        post = self.fake_answers(q, 2, 0)
+        self.assertEqual(Challenge._calculate_points(post)['points'], 50)
+
+    def test_full_correct_no_wrong(self):
+        q = self.get_question(4, 3)
+        post = self.fake_answers(q, 4, 0)
+        self.assertEqual(Challenge._calculate_points(post)['points'], 100)
+
+    def test_partial_correct_and_wrong1(self):
+        q = self.get_question(4, 3)
+        post = self.fake_answers(q, 3, 2)
+        self.assertEqual(Challenge._calculate_points(post)['points'], 8)
+
+    def test_no_correct_and_partial_wrong(self):
+        q = self.get_question(4, 3)
+        post = self.fake_answers(q, 0, 2)
+        self.assertEqual(Challenge._calculate_points(post)['points'], 0)
+
+    def test_full_wrong(self):
+        q = self.get_question(4, 3)
+        post = self.fake_answers(q, 0, 3)
+        self.assertEqual(Challenge._calculate_points(post)['points'], 0)
+
+    def test_all_answers(self):
+        q = self.get_question(4, 3)
+        post = self.fake_answers(q, 4, 3)
+        self.assertEqual(Challenge._calculate_points(post)['points'], 0)
+
+
+class TestCustomChallenge(WousoTest):
+    def test_custom_create(self):
+        Challenge.WARRANTY = False
+        game = ChallengeGame.get_instance()
+        p1, p2 = self._get_player(1), self._get_player(2)
+
+        challenge = Challenge.create_custom(p1, p2, [], game)
+        self.assertTrue(challenge)
+        self.assertEqual(challenge.owner, game)
+
+
+class TestChallengeCache(WousoTest):
+    def test_cache_points(self):
+        scoring.setup_scoring()
+        Challenge.WARRANTY = True
+        p1, p2 = self._get_player(1), self._get_player(2)
+
+        initial_points = p1.points
+        challenge = Challenge.create(p1, p2, ignore_questions=True)
+        p1 = Player.objects.get(pk=p1.pk)
+        self.assertNotEqual(p1.points, initial_points)
+        self.assertTrue(challenge)
+        challenge.refuse()
+        p1 = p1.user.get_profile()
+        self.assertEqual(p1.points, initial_points)
+
+# TODO: add page tests (views) for challenge run
+

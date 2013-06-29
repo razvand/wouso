@@ -215,6 +215,9 @@ li label {
     width: 95%;
     padding: 6px;
 }
+li label.checkbox {
+    width: 30px;
+}
 li label:hover {
     background-color: #eee;
 }
@@ -546,6 +549,9 @@ div.progress {
 .coin-gold {
     background:url(../art/default/gold.png) center left no-repeat;
 }
+.coin-karma {
+    background:url(../art/default/karma.png) center left no-repeat;
+}
 .artifact-spells {
     background-color: transparent !important;
 }
@@ -586,4 +592,26 @@ div.group-cc {
 table.border td {
     border-bottom: 1px solid silver;
     border-right: 1px solid silver;
+}
+
+
+input.inline, label.inline {
+    display: inline-block;
+    float: none;
+}
+
+.pagination ul {
+    list-style-type: none;
+}
+.pagination li {
+    float: left;
+    border: 1px solid #dddddd;
+}
+.pagination li a, .pagination li span {
+    display: block;
+    padding: 10px;
+    margin: 2px;
+}
+.pagination li.active {
+    font-weight: bold;
 }

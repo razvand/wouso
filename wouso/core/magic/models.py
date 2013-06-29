@@ -5,7 +5,7 @@ from django.core.urlresolvers import reverse
 from django.db import models
 from django.utils.translation import ugettext as _
 from django.conf import settings
-from wouso.core.app import App
+from wouso.core.common import App, Item, CachedItem
 
 class Modifier(models.Model):
     """ Basic model for all the magic.
@@ -28,39 +28,42 @@ class Modifier(models.Model):
         """ Image can be stored inside uploads or in theme, return the
         full path or the css class. """
         if self.image:
-            return "%s/%s" % (settings.MEDIA_ARTIFACTS_URL, os.path.basename(str(self.image)))
+            return os.path.join(settings.MEDIA_ARTIFACTS_URL, os.path.basename(str(self.image)))
 
         if hasattr(self, 'group'):
-            return ("%s-%s" %  (self.group, self.name)).lower()
+            return ("%s-%s" %  (self.group if self.group else 'default', self.name)).lower()
 
         return self.name.lower()
 
 
-class ArtifactGroup(models.Model):
+class ArtifactGroup(CachedItem, models.Model):
     """ A group of artifacts for a Species. It cannot contain two artifacts of the same name."""
+    CACHE_PART = 'name'
+
     name = models.CharField(max_length=100, unique=True)
 
     def __unicode__(self):
         return self.name
 
-class Artifact(Modifier):
+class Artifact(CachedItem, Modifier):
     """ The generic artifact model. This should contain the name (identifier) and group,
     but also personalization such as: image (icon) and title
     """
+    CACHE_PART = 'full_name'
     class Meta:
         unique_together = ('name', 'group', 'percents')
 
-    group = models.ForeignKey(ArtifactGroup)
-
-    @classmethod
-    def DEFAULT(kls):
-        # TODO: get rid of me
-        return ArtifactGroup.objects.get_or_create(name='Default')[0]
+    group = models.ForeignKey(ArtifactGroup, null=True, blank=True, default=None)
+    full_name = models.CharField(max_length=200, editable=False)
 
     def __unicode__(self):
         if self.title:
             return u"%s" % self.title
-        return u"%s [%s]" % (self.name, self.group.name)
+        return u"%s %s" % (self.name, "[%s]" % self.group.name if self.group else '(none)')
+
+    def save(self, **kwargs):
+        self.full_name = "%s-%s-%s" % (self.name, self.group.name.lower() if self.group else 'default', self.percents)
+        return super(Artifact, self).save(**kwargs)
 
 
 class NoArtifactLevel(object):
@@ -91,6 +94,10 @@ class Spell(Modifier):
     def group(self):
         return 'spells'
 
+    @property
+    def image_url(self):
+        return self.path if self.image else ''
+
     def history_bought(self):
         return self.spellhistory_set.filter(type='b').count()
 
@@ -102,7 +109,6 @@ class Spell(Modifier):
 
     def history_expired(self):
         return self.spellhistory_set.filter(type='e').count()
-
 
     def __unicode__(self):
         if self.title:
@@ -217,6 +223,8 @@ class PlayerSpellDue(models.Model):
 class Bazaar(App):
     @classmethod
     def get_header_link(kls, request):
+        if kls.disabled():
+            return None
         url = reverse('bazaar_home')
         player = request.user.get_profile() if request.user.is_authenticated() else None
         if player:

@@ -6,12 +6,12 @@ from django.db.models import Count, Q
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.utils.translation import ugettext as _, ugettext, ugettext_noop
+from django.utils.translation import ugettext as _, ugettext_noop
 from exceptions import ValueError
 from wouso.core.config.models import BoolSetting
 from wouso.core.scoring.sm import InvalidFormula
 from wouso.core.user.models import Player
-from wouso.core.magic.models import Spell, SpellHistory, PlayerSpellDue, Artifact
+from wouso.core.magic.models import Spell, SpellHistory, PlayerSpellDue, Artifact, Bazaar
 from wouso.core import scoring, signals
 from wouso.interface.activity.models import Activity
 
@@ -106,14 +106,17 @@ def bazaar_buy(request, spell):
 
     player = request.user.get_profile()
     error, message = '',''
-    if spell.price > player.coins.get('gold', 0):
+
+    if Bazaar.disabled():
+        error = _("Magic is disabled")
+    elif spell.price > player.coins.get('gold', 0):
         error = _("Insufficient gold amount")
     elif spell.available == False:
         error = _("Spell is not available")
     elif spell.level_required > player.level_no:
         error = _("Level {level} is required to buy this spell").format(level=spell.level_required)
     else:
-        player.add_spell(spell)
+        player.magic.add_spell(spell)
         scoring.score(player, None, 'buy-spell', external_id=spell.id,
                       price=spell.price)
         signal_msg = ugettext_noop('bought a spell')
@@ -137,7 +140,9 @@ def magic_cast(request, destination=None, spell=None):
 
     error = ''
 
-    if request.method == 'POST':
+    if Bazaar.disabled():
+        error = _("Magic is disabled")
+    elif request.method == 'POST':
         spell = get_object_or_404(Spell, pk=request.POST.get('spell', 0))
         try:
             days = int(request.POST.get('days', 0))
@@ -151,7 +156,7 @@ def magic_cast(request, destination=None, spell=None):
                 if not spell.mass:
                     error = destination.magic.cast_spell(spell=spell, source=player, due=due)
                 else:
-                    players = player.get_neighbours_from_top(2)
+                    players = destination.get_neighbours_from_top(2, player.race, spell.type)
                     players = player.magic.filter_players_by_spell(players, spell)
                     error = player.magic.mass_cast(spell=spell, destination=players, due=due)
 
@@ -176,7 +181,8 @@ def affected_players(request):
 
     if spell.mass:
         user = request.user.get_profile()
-        players = user.get_neighbours_from_top(2)
+        destination = get_object_or_404(Player, pk=user_id)
+        players = destination.get_neighbours_from_top(2, user.race, spell.type)
         players = user.magic.filter_players_by_spell(players, spell)
     else :
         user = get_object_or_404(Player, pk=user_id)

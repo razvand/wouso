@@ -42,7 +42,7 @@ def setup_scoring():
     """ Prepare database for Scoring """
     for cc in CORE_POINTS:
         if not Coin.get(cc):
-            Coin.add(cc, name=cc)
+            Coin.add(cc)
     # special case, gold is integer
     gold = Coin.get('gold')
     gold.integer = True
@@ -65,13 +65,26 @@ def calculate(formula, **params):
     if formula is None:
         raise InvalidFormula(formula)
 
-    if not formula.formula:
+    if not formula.definition:
         return {}
 
+    return calculate_definition(formula.definition, formula, **params)
+
+
+def calculate_definition(definition, formula=None, **params):
+    """
+    Calculate a formula defintion. Example of such defintions are:
+        * points=50
+        * points=10+{{level}}*100
+        * gold=3;points=100
+
+    Returns a dictionary with coins and values, example:
+        {'points': 30, 'gold': 100}
+    """
     ret = {}
     try:
-        frml = formula.formula.format(**params)
-        # Apparently, Python does not allow assignments inside eval
+        frml = definition.format(**params)
+        # Python does not allow assignments inside eval
         # Using this workaround for now
         ass = frml.split(';')
         for a in ass:
@@ -86,7 +99,6 @@ def calculate(formula, **params):
     except Exception as e:
         logging.exception(e)
         raise FormulaParsingError(formula)
-
     return ret
 
 
@@ -107,7 +119,7 @@ def timer(user, game, formula, default=300, **params):
     formula = Formula.get(formula)
     if formula is None:
         raise InvalidFormula(formula)
-    if not formula.formula:
+    if not formula.definition:
         return default
 
     values = calculate(formula, **params)
@@ -118,6 +130,8 @@ def timer(user, game, formula, default=300, **params):
 
 def unset(user, game, formula, external_id=None, **params):
     """ Remove all history records by the external_id, formula and game given to the user """
+    formula = Formula.get(formula)
+    user = user.user.get_profile() # make sure you are working on fresh Player
     for history in History.objects.filter(user=user, game=game.get_instance(), formula=formula, external_id=external_id):
         if history.coin.name == 'points':
             user.points -= history.amount
@@ -126,9 +140,10 @@ def unset(user, game, formula, external_id=None, **params):
     update_points(user, game)
 
 def rollback(user, game, formula, external_id=None, **params):
-    if game != None:
+    if game is not None:
         game = game.get_instance()
     formula = Formula.get(formula)
+    user = user.user.get_profile() # make sure you are working on fresh Player
     for history in History.objects.filter(user=user, game=game, formula=formula, external_id=external_id):
         if history.coin.name == 'points':
             user.points -= history.amount
@@ -172,16 +187,18 @@ def score_simple(player, coin, amount, game=None, formula=None,
         raise InvalidScoreCall()
 
     user = player.user
+    player = user.get_profile()
+    user = player.user
 
     coin = Coin.get(coin)
     formula = Formula.get(formula)
 
     computed_amount = 1.0 * amount * percents / 100
-    hs = History.objects.create(user=user, coin=coin, amount=computed_amount,
-        game=game, formula=formula, external_id=external_id, percents=percents)
+    hs = History.add(user=user, coin=coin, amount=computed_amount,
+            game=game, formula=formula, external_id=external_id, percents=percents)
 
     # update user.points asap
-    if coin.id == 'points':
+    if coin.name == 'points':
         if player.magic.has_modifier('top-disguise'):
             computed_amount = 1.0 * computed_amount * player.magic.modifier_percents('top-disguise') / 100
 
@@ -258,7 +275,7 @@ def first_login_check(sender, **kwargs):
 
     if player.activity_from.count() == 0:
         # kick some activity
-        signal_msg = ugettext_noop('has joined the game.')
+        signal_msg = ugettext_noop('joined the game.')
 
         signals.addActivity.send(sender=None, user_from=player,
             user_to=player,

@@ -61,6 +61,9 @@
     <div id="header-cp">
         <div id="topbar">
             <div class="first-line">
+                {% if user.real_user %}
+                   Impersonated by {{ user.real_user }} <a href="{% url impersonate_clear %}">clear</a>
+                {% endif %}
                 {{ user.get_profile }}
                 <a id="head-home" href="{% url homepage %}">Game</a>&nbsp;
                 <a id="head-cpanel" href="{% url dashboard %}">CPanel</a>&nbsp;
@@ -82,14 +85,14 @@
                         <li class="home"><a href="{% url dashboard %}">Dashboard</a></li>
                         <li class="qpool"><a href="{% url qpool_home %}">Question Pool</a>
                         </li>
+                        <ul class="submenu">
+                            <li class="qpool_import"></li>
+                        </ul>
+                        </li>
                         <li class="spells"><a href="{% url spells %}">Spells</a></li>
                         <li class="artifacts"><a href="{% url artifact_home %}">Artifacts</a></li>
-                        {% if user.is_superuser %}
-                        <li class="custom"><a href="{% url customization %}">Customization</a></li>
                         <li><a href="{% url all_players %}">Players</a></li>
                         <li><a href="{% url races_groups %}">Races & groups</a></li>
-                        <li><a href="{% url reports %}">Reports</a></li>
-                        {% endif %}
                     </ul>
                 </div>
                 <div class="widget-content">
@@ -101,6 +104,14 @@
                     </ul>
                 </div>
                 <div class="widget-content">
+                    {% if user.is_staff or user.is_superuser %}
+                    <ul class="menu">
+                        Admin
+                        <li class="roles"><a href="{% url roles %}">Roles</a></li>
+                        <li class="custom"><a href="{% url customization %}">Customization</a></li>
+                        <li class="reports"><a href="{% url reports %}">Reports</a></li>
+                    </ul>
+                    {% endif %}
                     <ul class="menu">
                         Shortcuts
 
@@ -132,9 +143,11 @@
             <div class="section-content">
             {% block sectioncontent %}
 
+
             <div class="subgroups sg-large">
                 <h3>Information</h3>
                 <p>Django version: {{ django_version }}</p>
+                <p>Database: {{ database_name }} [{{ database_engine }}]</p>
                 <p>WoUSO version: {{ wouso_version }}</p>
                 <p>WoUSOcron last run: {{ last_run }}</p>
                 <h4>Staff</h4>
@@ -180,12 +193,14 @@
 
             <h3>Misc</h3>
             <a href="{% url the_bell %}">Press the bell!</a>
+            <a href="{% url clear_cache %}">Clear cache</a>
 
             {% endblock %}
             </div><!-- section content -->
         {% endblock %}
         </div>
-    </div>
+
+
 
 
     <div id="footer">

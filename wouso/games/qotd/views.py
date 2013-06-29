@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 from django.http import HttpResponseRedirect
@@ -16,11 +17,11 @@ def index(request):
 
     profile = request.user.get_profile()
     qotd_user = profile.get_extension(QotdUser)
-    
-    if qotd_user.has_modifier('qotd-blind'):
-        return render_to_response('qotd/index.html', {"error":_("You have been blinded,you cannot answer to the Question of the Day")}, context_instance=RequestContext(request))
 
-    if not qotd_user.has_question:
+    if qotd_user.magic.has_modifier('qotd-blind'):
+        messages.error(request, _("You have been blinded,you cannot answer to the Question of the Day"))
+        return redirect('games.qotd.views.history')
+    elif not qotd_user.has_question:
         qotd = QotdGame.get_for_today()
         qotd_user.set_question(qotd)
     else:
@@ -31,7 +32,7 @@ def index(request):
         extra = request.GET.urlencode()
         if extra:
             extra = '?' + extra
-        return HttpResponseRedirect(reverse('games.qotd.views.done') + extra)
+        return HttpResponseRedirect(reverse('games.qotd.views.history') + extra)
 
     if qotd is None:
         form = None
@@ -58,7 +59,7 @@ def done(request):
         return HttpResponseRedirect(reverse('wouso.interface.views.homepage'))
     # Do not show results until done
     if not request.user.get_profile().get_extension(QotdUser).has_answered:
-        return HttpResponseRedirect(reverse("games.qotd.views.index"))
+        return HttpResponseRedirect(reverse("games.qotd.views.history"))
 
     user = request.user.get_profile().get_extension(QotdUser)
     qotd = user.my_question
@@ -79,7 +80,14 @@ def done(request):
             {'question': qotd, 'choice': ans, 'valid': valid,},
             context_instance=RequestContext(request))
 
+
+@login_required
+def history(request):
+    return render_to_response('qotd/history.html', {'history': QotdGame.get_history()}, context_instance=RequestContext(request))
+
+
 def sidebar_widget(request):
+    # TODO: nothing should happen in the sidebar_widget
     qotd = QotdGame.get_for_today()
     qotd_user = request.user.get_profile().get_extension(QotdUser)
 

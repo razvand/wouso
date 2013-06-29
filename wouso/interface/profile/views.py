@@ -1,19 +1,19 @@
 from django import forms
 from django.core.exceptions import ValidationError
 from hashlib import md5
-from django.utils import simplejson
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core import serializers
-from django.http import Http404, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.http import Http404, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
+from django.utils.html import strip_tags
 from wouso.core.god import God
 from wouso.core.user.models import Player, PlayerGroup, Race
 from wouso.core.scoring.models import History
 from wouso.core.magic.models import Spell, PlayerSpellDue
 from wouso.interface.activity.models import Activity
-from wouso.interface.top.models import TopUser, GroupHistory, NewHistory
+from wouso.interface.top.models import TopUser, GroupHistory, NewHistory, ObjectHistory
 from wouso.core.game import get_games
 
 
@@ -35,7 +35,7 @@ def set_profile(request):
         def clean_nickname(self):
             if Player.objects.exclude(id=self.instance.id).filter(nickname=self.cleaned_data['nickname']).count():
                 raise ValidationError("Nickname is used")
-            self.cleaned_data['nickname'] = self.cleaned_data['nickname'].strip().replace(' ', '_')
+            self.cleaned_data['nickname'] = strip_tags(self.cleaned_data['nickname'].strip().replace(' ', '_'))
             return self.cleaned_data['nickname']
 
 
@@ -72,22 +72,12 @@ def save_profile(request):
 
 @login_required
 def user_profile(request, id, page=u'1'):
-    try:
-        profile = Player.objects.get(id=id)
-    except Player.DoesNotExist:
-        raise Http404
+    profile = get_object_or_404(Player, id=id)
 
-    # TODO: parca exista o functie in core pentru gravatar
-    avatar = "http://www.gravatar.com/avatar/%s.jpg?d=monsterid"\
-        % md5(profile.user.email).hexdigest()
     activity_list = Activity.get_player_activity(profile)
 
     top_user = profile.get_extension(TopUser)
-    #top_user.topgroups = list(profile.groups.all())
-    #for g in top_user.topgroups:
-    #    g.week_evolution = top_user.week_evolution(relative_to=g)
-    #    g.position = TopHistory.get_user_position(top_user, relative_to=g)
-    history = History.user_points(profile)
+    history = History.user_points(profile.user)
     paginator = Paginator(activity_list, 10)
 
     try:
@@ -114,7 +104,6 @@ def user_profile(request, id, page=u'1'):
 
     return render_to_response('profile/profile.html',
                               {'profile': profile,
-                               'avatar': avatar,
                                'activity': activity,
                                'top': top_user,
                                'scoring': history,
@@ -196,6 +185,7 @@ def player_race(request, race_id):
                              'children': groups,
                              'top_users': top_users,
                              'top_rank': top_rank,
+                             'top': ObjectHistory(),
                              'activity': activity,
                              'levels': levels},
                             context_instance=RequestContext(request)

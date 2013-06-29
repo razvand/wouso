@@ -84,7 +84,7 @@ TEMPLATE_LOADERS = (
     #     'django.template.loaders.eggs.Loader',
     )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE_CLASSES = [
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -96,7 +96,7 @@ MIDDLEWARE_CLASSES = (
     'wouso.middleware.Seen',
     'wouso.middleware.DebugExceptionMiddleware',
     'wouso.middleware.ImpersonateMiddleware',
-    )
+]
 AUTHENTICATION_BACKENDS = (
     #'wouso.middleware.ldap_connection.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
@@ -140,6 +140,8 @@ INSTALLED_APPS = [
 
     'wouso.games.qotd',
     'wouso.games.challenge',
+    'wouso.games.grandchallenge',
+    'wouso.games.specialchallenge',
     'wouso.games.quest',
     'wouso.games.specialquest',
     'wouso.games.workshop',
@@ -162,7 +164,7 @@ AUTH_PROFILE_MODULE = 'user.Player'
 MEDIA_ARTIFACTS_DIR = os.path.dirname(__file__) + "/resources/static/upload/"
 MEDIA_ARTIFACTS_URL = "/static/upload/"
 
-WOUSO_VERSION = '4.9'
+WOUSO_VERSION = '5.0.1'
 
 LEVEL_LIMITS = None # Override this with an iterable
 STARTING_POINTS = 15
@@ -202,18 +204,15 @@ else:
 
 AVATAR_DEFAULT = 'monsterid'
 
-
 BASE_PATH = os.path.dirname(__file__)
-
 QUNIT_TEST_DIRECTORY = os.path.join(BASE_PATH, 'qunit_tests')
 
-
 try:
-	import django_qunit
+    import django_qunit
 except ImportError:
-	pass
+    pass
 else:
-	INSTALLED_APPS += ['django_qunit']
+    INSTALLED_APPS += ['django_qunit']
 
 try:
     imp.find_module('django_socketio')
@@ -230,10 +229,39 @@ else:
     CHAT_ENABLED = True
     SOCKETIO_HOST = ''
     SOCKETIO_PORT = '8000'
+
+try:
+    imp.find_module('debug_toolbar')
+except ImportError:
+    pass
+else:
+    if DEBUG:
+        MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+        INSTALLED_APPS.append('debug_toolbar')
+        INTERNAL_IPS = ('127.0.0.1',)
+        DEBUG_TOOLBAR_CONFIG = {'INTERCEPT_REDIRECTS': False}
+
+
+
 # the probability of getting bonus points for correctly answered qotd
 # must be a number between 0 and 100
 QOTD_BONUS_PROB = 30
 
+# Default time for a workshop, minutes
+WORKSHOP_TIME_MINUTES = 7
+# Time to allow post answers, minutes
+WORKSHOP_GRACE_PERIOD = 1
+
+DISPLAY_NAME = '{first_name} {last_name}'
+
+
+# To setup a cache, put this in localsettings:
+# CACHES = {
+#    'default': {
+#        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+#        'LOCATION': 'unique-snowflake'
+#    }
+# }
 
 # PLEASE LEAVE THIS ON THE LAST LINES OF THIS FILE
 if os.path.isfile(os.path.dirname(__file__) + "/localsettings.py"):

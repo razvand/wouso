@@ -4,16 +4,13 @@ from django.conf import settings
 from wouso.core.game import get_games
 from wouso.core.config.models import Setting
 from wouso.core.magic.models import Bazaar
-from wouso.interface.top.models import Top
-from wouso.interface.apps.qproposal.models import Qproposal
-from wouso.interface.apps.statistics.models import Statistics
+from wouso.interface.apps import get_apps
 from wouso.interface.apps.messaging.models import Message
-from wouso.interface.apps.statistics.views import footer_link as stats_link
 from wouso.interface.chat.models import Chat
 from wouso.interface import get_static_pages, detect_mobile, mobile_browser
 from wouso.settings import FORCE_SCRIPT_NAME
-
 from . import set_theme
+
 
 def header_footer(request):
     """ Generate header and footer bar contents.
@@ -24,68 +21,30 @@ def header_footer(request):
         return {}
     #TODO ordering, using config
 
-    header = []
-    try:
+    def header_generator():
         for game in get_games():
             h = game.get_header_link(request)
             if h:
-                header.append((h, game.get_instance().name))
-    except Exception as e:
-        logging.exception(e)
+                yield h, game.get_instance().verbose_name
+        for game in [Message, Bazaar, Chat]:
+            h = game.get_header_link(request)
+            if h:
+                yield h, game.__name__
 
-    # add also messages and magic link
-    try:
-        h = Message.get_header_link(request)
-        if h:
-            header.append((h, 'Message'))
-
-        h = Bazaar.get_header_link(request)
-        if h:
-            header.append((h, 'Magic'))
-
-        h = Chat.get_header_link(request)
-        if h:
-            header.append((h, 'Chat'))
-
-    except Exception as e:
-        logging.exception(e)
-
-    footer = []
-    try:
+    def footer_generator():
         for game in get_games():
             f = game.get_footer_link(request)
             if f:
-                footer.append(f)
-    except: pass
+                yield f
+        for s in get_static_pages():
+            yield s
+        for a in get_apps():
+            f = a.get_footer_link(request)
+            if f:
+                yield f
 
-    # also add stats link
-    try:
-        f = stats_link(request)
-        if f:
-            footer.append(f)
-    except:
-        pass
+    return {'header': header_generator, 'heads': header_generator, 'footer': footer_generator}
 
-    # also add static pages
-    for sp in get_static_pages():
-        footer.append(sp.html_link())
-
-    # qporposal
-    if not Qproposal.disabled():
-        footer.append(Qproposal.get_footer_link(request))
-
-    if not Statistics.disabled():
-        footer.append(Statistics.get_footer_link(request))
-
-    # format header
-    hids = lambda p: '<span id="head-%s"><a href="%s">%s</a>%s</span>' % (p[1].lower(), \
-                        p[0]['link'], p[0]['text'], \
-                        '<sup class="unread-count">%d</sup>' % p[0]['count'] if p[0].get('count', False) else '')
-
-    header_html = " ".join(map(hids, header))
-    footer = " | ".join(footer)
-
-    return {'header': header_html, 'heads': header, 'footer': footer}
 
 def sidebar(request):
     """ For each registered game, get a widget to be displayed in sidebar
@@ -94,26 +53,18 @@ def sidebar(request):
 
     Returns a 'sidebar' list containing html boxes.
     """
-
-    sidebar = []
-
-    try:
-        # Request blocks from games
-        for game in get_games():
-            w = game.get_sidebar_widget(request)
+    def sidebar_generator():
+        for game in get_games() + list(get_apps()):
+            try:
+                w = game.get_sidebar_widget(request)
+            except Exception as e:
+                logging.exception(e)
+                w = None
             if w:
-                sidebar.append(w)
+                yield w
 
-        # Request blocks from apps
-        for app in (Top,):
-            w = app.get_sidebar_widget(request)
-            if w:
-                sidebar.append(w)
-    except Exception as e:
-        logging.error(e)
-        # This is a hack for fixing test. TODO: actually fix ./manage.py test
+    return {'sidebar': sidebar_generator}
 
-    return {'sidebar': sidebar}
 
 def context(request):
     """ Make all configuration settings available as config_name
@@ -131,6 +82,19 @@ def context(request):
         settings_dict['config_chat_host'] = settings.SOCKETIO_HOST
         settings_dict['config_chat_port'] = settings.SOCKETIO_PORT
 
+    for k, v in settings_dict.iteritems():
+        if k.startswith('config_disable'):
+            try:
+                settings_dict[k] = bool(v)
+            except ValueError: pass
+
+    # user defined theme
+    if request.user.is_authenticated():
+        custom_theme = settings_dict.get('config_theme_user_%d' % request.user.get_profile().id, None)
+        if custom_theme:
+            settings_dict['config_theme'] = custom_theme
+            set_theme(custom_theme)
+
     # override theme using GET args
     if request.GET.get('theme', None) is not None:
         from wouso.utils import get_themes
@@ -139,7 +103,7 @@ def context(request):
             settings_dict['config_theme'] = theme
             set_theme(theme)
     else:
-        set_theme(None)
+        set_theme(settings_dict['config_theme'])
 
     # shorthand user.get_profile
     settings_dict['player'] = request.user.get_profile() if request.user.is_authenticated() else None

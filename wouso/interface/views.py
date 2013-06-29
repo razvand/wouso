@@ -40,14 +40,15 @@ def anonymous_homepage(request):
 
 def login_view(request):
     # TODO: rethink and rewrite
+    next = request.GET.get('next', '')
     if request.method != 'POST':
         form = AuthenticationForm(request)
-        return render_to_response('registration/login.html', {'form': form},
+        return render_to_response('registration/login.html', {'form': form, 'next': next},
             context_instance=RequestContext(request))
     else:
         form = AuthenticationForm(data=request.POST)
         if not form.is_valid():
-            return render_to_response('registration/login.html', {'form': form},
+            return render_to_response('registration/login.html', {'form': form, 'next': next},
                 context_instance=RequestContext(request))
 
     user = authenticate(username=request.POST['username'], password=request.POST['password'])
@@ -64,6 +65,8 @@ def login_view(request):
             request.session.set_expiry(MAX_TIME)
             login(request, user)
             signals.addActivity.send(sender=None, user_from=user.get_profile(), action="login", game = None, public=False)
+            if request.POST.get('next'):
+                return HttpResponseRedirect(request.POST.get('next'))
             return redirect(settings.LOGIN_REDIRECT_URL)
     return HttpResponseRedirect("/")
 
@@ -146,16 +149,26 @@ def search(request):
     if form.is_valid():
         query = form.cleaned_data['query']
         if len(query.split()) == 1:
-            searchresults = Player.objects.filter(Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query) | Q(user__username__icontains=query))
+            if request.user.get_profile().in_staff_group():
+                searchresults = Player.objects.filter(Q(user__first_name__icontains=query) | Q(user__last_name__icontains=query) |
+                                                      Q(user__username__icontains=query) | Q(nickname__icontains=query)
+                )
+            else:
+                searchresults = Player.objects.filter(Q(nickname__icontains=query))
             # special queries
             if query == 'outsiders':
                 searchresults = Player.objects.filter(groups=None)
         else:
             query = query.split()
             searchresults = set()
-            for word in query:
-                r = Player.objects.filter(Q(user__first_name__icontains=word) | Q(user__last_name__icontains=word))
-                searchresults = searchresults.union(r)
+            if request.user.get_profile().in_staff_group():
+                for word in query:
+                    r = Player.objects.filter(Q(user__first_name__icontains=word) | Q(user__last_name__icontains=word) |
+                                          Q(nickname__icontains=query)
+                    )
+                    searchresults = searchresults.union(r)
+            else:
+                searchresults = Player.objects.filter(Q(nickname__icontains=query))
 
         # search groups
         group_results = PlayerGroup.objects.filter(Q(name__icontains=query)|Q(title__icontains=query))
@@ -174,17 +187,18 @@ def instantsearch(request):
     form = InstantSearchForm(request.GET)
     if form.is_valid():
         query = form.cleaned_data['q']
-        users = User.objects.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query) | Q(username__icontains=query))
-        user_ids = [u.id for u in users]
-        searchresults = Player.objects.filter(user__in=user_ids)
-
+        if request.user.is_authenticated() and request.user.get_profile().in_staff_group():
+            users = User.objects.filter(Q(first_name__icontains=query) | Q(last_name__icontains=query) | Q(username__icontains=query))
+            user_ids = [u.id for u in users]
+            searchresults = Player.objects.filter(Q(user__in=user_ids) | Q(full_name__icontains=query) | Q(nickname__icontains=query))
+        else:
+            searchresults = Player.objects.filter(Q(nickname__icontains=query))
         return render_to_response('interface/instant_search_results.txt',
                                   {'searchresults': searchresults},
                                   context_instance=RequestContext(request))
 
     else:
         return HttpResponse('')
-
 
 def searchone(request):
     """ Get one user, based on his/her name """
@@ -235,7 +249,7 @@ def ajax_notifications(request):
         context = RequestContext(request)
         count = 0
         # TODO use reduce
-        for h in context.get('heads', []):
+        for h in context.get('header', [])():
             count += h[0].get('count', 0)
     else:
         count = -1

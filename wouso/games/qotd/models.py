@@ -28,7 +28,7 @@ class QotdUser(Player):
         return True
 
     def set_question(self, question):
-        if not self.has_question:
+        if question and not self.has_question:
             self.my_question = question
             self.save()
 
@@ -122,13 +122,13 @@ class QotdGame(Game):
         """ Returns a list of formulas used by qotd """
         fs = []
         qotd_game = kls.get_instance()
-        fs.append(dict(id='qotd-ok',
-            formula='points=4 + (1 if {hour} < 12 else -1)',
+        fs.append(dict(name='qotd-ok',
+            definition='points=4 + (1 if {hour} < 12 else -1)',
             owner=qotd_game.game,
             description='Points earned on a correct answer in the morning')
         )
-        fs.append(dict(id="qotd-ok-bonus",
-            formula='points=2',
+        fs.append(dict(name="qotd-ok-bonus",
+            definition='points=2',
             owner=qotd_game.game,
             description='Points earned in case of bonus')
         )
@@ -143,45 +143,16 @@ class QotdGame(Game):
 
     @classmethod
     def get_api(kls):
-        from piston.handler import BaseHandler
-        class QotdHandler(BaseHandler):
-            methods_allowed = ('GET', 'POST')
-            def read(self, request):
-                question = kls.get_for_today()
-                try:
-                    qotduser = request.user.get_profile().get_extension(QotdUser)
-                except models.Model.DoesNotExist:
-                    raise Http404()
-                if question:
-                    return {'text': question.text, 'answers': dict([(a.id, a.text) for a in question.answers]),
-                            'had_answered': qotduser.has_answered}
-                return {}
-
-            def create(self, request):
-                question = kls.get_for_today()
-                try:
-                    qotduser = request.user.get_profile().get_extension(QotdUser)
-                except models.Model.DoesNotExist:
-                    raise Http404()
-                if not question:
-                    return {'success': False, 'error': 'No question for today'}
-                if qotduser.has_answered:
-                    return {'success': False, 'error': 'User already answered'}
-                attrs = self.flatten_dict(request.data)
-                if 'answer' not in attrs.keys():
-                    return {'success': False, 'error': 'Answer not provided'}
-                try:
-                    answer_id = int(attrs['answer'])
-                    answer = Answer.objects.get(pk=answer_id)
-                except ValueError, Answer.DoesNotExist:
-                    return {'success': False, 'error': 'Invalid answer'}
-                else:
-                    qotduser.set_answered(answer.id, answer.correct)
-                    return {'success': True, 'correct': answer.correct, 'has_answered': qotduser.has_answered}
-
+        from api import QotdHandler
         return {r'^qotd/today/$': QotdHandler}
 
     @classmethod
     def get_modifiers(cls):
         return ['qotd-blind', #player cannot launch QuestionOfTheDay
                 ]
+
+    @classmethod
+    def get_history(cls):
+        today = datetime.now()
+        qs = Schedule.objects.filter(day__lte=today).order_by('-day')[:7]
+        return qs

@@ -4,7 +4,15 @@ from django.core.management.commands.dumpdata import Command as DumpdataCommand
 from optparse import make_option
 from wouso.core.magic.utils import setup_magic
 from wouso.core.scoring import check_setup, setup_scoring
-from wouso.core.user.utils import setup_user_groups
+from wouso.core.user.models import update_display_name, Player
+from wouso.core.user.utils import setup_user_groups, setup_staff_groups
+
+
+def update_all_display_names():
+    qs = Player.objects.all()
+    for u in qs:
+        update_display_name(u)
+    print "Updated ", qs.count(), "players."
 
 
 class Command(BaseCommand):
@@ -41,6 +49,12 @@ class Command(BaseCommand):
             default=False,
             help='Reset scoring and artifacts'
         ),
+        make_option('--update-display',
+            action='store_true',
+            dest='updatedisplay',
+            default=False,
+            help='Update display names according to config'
+        ),
     )
 
     def handle(self, *args, **options):
@@ -64,6 +78,7 @@ class Command(BaseCommand):
             self.stdout.write('\n')
             self.stdout.write('Setting up user groups...')
             setup_user_groups()
+            setup_staff_groups()
             self.stdout.write('\n')
             self.stdout.write('Setting up magic...')
             setup_magic()
@@ -83,6 +98,9 @@ class Command(BaseCommand):
 
         elif options['reset']:
             call_command('sqlreset', *reset_labels)
+
+        elif options['updatedisplay']:
+            update_all_display_names()
 
         else:
             self.print_help('wousoctl', '')

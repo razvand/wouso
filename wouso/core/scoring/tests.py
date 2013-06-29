@@ -14,7 +14,7 @@ class ScoringTestCase(TestCase):
     def setUp(self):
         self.user, new = User.objects.get_or_create(username='33')
         self.game = Game.get_instance()
-        self.coin = Coin.objects.create(id='_test')
+        self.coin = Coin.add('_test')
 
     def tearDown(self):
         #self.user.delete()
@@ -38,27 +38,27 @@ class ScoringTestCase(TestCase):
         self.assertEqual(history.amount, 10)
 
     def testCalculate(self):
-        formula = Formula.objects.create(id='_test_formula',
-            formula='_test=5', owner=self.game)
+        formula = Formula.add('_test_formula',
+            definition='_test=5', owner=self.game)
 
         # Call by name
         ret = scoring.calculate('_test_formula')
         self.assertTrue(isinstance(ret, dict))
 
-        # Call by objcet
+        # Call by object
         ret = scoring.calculate(formula)
         self.assertTrue(isinstance(ret, dict))
         self.assertEqual(ret['_test'], 5)
 
-        formula2 = Formula.objects.create(id='_test_formula2',
-            formula='_test=5*3', owner=self.game)
+        formula2 = Formula.add('_test_formula2',
+            definition='_test=5*3', owner=self.game)
 
         ret = scoring.calculate(formula2)
         self.assertTrue(isinstance(ret, dict))
         self.assertEqual(ret['_test'], 15)
 
         # Multiple coins
-        formula2.formula='_test=5*3; points=4'
+        formula2.definition='_test=5*3; points=4'
 
         ret = scoring.calculate(formula2)
         self.assertTrue(isinstance(ret, dict))
@@ -66,7 +66,7 @@ class ScoringTestCase(TestCase):
         self.assertEqual(ret['points'], 4)
 
         # Fail safe
-        formula2.formula='_test=5*cucu'
+        formula2.definition='_test=5*cucu'
         try:
             ret = scoring.calculate(formula2)
             # no error? wtf
@@ -75,8 +75,8 @@ class ScoringTestCase(TestCase):
             self.assertTrue(isinstance(e, FormulaParsingError))
 
     def testScore(self):
-        formula = Formula.objects.create(id='_test_formula_sc',
-            formula='_test=13', owner=self.game)
+        formula = Formula.add('_test_formula_sc',
+            definition='_test=13', owner=self.game)
 
         scoring.score(self.user.get_profile(), self.game, formula,
             external_id=3)
@@ -95,7 +95,7 @@ class UpdateScoringTest(WousoTest):
     def testUpdatePoints(self):
         Coin.add('points')
         Coin.add('gold')
-        Formula.objects.create(id='level-gold', formula='gold=10*{level}', owner=None)
+        Formula.add('level-gold', definition='gold=10*{level}', owner=None)
         player = self._get_player()
         player.points = 82
         player.level_no = 1
@@ -117,6 +117,7 @@ class ScoringHistoryTest(WousoTest):
         Coin.add('points')
         Coin.add('gold')
         player = self._get_player()
+        scoring.score_simple(player, 'points', 10)
         self.assertIn('points', History.user_coins(player.user))
 
     def test_user_points(self):
@@ -125,10 +126,10 @@ class ScoringHistoryTest(WousoTest):
 
         scoring.score_simple(player, 'points', 10)
 
-        up = History.user_points(player.user)
+        up = History.user_points(user=player.user)
         self.assertTrue(up.has_key('wouso'))
-        self.assertTrue(up['wouso'].has_key(coin))
-        self.assertEqual(up['wouso'][coin], 10)
+        self.assertTrue(up['wouso'].has_key(coin.name))
+        self.assertEqual(up['wouso'][coin.name], 10)
 
     def test_accessors(self):
         player = self._get_player()
@@ -152,20 +153,17 @@ class ScoringHistoryTest(WousoTest):
 
 class ScoringSetupTest(TestCase):
     def test_check_setup(self):
-        self.assertFalse(check_setup())
         setup_scoring()
         self.assertTrue(check_setup())
 
     def test_setup(self):
-        for c in CORE_POINTS:
-            self.assertFalse(Coin.get(c))
         setup_scoring()
         for c in CORE_POINTS:
             self.assertTrue(Coin.get(c))
 
 class ScoringFirstLogin(WousoTest):
     def test_first_login_points(self):
-        f = Formula.add('start-points', formula='points=10')
+        f = Formula.add('start-points', definition='points=10')
         Coin.add('points')
         player = self._get_player()
 
@@ -182,14 +180,14 @@ class ScoringFirstLogin(WousoTest):
 
 class ScoringTestFunctions(TestCase):
     def test_fibbonaci_formula(self):
-        formula = Formula.objects.create(id='test-fib', formula='points=fib(0)')
+        formula = Formula.add('test-fib', definition='points=fib(0)')
         value = calculate(formula)['points']
         self.assertEqual(value, 0)
-        formula.formula = 'points=fib(1)'; formula.save(); value = calculate(formula)['points']
+        formula.definition = 'points=fib(1)'; formula.save(); value = calculate(formula)['points']
         self.assertEqual(value, 1)
-        formula.formula = 'points=fib(2)'; formula.save(); value = calculate(formula)['points']
+        formula.definition = 'points=fib(2)'; formula.save(); value = calculate(formula)['points']
         self.assertEqual(value, 1)
-        formula.formula = 'points=fib(3)'; formula.save(); value = calculate(formula)['points']
+        formula.definition = 'points=fib(3)'; formula.save(); value = calculate(formula)['points']
         self.assertEqual(value, 2)
-        formula.formula = 'points=fib(4)'; formula.save(); value = calculate(formula)['points']
+        formula.definition = 'points=fib(4)'; formula.save(); value = calculate(formula)['points']
         self.assertEqual(value, 3)

@@ -3,11 +3,63 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to Wouso API's documentation!
-=====================================
+Wouso API's documentation
+=========================
 
-Base api:
---------
+The wouso API is a REST web service using OAuth v1.0 authentication, allowing your application to interact with a
+wouso instance. A testing server is available at: http://wouso-next.rosedu.org/api/ .
+
+A demo python library interfacing with the api is available here: http://github.com/rosedu/wouso-extras .
+
+Basic information:
+------------------
+
+.. http:get:: /api/info/online/
+
+    Fetch information about players seen online in the last 10 minutes.
+
+    **Example response**:
+     .. sourcecode:: http
+
+        HTTP/1.1 200 OK
+        Vary: Accept
+        Content-Type: text/javascript
+
+        [
+            {
+                "first_name": "Alex",
+                "last_name": "Eftimie2",
+                "nickname": "admin",
+                "id": 1,
+                "last_seen": "2013-02-17T18:45:56.643"
+            }
+        ]
+
+    Variation: `/api/info/online/list/`, with response: `[ "admin", ...]`
+
+.. http:get:: /api/info/nickname/
+
+    Return the current player's nickname.
+
+.. http:post:: /api/info/nickname/
+
+    Attempt to change the nickname of the authenticated player. The nickname is sent as the payload to the POST request. Possible errors: "no nickname", "nickname already in use".
+
+    **Example request**
+     .. sourcecode:: http
+
+        POST /api/info/nickname/ HTTP/1.1
+        Host: wouso-next.rosedu.org
+        ...
+
+        nickname=myl33tnickname
+
+    **Example response**:
+     .. sourcecode:: http
+
+        { "success": True }
+        { "success": False, "error": "Nickname in use" }
+
 
 Notifications
 ~~~~~~~~~~~~~
@@ -46,17 +98,18 @@ Notifications
     :statuscode 200: no error
     :statuscode 401: not authorized
 
+
 Player information
 ~~~~~~~~~~~~~~~~~~
 
-.. http:get:: /api/info/
+.. http:get:: /api/player/(player_id)/info/
 
     Returns information about current (authenticated) user.
 
     **Example request**:
      .. sourcecode:: http
 
-        GET /api/info/ HTTP/1.1
+        GET /api/player/1/info/ HTTP/1.1
         Host: wouso-next.rosedu.org
         Accept: application/json, text/javascript
         Authorization: OAuth oauth_version="1.0",oauth_nonce="a1df9b758e16eaebe8a2208d1e210bfb",oauth_timestamp="1312861474",oauth_consumer_key="xxxxxx",oauth_token="xxxxx",oauth_signature_method="PLAINTEXT",oauth_signature="xxxxxx"
@@ -69,6 +122,7 @@ Player information
         Content-Type: text/javascript
 
         {
+            username: "alex.eftimie",
             first_name: "Alex",
             last_name: "Eftimie",
             avatar:  "http://www.gravatar.com/avatar/d43fad239b039cebdb4206cdc692f314.jpg",
@@ -86,7 +140,9 @@ Player information
                 points_gained: 55,
                 points_left: 45,
             }
-            race: "CA",
+            race: "Oxynia",
+            race_id: "1",
+            race_slug: "ca",
             group: "CA311",
             email: "alex@rosedu.org",
             points: 0,
@@ -96,6 +152,10 @@ Player information
     :statuscode 200: no error
     :statuscode 401: not authorized
     :statuscode 404: current user doesn't have a profile
+
+.. http:get:: /api/player/info/
+
+    Returns information about current (authenticated) user. Same response as `/api/player/(player_id)/info/`.
 
 .. http:get:: /api/search/<query string>/
 
@@ -152,15 +212,14 @@ Magic and Bazaar
         {
              [
                  {
+                     id: 30,
                      name: "challenge-cannot-be-challenged",
                      title: "Nu poate fi provocat",
                      type: "n",
                      due_days: 3,
-                     image: "<custom image>",
+                     image_url: "/static/upload/challenge.png",
                      price: 10,
                      percents: 100,
-                     group_id: 1,
-                     id: 30,
                      description: "Nu permite provocarea jucătorului pe care este aplicată."
                  },
              ]
@@ -171,7 +230,7 @@ Magic and Bazaar
 
 .. http:get:: /api/bazaar/inventory/
 
-    Returns a list of spells in current authenticated user's inventory.
+    Returns a list of spells in current authenticated user's inventory, also active and cast lists.
 
     **Example request**:
      .. sourcecode:: http
@@ -189,13 +248,35 @@ Magic and Bazaar
         Content-Type: text/javascript
 
         {
-            spells:
-            [
+            spells_cast: [
                 {
+                    due: "2013-04-04T15:50:03.643",
+                    spell_id: 1,
+                    spell_title: "Disguise -25%",
+                    spell_name: "top-disguise",
+                    image_url: "/static/image.png",
                     player_id: 1,
-                    spell_id: 30
-                    amount: 1,
-                    id: 1,
+                    player: "admin"
+                }
+            ],
+            spells_available: [
+                {
+                    spell_id: 2,
+                    spell_name: "top-disguise",
+                    spell_title: "Disguise -15%",
+                    image_url: "/static/image.png",
+                    amount: 1
+                }
+            ],
+            spells_onme: [
+                {
+                    due: "2013-04-04T15:50:03.643",
+                    spell_id: 1,
+                    spell_title: "Disguise -25%",
+                    spell_name: "top-disguise",
+                    image_url: "/static/image.png",
+                    source_id: 1,
+                    source: "admin"
                 }
             ]
         }
@@ -253,25 +334,63 @@ Magic and Bazaar
 
 .. http:post:: /api/player/<player_id>/cast/
 
-    Cast a spell given as POST parameter to player_id.
+    Cast a *spell* given as POST parameter to player_id. Accepts an optional *days* parameter.
 
-Top API
--------
+    **Example request**:
+     .. sourcecode:: http
+
+        POST /api/player/2/cast/ HTTP/1.1
+        Host: wouso-next.rosedu.org
+        Accept: application/json, text/javascript
+        Content-Type: application/x-www-form-urlencoded
+        Content-Length: 7
+
+        spell=1&days=2
+
+    **Example response**:
+     .. sourcecode:: javascript
+
+        {
+            success: true
+        }
+
+
+Top
+----
 .. http:get:: /api/top/race/
 
-    Returns top races in the game.
+    Returns top races in the game, ordered by points.
+
+    **Example response**:
+     .. sourcecode:: javascript
+
+         [
+             {
+                 title: "Others",
+                 points: 2008,
+                 id: 1,
+                 name: "Others"
+             },
+             {
+                 title: "Zota",
+                 points: 315,
+                 id: 4,
+                 name: "CB"
+             }
+             ...
+         ]
 
 .. http:get:: /api/top/race/(race_id)/group/
 
-    Returns top groups in selected race.
+    Returns top groups in selected race, ordered by points.
 
 .. http:get:: /api/top/race/(race_id)/player/
 
-    Returns top groups in selected race.
+    Returns top players in selected race.
 
 .. http:get:: /api/top/group/
 
-    Returns top groups in the game.
+    Returns top groups in the game, ordered by points.
 
 .. http:get:: /api/top/group/(group_id)/player/
 
@@ -281,11 +400,32 @@ Top API
 
     Returns top players in the game.
 
-Group API
----------
+
+Races and Groups
+----------------
+.. http:get:: /api/race/
+
+    List all races defined in wouso.
+
+.. http:get:: /api/race/(race_id)/members/
+
+    All players in selected race.
+
+.. http:get:: /api/race/(race_id)/groups/
+
+    All groups in selected race.
+
+.. http:get:: /api/group/
+
+    List all groups defined in wouso.
+
 .. http:get:: /api/group/(group_id)/
 
     Returns information about the group: name, member count, rank.
+
+.. http:get:: /api/group/(group_id)/members/
+
+    All players in selected group.
 
 .. http:get:: /api/group/(group_id)/activity/
 
@@ -295,8 +435,9 @@ Group API
 
     Returns group points evolution.
 
-Messages API
-------------
+
+Messages
+--------
 .. http:get:: /api/messages/(type)
 
     Returns all messages by type:
@@ -312,7 +453,16 @@ Messages API
      * subject
      * reply_to (id of the message to reply_to)
 
-Game API
+.. http:post:: /api/messages/(action)/(msg_id)/
+
+    Apply an action on a message, if it is received by user. Available actions are:
+     * setread
+     * setunread
+     * archive
+     * unarchive
+
+
+Games
 --------
 
 Question of the Day
@@ -487,6 +637,60 @@ Challenge
             16: [ 9 ],
             17: [ ]
         }
+
+
+Quest
+~~~~~
+
+The calls in the `/admin/` namespace must be made by users having `quest.change_quest` permission set.
+
+.. http:get:: /api/quest/admin/
+
+    Return a list of quests.
+
+    **Example response**:
+     .. sourcecode:: json
+
+         [
+            {
+                 id: 1,
+                 title: "Gioconda",
+                 start: "2012-11-08T14:11:42",
+                 end: "2013-11-08T16:00:00"
+            }
+         ]
+
+.. http:get:: /api/quest/admin/quest=(quest_id)/username=(username)/
+
+    Fetch user information regarding specific quest.
+
+    **Example response**:
+     .. sourcecode:: json
+
+        {
+            status: "Available",
+            current_level: 4,
+            user: {
+                    id: 1
+            }
+        }
+
+.. http:post:: /api/quest/admin/quest=(quest_id)/username=(username)/
+
+    Increment current level for specific user and quest.
+
+    **Example response**
+     .. sourcecode:: json
+
+        {
+            current_level: 5,
+            user: {
+                id: 3,
+                username: "toma"
+            }
+        }
+
+
 
 Indices and tables
 ==================

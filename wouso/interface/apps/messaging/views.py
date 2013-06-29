@@ -35,7 +35,7 @@ def home(request, quiet=None, box=None, page=u'0'):
 
     return render_to_response(template,
                               {'user': request.user,
-                               'messages': messages,
+                               'messages_list': messages,
                                'box': box,
                                },
                               context_instance=RequestContext(request))
@@ -87,6 +87,16 @@ def message(request, mid):
                                   {'m': message, 'mess_user': me},
                                   context_instance=RequestContext(request))
     raise Http404
+
+@login_required
+def delete(request, id):
+    message = get_object_or_404(Message, pk=id)
+    message.delete()
+    go_back = request.META.get('HTTP_REFERER', None)
+    if not go_back:
+        go_back = reverse('wouso.interface.messaging.views.home')
+    return HttpResponseRedirect(go_back)
+
 
 def header_link(request):
     # TODO refactor this lame thing

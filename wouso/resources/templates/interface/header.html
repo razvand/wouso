@@ -16,6 +16,9 @@
 <div id="topbar">
     <div class="first-line">
     {% if user.is_authenticated %}
+        {% if user.real_user %}
+            Impersonated by {{ user.real_user }} <a href="{% url impersonate_clear %}">clear</a>
+        {% endif %}
         {% if perms.config.change_setting %}
         <a id="head-cpanel" href="{% url dashboard %}">CPanel</a>
         {% endif %}
@@ -48,5 +51,9 @@
 {% endif %}
 
 <div id="menu">
-    {% autoescape off %}{{ header }}{% endautoescape %}
+    {% for f in header %}
+    <span id="head-{{ f.1 }}"><a href="{{ f.0.link }}">{{ f.0.text }}</a>
+        {% if f.0.count %}<sup class="unread-count">{{ f.0.count }}</sup>{% endif %}
+    </span>
+    {% endfor %}
 </div>

@@ -1,0 +1,94 @@
+{% extends 'interface/section_base.html'%}
+{% load i18n %}
+{% load user %}
+{% block title %}{% trans 'GrandChallenges' %}{% endblock %}
+{% block sectiontitle %}{% trans 'Grand Challenge' %}{% endblock %}
+
+{% block sectioncontent %}
+<h3>Rounds</h3>
+    <table>
+        {% for round in gc.get_current_round.rounds %}
+        <tr>
+            <th>
+                {{ round.round_number }}
+            </th>
+            <td width="100%" align="center">
+                {% for c in round.challenges %}
+                    {% if c.is_played %}
+                        {% if c.user_from.user == c.winner %}
+                        <strong>{{ c.user_from.user }}</strong>
+                        {% else %}
+                                {{ c.user_from.user }}
+                        {% endif %}
+                        vs
+                        {% if c.user_to.user == c.winner %}
+                        <strong>{{ c.user_to.user }}</strong>
+                        {% else %}
+                                {{ c.user_to.user }}
+                        {% endif %}
+                    {% else %}
+                        {{ c.user_from.user }} vs {{ c.user_to.user }}
+                    {% endif %}
+                    ,
+                {% endfor %}
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+<h3>Status</h3>
+<p>
+    {% if gc.is_started %}
+        Grand Challenge is running.
+        {% if gcuser.last_round == gc.get_current_round.round_number %}
+            You are part of the game!
+        {% else %}
+            You left the game at round {{ gcuser.last_round }} with {{ gcuser.lost }} lost challenges.
+        {% endif %}
+    {% else %}
+        Grand Challenge is not started (either not started or finished)
+    {% endif %}.
+</p>
+{% if gc.is_finished %}
+<p>
+    Grand Challenge is over, winner is: {% player_simple gc.get_winner %}
+</p>
+{% endif %}
+
+
+<h3>{% trans 'Active' %}</h3>
+<ul class="answers">
+{% if not active %}
+    {% trans 'No challenges in this category.' %}
+{% else %}
+    {% for c in active %}
+        {{ c.date }}
+        <a href="{% url interface.profile.views.user_profile c.user_from.user.id %}">{{ c.user_from }}</a> vs.
+        <a href="{% url interface.profile.views.user_profile c.user_to.user.id %}">{{ c.user_to }}</a> - Status:
+        {% if c.won == gcuser %} Won
+        {% else %} {% if c.lost == gcuser %} Lost
+        {% else %} {% if c.active == True %} <span class="points"><a>{% trans 'Play round' %}</a></span>
+        {% endif %}{% endif %}{% endif %}
+    {% endfor %}
+{% endif %}
+
+{% if played %}
+<h3>{% trans 'Played' %}</h3>
+<ul class="answers">
+    {% for c in played %}
+    <li>
+    {{ c.date }}
+    <a href="{% url interface.profile.views.user_profile c.user_from.user.id %}">{{ c.user_from }}</a> vs.
+    <a href="{% url interface.profile.views.user_profile c.user_to.user.id %}">{{ c.user_to }}</a>
+     - Result:  {% if c.won == gcuser %} Won
+                {% else %} {% if c.lost == gcuser %} Won by {{ c.won }}
+                {% else %} Pending
+                {% endif %}{% endif %}
+    </li>
+    {% empty %}
+    <li class="empty">{% trans 'No challenges in this category.' %}</li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% endblock %}

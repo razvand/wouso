@@ -11,21 +11,22 @@
 
 <table>
     <tr>
-        <th>Student</th>
+        <th colspan="2">Student</th>
         {% for w in semigroup.workshop_set.all %}
         <th>#{{ w.id }}</th>
         {% endfor %}
     </tr>
     {% for p in players %}
     <tr>
-        <td>{{ p }}</td>
+        <td>{{ p.user.first_name }} {{ p.user.last_name }}</td>
+        <td>[{{ p.user.username }}]</td>
         {% for w in semigroup.workshop_set.all %}
             <td>{% get_final_grade w p %}</td>
         {% endfor %}
     </tr>
     {% endfor %}
     <tr>
-        <td></td>
+        <td colspan="2"></td>
         {% for w in semigroup.workshop_set.all %}
         <td>
             <a href="{% url ws_reviewers_map w.id %}">view</a>

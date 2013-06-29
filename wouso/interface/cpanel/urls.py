@@ -44,30 +44,40 @@ upat = [
     url(r'^spells/del/(?P<id>\d+)/$', 'wouso.interface.cpanel.views.spell_delete', name='spell_dell'),
 
     url(r'^formulas/$','wouso.interface.cpanel.views.formulas',name='formulas'),
-    url(r'^edit_formula/(?P<id>(-|[a-z]|[A-Z])+)/$','wouso.interface.cpanel.views.edit_formula',name='edit_formula'),
-    url(r'^formulas/del/(?P<id>(-|[a-z]|[A-Z])+)/$','wouso.interface.cpanel.views.formula_delete',name='formula_del'),
+    url(r'^edit_formula/(?P<id>\d+)/$','wouso.interface.cpanel.views.edit_formula',name='edit_formula'),
+    url(r'^formulas/del/(?P<id>\d+)/$','wouso.interface.cpanel.views.formula_delete',name='formula_del'),
     url(r'^add_formula/$','wouso.interface.cpanel.views.add_formula',name='add_formula'),
 
     url(r'^group/set/(?P<id>\d*)/$', 'wouso.interface.cpanel.views.groupset', name='group_set'),
     url(r'^staff/toggle/(?P<id>\d+)/$', 'wouso.interface.cpanel.views.stafftoggle', name='staff_toggle'),
 
     url(r'^players/$', 'wouso.interface.cpanel.views.players', name='all_players'),
-
+    url(r'^player/(?P<player_id>\d+)/bonus/$', 'wouso.interface.cpanel.views.bonus', name='bonus'),
     url(r'^add_player/$', 'wouso.interface.cpanel.views.add_player', name='add_player'),
-	url(r'^edit_player/(?P<user_id>\d+)/$', 'wouso.interface.cpanel.views.edit_player', name='edit_player'),
+    url(r'^edit_player/(?P<user_id>\d+)/$', 'wouso.interface.cpanel.views.edit_player', name='edit_player'),
+    url(r'^infractions/(?P<user_id>\d+)/$', 'wouso.interface.cpanel.views.infraction_history', name='infraction_history'),
+    url(r'^infractions_clear/(?P<user_id>\d+)/(?P<infraction_id>\d+)/$', 'wouso.interface.cpanel.views.infraction_clear', name='infraction_clear'),
+    url(r'^infractions_recheck/$', 'wouso.interface.cpanel.views.infraction_recheck', name='infraction_recheck'),
+    url(r'^edit_player/(?P<user_id>\d+)/$', 'wouso.interface.cpanel.views.edit_player', name='edit_player'),
     url(r'^races_groups/$', 'wouso.interface.cpanel.views.races_groups', name='races_groups'),
+    url(r'^roles/$', 'wouso.interface.cpanel.views.roles', name='roles'),
+    url(r'^roles/(?P<id>\d+)/$', 'wouso.interface.cpanel.views.roles_update', name='roles_update'),
+    url(r'^roles/(?P<id>\d+)/kick/player=(?P<player_id>\d+)/$', 'wouso.interface.cpanel.views.roles_update_kick', name='roles_update_kick'),
 
     # misc
     url(r'^bell/$', 'wouso.interface.cpanel.views.the_bell', name='the_bell'),
+    url(r'^tools/clear-cache/$', 'wouso.interface.cpanel.views.clear_cache', name='clear_cache'),
+
     url(r'^reports/$', 'wouso.interface.cpanel.views.reports', name='reports'),
     url(r'^reports/edit/(?P<id>\d+)/$', 'wouso.interface.cpanel.views.edit_report', name='edit_report'),
 
     url(r'^system_message/group/(?P<group>\d+)/$', 'wouso.interface.cpanel.views.system_message_group', name='system_message_group'),
+
+    url(r'^impersonate/(?P<player_id>\d+)/$', 'wouso.interface.cpanel.views.impersonate', name='impersonate'),
+    url(r'^impersonate/clear/$', 'wouso.interface.cpanel.views.clean_impersonation', name='impersonate_clear'),
 ]
 
 for g in get_cpanel_games():
     upat.append((r'games/{game}/'.format(game=g), include('wouso.games.{game}.cpanel_urls'.format(game=g))))
-
 upat.append(url(r'^games/', 'wouso.interface.cpanel.views.games', name='games_home'))
-
 urlpatterns = patterns('', *upat)

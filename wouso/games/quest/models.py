@@ -1,17 +1,22 @@
+# Quest will use QPool questions tagged 'quest'
 import os
 import logging
 import datetime
 import subprocess
 from django.db import models
 from django.utils.translation import ugettext_noop
+from django.conf import settings
 from wouso.core.user.models import Player
 from wouso.core.game.models import Game
 from wouso.core import scoring, signals
 from wouso.core.scoring.models import Formula
 from wouso.core.qpool.models import Question
-from wouso import settings
 
-# Quest will use QPool questions tagged 'quest'
+
+(TYPE_CLASSIC,
+ TYPE_CHECKER,
+ TYPE_EXTERNAL) = range(3)
+
 
 class QuestUser(Player):
     current_quest = models.ForeignKey('Quest', null=True, blank=True, default=None)
@@ -29,9 +34,9 @@ class QuestUser(Player):
         Check if we started the current quest.
         """
         quest = QuestGame.get_current()
-        if (not quest) or (not self.current_quest):
+        if (not quest) or (not self.current_quest_id):
             return False
-        return self.current_quest.id == quest.id
+        return self.current_quest_id == quest.id
 
     @property
     def current_question(self):
@@ -55,13 +60,27 @@ class QuestUser(Player):
         else:
             return self.finished_time - self.started_time
 
+    def pass_level(self, quest):
+        """
+        Pass current level. Increment current level and score.
+        """
+        if self.current_quest != quest:
+            return None
+        scoring.score(self, QuestGame, quest.get_formula('quest-ok'), level=(self.current_level + 1), external_id=quest.id)
+        self.current_level += 1
+        if self.current_level == quest.count:
+            self.finish_quest()
+            scoring.score(self, QuestGame, quest.get_formula('quest-finish-ok'), external_id=quest.id)
+        self.save()
+        return self.current_level
+
     def finish_quest(self):
         if not self.finished:
-            qr = QuestResult(user=self, quest=self.current_quest, level=self.current_level)
-            qr.save()
-
             if self.current_level < self.current_quest.count:
                 return
+
+            qr = QuestResult(user=self, quest=self.current_quest, level=self.current_level)
+            qr.save()
 
             # sending the signal
             signal_msg = ugettext_noop("has finished quest {quest}")
@@ -74,6 +93,10 @@ class QuestUser(Player):
             self.finished = True
             self.finished_time = datetime.datetime.now()
             self.save()
+
+    def register_quest_result(self):
+        if not self.finished:
+            qr, created = QuestResult.objects.get_or_create(user=self, quest=self.current_quest, level=self.current_level)
 
     def set_current(self, quest):
         self.started_time = datetime.datetime.now()
@@ -90,17 +113,26 @@ class QuestUser(Player):
                                  arguments=dict(quest=quest.title),
                                  game=QuestGame.get_instance())
 
+
 class QuestResult(models.Model):
     user = models.ForeignKey('QuestUser')
     quest = models.ForeignKey('Quest')
     level = models.IntegerField(default=0)
 
+
 class Quest(models.Model):
+    QUEST_TYPES = (
+        (TYPE_CLASSIC, 'In site text answers'),
+        (TYPE_CHECKER, 'In site answers, verified by checker'),
+        (TYPE_EXTERNAL, 'External levels and answers'),
+    )
     start = models.DateTimeField()
     end = models.DateTimeField()
     title = models.CharField(default="", max_length=100)
     questions = models.ManyToManyField(Question)
     order = models.CharField(max_length=1000, default="", blank=True)
+    type = models.IntegerField(default=TYPE_CLASSIC, choices=QUEST_TYPES)
+    registered = models.BooleanField(default=False)
 
     def get_formula(self, type='quest-ok'):
         """ Allow specific formulas for specific quests.
@@ -109,15 +141,20 @@ class Quest(models.Model):
         """
         if type not in ('quest-ok', 'quest-finish-ok', 'finalquest-ok', 'quest-finish-bonus'):
             return None
+
+        # TODO: use Formula.get here
         try:
-            formula = Formula.objects.get(id='%s-%d' % (type, self.id))
+            formula = Formula.objects.get(name='%s-%d' % (type, self.id))
         except Formula.DoesNotExist:
-            formula = Formula.objects.get(id=type)
+            formula = Formula.objects.get(name=type)
         return formula
 
     def is_final(self):
         final = FinalQuest.objects.filter(id=self.id).count()
         return final > 0
+
+    def is_answerable(self):
+        return self.type == TYPE_CLASSIC
 
     @property
     def count(self):
@@ -166,7 +203,7 @@ class Quest(models.Model):
 
     def check_answer(self, user, answer):
         if user.current_quest != self:
-            user.finish_quest()
+            user.register_quest_result()
             user.set_current(self)
             return False
         try:
@@ -175,17 +212,32 @@ class Quest(models.Model):
             logging.error("No such question")
             return False
 
-        if not user.current_level == self.count and \
-                answer.lower() == question.answers.all()[0].text.lower():
-            # score current progress
-            scoring.score(user, QuestGame, self.get_formula('quest-ok'), level=(user.current_level + 1))
-            user.current_level += 1
-            if user.current_level == self.count:
-                user.finish_quest()
-                # score finishing
-                scoring.score(user, QuestGame, self.get_formula('quest-finish-ok'))
-            user.save()
-            return True
+        if not user.current_level == self.count:
+            if self.answer_correct(user.current_level, question, answer, user):
+                user.pass_level(self)
+                return True
+        return False
+
+    def answer_correct(self, level, question, answer, user):
+        """
+        Check if an answer is correct for a question and level.
+        """
+        if self.type == TYPE_EXTERNAL:
+            return False
+        elif self.type == TYPE_CHECKER:
+            path = os.path.join(settings.FINAL_QUEST_CHECKER_PATH, 'task-%02d' % (level + 0), 'check')
+            if not os.path.exists(path):
+                self.error = 'No checker for level %d' % level
+                return False
+            p = subprocess.Popen([path, user.user.username, answer], stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=os.path.dirname(path))
+            retval = p.wait()
+            if retval > 1:
+                self.error = 'Error running checker for %d' % level
+                return False
+            return retval == 0
+        elif self.type == TYPE_CLASSIC:
+            answers = [a.text.lower() for a in question.answers.all()]
+            return answer.strip().lower() in answers
         return False
 
     def reorder(self, order):
@@ -196,13 +248,24 @@ class Quest(models.Model):
         self.save()
 
     def players_count(self):
+        """
+        Number of players who attempted the quest
+        """
         return self.questresult_set.values('user').distinct().count()
+    
+    def players_completed(self):
+        """
+        Number of players who finished the quest
+        """
+        return self.questresult_set.filter(level=self.count).count()
 
     def top_results(self):
         """
          Return the first 10 players who finished this quest
         """
-        return self.questresult_set.exclude(user__race__can_play=False).order_by('id')[:10]
+        top_results = self.questresult_set.exclude(user__race__can_play=False).order_by('id')
+        top_results = [entry for entry in top_results if entry.level == self.count][:10]
+        return top_results
 
     def __unicode__(self):
         return "%s - %s %s" % (self.start, self.end, self.title)
@@ -223,33 +286,38 @@ class QuestGame(Game):
     @classmethod
     def get_current(cls):
         try:
-            return FinalQuest.objects.get(start__lte=datetime.datetime.now(),
+            quest =  FinalQuest.objects.get(start__lte=datetime.datetime.now(),
                 end__gte=datetime.datetime.now())
         except:
             try:
-                return Quest.objects.get(start__lte=datetime.datetime.now(),
+                quest = Quest.objects.get(start__lte=datetime.datetime.now(),
                                 end__gte=datetime.datetime.now())
             except:
-                return None
+                quest = None
+        return quest
+
+    @classmethod
+    def get_staff_and_permissions(cls):
+        return [{'name': 'Quest Staff', 'permissions': ['change_quest']}]
 
     @classmethod
     def get_formulas(kls):
         """ Returns a list of formulas used by qotd """
         fs = []
         quest_game = kls.get_instance()
-        fs.append(dict(id='quest-ok', formula='points={level}',
+        fs.append(dict(name='quest-ok', definition='points={level}',
             owner=quest_game.game,
             description='Points earned when finishing a level. Arguments: level.')
         )
-        fs.append(dict(id='quest-finish-ok', formula='points=10',
+        fs.append(dict(name='quest-finish-ok', definition='points=10',
             owner=quest_game.game,
             description='Bonus points earned when finishing the entire quest. No arguments.')
         )
-        fs.append(dict(id='quest-finish-bonus', formula='points=fib(12 - {position})',
+        fs.append(dict(name='quest-finish-bonus', definition='points=fib(12 - {position})',
             owner=quest_game.game,
             description='Bonus points earned when finishing a quest. Given to first 10, argument: position.')
         )
-        fs.append(dict(id='finalquest-ok', formula='points={level}+{level_users}',
+        fs.append(dict(name='finalquest-ok', definition='points={level}+{level_users}',
             owner=quest_game.game,
             description='Bonus points earned when finishing the final quest. Arguments: level, level_users')
         )
@@ -262,49 +330,34 @@ class QuestGame(Game):
             return sidebar_widget(request)
         return None
 
-class FinalQuest(Quest):
-    def check_answer(self, user, answer):
-        self.error = ''
-        if user.current_quest.id != self.id:
-            user.finish_quest()
-            user.set_current(self)
-            return False
+    @classmethod
+    def get_api(kls):
+        from api import QuestAdminHandler, QuestAdminUserHandler
+        return {r'^quest/admin/$': QuestAdminHandler,
+                r'^quest/admin/quest=(?P<quest_id>\d+)/username=(?P<username>[^/]+)/$': QuestAdminUserHandler
+        }
 
+    @classmethod
+    def final_exists(cls):
+        return FinalQuest.objects.all().count() != 0
+
+    @classmethod
+    def get_final(cls):
         try:
-            question = self.levels[user.current_level]
+            return FinalQuest.objects.all()[0]
         except IndexError:
-            logging.error("No such question")
+            return None
 
-        # Get the checker path
-        path = os.path.join(settings.FINAL_QUEST_CHECKER_PATH, 'task-%02d' % (user.current_level + 1), 'check')
-        if not os.path.exists(path):
-            self.error = 'No checker for level %d' % user.current_level
-            return False
-
-        # Run checker path
-
-        args = [path, user.user.username, answer]
-        work_dir = os.path.join(settings.FINAL_QUEST_CHECKER_PATH, 'task-%02d' % (user.current_level + 1))
-        p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, cwd=work_dir)
-        retval = p.wait()
-
-        if retval > 1:
-            self.error = 'Error running checker for %d' % user.current_level
-
-        if not user.current_level == self.count and \
-            (retval == 0):
-            scoring.score(user, QuestGame, self.get_formula('quest-ok'), level=(user.current_level + 1))
-            user.current_level += 1
-            user.save()
-            if user.current_level == self.count:
-                user.finish_quest()
-                scoring.score(user, QuestGame, self.get_formula('quest-finish-ok'))
-            return True
-        return False
-
+class FinalQuest(Quest):
     def give_level_bonus(self):
-        for level in xrange(len(self.levels)):
-            users = QuestUser.objects.filter(current_level=level)
+        final = QuestGame.get_final()
+        if not final:
+            return
+
+        for level in xrange(len(self.levels) + 1):
+            if level == 0:
+                continue
+            users = QuestUser.objects.filter(current_quest=final, current_level__gte=level, race__can_play=True)
 
             for user in users:
                 scoring.score(
@@ -313,4 +366,10 @@ class FinalQuest(Quest):
                         self.get_formula('finalquest-ok'),
                         level=level,
                         level_users=users.count()
+                )
+                signal_msg = ugettext_noop("received bonus for reaching level {level} in the final quest")
+                signals.addActivity.send(sender=None, user_from=user,
+                    user_to=user, message=signal_msg,
+                    arguments=dict(level=level),
+                    game=QuestGame.get_instance()
                 )

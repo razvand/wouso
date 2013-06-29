@@ -32,7 +32,7 @@ class ManagerTestCase(WousoTest):
         self.assertEqual(self.player.magic.modifier_percents('inexistent-modifier'), 100) # should return 0
 
     def test_manager_use_modifier(self):
-        Artifact.objects.create(name='modifier-name', group=Artifact.DEFAULT())
+        Artifact.objects.create(name='modifier-name')
         self.player.magic.give_modifier('modifier-name', 1)
         self.assertTrue(self.player.magic.has_modifier('modifier-name'))
 
@@ -41,30 +41,30 @@ class ManagerTestCase(WousoTest):
 
     def test_cast_spell(self):
         spell1 = Spell.objects.create(name='le-spell')
-        spell2 = Spell.objects.create(name='le-spell2', mass=True, type='n')
+        spell2 = Spell.objects.create(name='le-spell2', mass=True, type='o')
         v = []
         for i in range(0,7):
             player = self._get_player(i+2)
             player.points = 10-i
             player.save()
             v.append(player)
-        
+
         v[3].magic.add_spell(spell2)
         neigh = v[3].get_neighbours_from_top(2)
         neigh = v[3].magic.filter_players_by_spell(neigh, spell2)
         v[3].magic.mass_cast(spell2, neigh, datetime.now()+timedelta(days=1))
-        
+
         for i in [1, 2, 4, 5]:
             self.assertTrue(v[i].magic.is_spelled)
-        self.assertFalse(v[3].magic.is_spelled)
+        self.assertTrue(v[3].magic.is_spelled)
 
         v[6].magic.cast_spell(spell1, v[0], datetime.now()+timedelta(days=1))
         self.assertFalse(v[6].magic.is_spelled)
-        
+
         v[0].magic.add_spell(spell1)
         v[6].magic.cast_spell(spell1, v[0], datetime.now()+timedelta(days=1))
         self.assertTrue(v[6].magic.is_spelled)
-        
+
 
 class ModifierTest(TestCase):
     def test_path_simple(self):
@@ -97,8 +97,8 @@ class ArtifactTestCase(TestCase):
 class SpellTestCase(WousoTest):
 
     def test_buy_spell(self):
-        Coin.objects.create(id='gold')
-        Formula.objects.create(id='buy-spell', formula="gold=-{price}")
+        Coin.add('gold')
+        Formula.add('buy-spell', definition="gold=-{price}")
         spell = Spell.objects.create(name='test-spell', available=True, price=10)
         player = User.objects.create_user('test', 'test@a.ro', password='test').get_profile()
 

@@ -1,6 +1,9 @@
 import datetime
+from django.contrib import messages
 from django.contrib.auth import models as auth
 from django.contrib.auth.decorators import  permission_required
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.core.paginator import Paginator, EmptyPage, InvalidPage
 from django import forms
 from django.http import  HttpResponseRedirect, HttpResponse
@@ -11,7 +14,8 @@ from django.template import RequestContext
 from django.conf import settings
 from django.template.defaultfilters import slugify
 from django.utils.translation import ugettext_noop
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
+from django.utils.translation import ugettext as _
 from wouso.core.decorators import staff_required
 from wouso.core.user.models import Player, PlayerGroup, Race
 from wouso.core.magic.models import Artifact, ArtifactGroup, Spell
@@ -19,24 +23,28 @@ from wouso.core.qpool.models import Schedule, Question, Tag, Category, Answer
 from wouso.core.qpool import get_questions_with_category
 from wouso.core.god import God
 from wouso.core import scoring
-from wouso.core.scoring.models import Formula
-from wouso.core.signals import addActivity
+from wouso.core.scoring.models import Formula, History, Coin
+from wouso.core.signals import addActivity, add_activity
+from wouso.core.security.models import Report
+from wouso.games.challenge.models import Challenge, Participant
 from wouso.interface.apps.messaging.models import Message
 from wouso.interface.cpanel.models import Customization, Switchboard, GamesSwitchboard
 from wouso.interface.apps.qproposal import QUEST_GOLD, CHALLENGE_GOLD, QOTD_GOLD
 from wouso.utils.import_questions import import_from_file
+from wouso.middleware.impersonation import ImpersonateMiddleware
 from forms import QuestionForm, TagsForm, UserForm, SpellForm, AddTagForm, AnswerForm, EditReportForm
 from forms import FormulaForm
-from wouso.core.security.models import Report
-
 
 @staff_required
 def dashboard(request):
     from wouso.games.quest.models import Quest, QuestGame
     from django import get_version
-    from wouso.settings import WOUSO_VERSION
+    from wouso.settings import WOUSO_VERSION, DATABASES
     from wouso.core.config.models import Setting
 
+    database = DATABASES['default'].copy()
+    database_engine = database['ENGINE'].split('.')[-1]
+    database_name = database['NAME']
     future_questions = Schedule.objects.filter(day__gte=datetime.datetime.now())
     nr_future_questions = len(future_questions)
 
@@ -72,6 +80,8 @@ def dashboard(request):
                                'artifact_groups': artifact_groups,
                                'django_version': get_version(),
                                'wouso_version': WOUSO_VERSION,
+                               'database_engine': database_engine,
+                               'database_name': database_name,
                                'staff': staff_group,
                                'last_run': last_run,
                                'online_users': online_last10,
@@ -114,7 +124,7 @@ def formula_delete(request, id):
 def add_formula(request):
     form = FormulaForm()
     if request.method == "POST":
-        formula=FormulaForm(data = request.POST)
+        formula = FormulaForm(data = request.POST)
         if formula.is_valid():
             formula.save()
             return HttpResponseRedirect(reverse('wouso.interface.cpanel.views.formulas'))
@@ -151,7 +161,7 @@ def spells(request):
 def edit_spell(request, id):
     spell = get_object_or_404(Spell, pk=id)
     if request.method == "POST":
-        form = SpellForm(data = request.POST, instance = spell)
+        form = SpellForm(data = request.POST, instance = spell, files=request.FILES)
         if form.is_valid():
             form.save()
             return HttpResponseRedirect(reverse('wouso.interface.cpanel.views.spells'))
@@ -164,7 +174,7 @@ def edit_spell(request, id):
 def add_spell(request):
     form = SpellForm()
     if request.method == "POST":
-        spell = SpellForm(data = request.POST)
+        spell = SpellForm(data=request.POST, files=request.FILES)
         if spell.is_valid():
             spell.save()
             return HttpResponseRedirect(reverse('wouso.interface.cpanel.views.spells'))
@@ -481,7 +491,7 @@ def qpool_importer(request):
 
 @permission_required('config.change_setting')
 def qpool_import_from_upload(request):
-    # TODO: use form
+    # TODO: use a form
     cat = request.POST.get('category', None)
     tags = request.POST.getlist('tags')
 
@@ -638,7 +648,7 @@ def artifactset(request, id):
     if request.method == "POST":
         artifact = get_object_or_404(Artifact, pk=request.POST.get('artifact', 0))
         amount = int(request.POST.get('amount', 1))
-        profile.give_modifier(artifact.name, amount)
+        profile.magic.give_modifier(artifact.name, amount)
 
     return render_to_response('cpanel/artifactset.html',
                               {'to': profile,
@@ -763,9 +773,9 @@ def stafftoggle(request, id):
 
     if profile != request.user.get_profile():
         staff_group, new = auth.Group.objects.get_or_create(name='Staff')
-        # TODO: fixme
-        if staff_group in profile.user.groups.all():
-            profile.user.groups.remove(staff_group)
+        if profile.in_staff_group():
+            if staff_group in profile.user.groups.all():
+                profile.user.groups.remove(staff_group)
         else:
             profile.user.groups.add(staff_group)
 
@@ -774,7 +784,6 @@ def stafftoggle(request, id):
 
 @permission_required('config.change_setting')
 def players(request):
-    from wouso.core.scoring.models import History
     from wouso.interface.activity.models import Activity
     def qotdc(self):
         return History.objects.filter(user=self, game__name='QotdGame').count()
@@ -782,9 +791,13 @@ def players(request):
         return Activity.get_player_activity(self).count()
     def cc(self):
         return History.objects.filter(user=self, game__name='ChallengeGame').count()
+    def inf(self):
+        return History.user_coins(user=self)['penalty']
+
     Player.qotd_count = qotdc
     Player.activity_count = ac
     Player.chall_count = cc
+    Player.infraction_points = inf
     all = Player.objects.all().order_by('-user__date_joined')
 
     return render_to_response('cpanel/players.html', dict(players=all), context_instance=RequestContext(request))
@@ -818,11 +831,94 @@ def edit_player(request, user_id):
     return render_to_response('cpanel/edit_player.html', {'form':form}, context_instance=RequestContext(request))
 
 
+@staff_required
+def infraction_history(request, user_id):
+    user = get_object_or_404(User, pk=user_id)
+    inf_list = History.objects.filter(user=user, coin__name='penalty').order_by('-timestamp')
+    infractions = {}
+    for i in inf_list:
+        if i.formula.name=="chall-was-set-up-infraction":
+            list = infractions.setdefault(i.formula.name, [])
+            list.append( (i, Challenge.objects.get(pk=i.external_id)) )
+
+    return render_to_response('cpanel/view_infractions.html',
+            {'infractions':infractions, 'p':user.player_related.get()},
+            context_instance=RequestContext(request))
+
+
+@staff_required
+def infraction_recheck(request):
+    """ Rerun an infraction check on the current challenge history
+
+        The view should allow for other infraction additions. """
+    try:
+        inf_list = History.objects.filter(coin__name='penalty',
+                formula__name='chall-was-set-up-infraction').delete()
+    except:
+        pass
+
+    all_participants = Participant.objects.filter(seconds_took__lt=15).exclude(seconds_took=None)
+    formula = Formula.objects.get(name='chall-was-set-up-infraction')
+    for p in all_participants:
+        id = None
+        if p.user_from.count():
+            if p.user_from.all()[0].status == 'P' and p.user_from.all()[0].winner.id != p.user.id:
+                user = p.user.player_ptr
+                id = p.user_from.all()[0].id
+        if p.user_to.count():
+            if p.user_to.all()[0].status == 'P' and p.user_to.all()[0].winner.id != p.user.id:
+                user = p.user.player_ptr
+                id = p.user_to.all()[0].id
+        if id:
+           scoring.score(user=user, game=None, formula=formula, external_id=id)
+    return HttpResponseRedirect(reverse('wouso.interface.cpanel.views.players'))
+
+
+@staff_required
+def infraction_clear(request, user_id, infraction_id):
+    History.objects.get(pk=infraction_id).delete()
+    return HttpResponseRedirect(reverse('wouso.interface.cpanel.views.infraction_history', args=(user_id,)))
+
+
 @permission_required('config.change_setting')
 def races_groups(request):
     return render_to_response('cpanel/races_groups.html', {'races': Race.objects.all()},
         context_instance=RequestContext(request)
     )
+
+
+@permission_required('superuser')
+def roles(request):
+    roles = Group.objects.all()
+
+    return render_to_response('cpanel/roles.html', {'roles': roles},
+                              context_instance=RequestContext(request)
+    )
+
+
+@permission_required('superuser')
+def roles_update(request, id):
+    group = get_object_or_404(Group, pk=id)
+
+    if request.method == 'POST':
+        player_id = request.POST['player']
+        user = get_object_or_404(Player, pk=player_id).user
+        user.groups.add(group)
+
+    return render_to_response('cpanel/roles_update.html', {'role': group},
+                              context_instance=RequestContext(request)
+    )
+
+
+@permission_required('superuser')
+def roles_update_kick(request, id, player_id):
+    group = get_object_or_404(Group, pk=id)
+    player = get_object_or_404(Player, pk=player_id)
+
+    if group in player.user.groups.all():
+        player.user.groups.remove(group)
+
+    return redirect('roles_update', id=group.id)
 
 
 @staff_required
@@ -836,6 +932,7 @@ def the_bell(request):
 
     return redirect('dashboard')
 
+
 @staff_required
 def reports(request, page=0):
     """
@@ -846,6 +943,7 @@ def reports(request, page=0):
                     {'reports': Report.objects.all().order_by('-timestamp')},
                     context_instance=RequestContext(request)
     )
+
 
 @staff_required
 def edit_report(request, id):
@@ -878,3 +976,65 @@ def system_message_group(request, group):
     return render_to_response('cpanel/system_message_group.html',
                         {'group': group, 'message': message},
                         context_instance=RequestContext(request))
+
+
+@permission_required('superuser')
+def impersonate(request, player_id):
+    # TODO: write tests
+    player = get_object_or_404(Player, pk=player_id)
+    ImpersonateMiddleware.set_impersonation(request, player)
+    return redirect('player_profile', id=player.id)
+
+
+def clean_impersonation(request):
+    ImpersonateMiddleware.clear(request)
+    return redirect('homepage')
+
+
+@permission_required('superuser')
+def clear_cache(request):
+    if request.method == 'POST':
+        cache.clear()
+        return redirect('dashboard')
+    else:
+        return render_to_response('cpanel/clear_cache.html', {}, context_instance=RequestContext(request))
+
+
+class BonusForm(forms.Form):
+    amount = forms.IntegerField(initial=0)
+    coin = forms.ModelChoiceField(queryset=Coin.objects.all())
+    reason = forms.CharField(required=False)
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount', None)
+        if not amount:
+            raise ValidationError('Invalid amount')
+        return amount
+
+
+@permission_required('config.change_setting')
+def bonus(request, player_id):
+    player = get_object_or_404(Player, pk=player_id)
+
+    if request.method == 'POST':
+        form = BonusForm(request.POST)
+        if form.is_valid():
+            coin, amount = form.cleaned_data['coin'], form.cleaned_data['amount']
+            formula = Formula.get('bonus-%s' % coin.name)
+            if formula is None:
+                messages.error(request, 'No such formula, bonus-%s' % coin.name)
+            else:
+                scoring.score(player, None, formula, external_id=request.user.get_profile().id, **{coin.name: amount})
+                if form.cleaned_data['reason']:
+                    add_activity(player, _('received {amount} {coin} bonus for {reason}'), amount=amount, coin=coin, reason=form.cleaned_data['reason'])
+                messages.info(request, 'Successfully given bonus')
+            return redirect('player_profile', id=player.id)
+    else:
+        form = BonusForm()
+
+    bonuses = scoring.History.objects.filter(user=player, formula__name__startswith='bonus-').order_by('-timestamp')
+    penalties = scoring.History.objects.filter(user=player, formula__name__startswith='penalty-').order_by('-timestamp')
+
+    return render_to_response('cpanel/bonus.html', {'target_player': player, 'form': form, 'bonuses': bonuses, 'penalties': penalties},
+        context_instance=RequestContext(request)
+    )

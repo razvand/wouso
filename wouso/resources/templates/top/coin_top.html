@@ -1,0 +1,54 @@
+{% extends 'top/maintop.html' %}
+{% load artifacts %}
+{% load i18n %}
+{% load user %}
+
+{% block title %}{% block sectiontitle %}{% trans 'Top for' %} {{ coin }}{% endblock %}{% endblock %}
+
+{% block sectioncontent %}
+    {% if top.disabled and not user.get_profile.in_staff_group %}
+        <p>{% trans 'Top has been disabled.' %}</p>
+    {% else %}
+        <table id="clasament" class="custom">
+            <tr>
+                <th>#</th>
+                <th colspan="2" width = "100%" align=left>{% trans 'Player' %}</th>
+                <th>{{ coin }}</th>
+            </tr>
+
+            {% for hs in top %}
+                <tr>
+                    <td>{{ forloop.counter|add:page_start }}</td>
+                    <td class="avatar-col">
+                        <a href="{% url player_profile hs.object %}" class="player-avatar-small">
+                            <img class="avatar small player-avatar-image" src="{% player_avatar hs.object %}&s=24" />
+                            <div class="player-avatar-race player-avatar-race-{{ hs.object.race_name|lower }}"></div>
+                        </a>
+                    </td>
+                    <td width="100%" class="left">
+                        {% player hs.object %}
+                    </td>
+                    <td>{% coin_amount hs.points coin %}</td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        {% if top.has_previous %}
+        <a href="{% url top_coin coin.name %}?page={{ top.previous_page_number }}"> Previous </a>
+        {% endif %}
+
+        {% for p in top.paginator.page_range %}
+        {% if p == top.number %}
+           <strong>{{ p }}</strong>
+        {% else %}
+        <a href="{% url top_coin coin.name %}?page={{ p }}">{{ p }}</a>
+        {% endif %}
+        {% endfor %}
+
+        {% if top.has_next %}
+        <a href="{% url top_coin coin.name %}?page={{ top.next_page_number }}"> Next </a>
+        {% endif %}
+
+
+    {% endif %}
+{% endblock %}

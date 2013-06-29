@@ -1,9 +1,11 @@
 import json
 from django.contrib.auth.models import User
 from django.test.testcases import TestCase
+from django.conf import settings
 from wouso.core.magic.models import Spell, ArtifactGroup
 from wouso.core.scoring.models import Formula, Coin
-import settings
+from wouso.core.tests import WousoTest
+
 
 class DisableAPI(TestCase):
     def setUp(self):
@@ -21,6 +23,7 @@ class DisableAPI(TestCase):
         settings.API_ENABLED = False
         response = self.client.get('/request_token')
         self.assertTrue(response.status_code, 404)
+
 
 class BazaarApi(TestCase):
     def setUp(self):
@@ -43,10 +46,10 @@ class BazaarApi(TestCase):
 
     def test_bazaar_buy_ok(self):
         spell = Spell.objects.create(price=0)
-        f = Formula.objects.get_or_create(id='buy-spell')[0]
-        f.formula='points=0'
+        f = Formula.add('buy-spell')
+        f.definition = 'points=0'
         f.save()
-        Coin.objects.get_or_create(id='points')
+        Coin.add('points')
 
         response = self.client.post('/api/bazaar/buy/', {'spell': spell.id})
 
@@ -59,6 +62,7 @@ class BazaarApi(TestCase):
         player = self.user.get_profile()
 
         self.assertTrue(spell in [s.spell for s in player.magic.spells_available])
+
 
 class NotificationRegister(TestCase):
     def setUp(self):
@@ -77,5 +81,20 @@ class NotificationRegister(TestCase):
         response = self.client.post('/api/notifications/register/', {'registration_id': '1245'})
 
         self.assertEqual(response.status_code, 200)
+        data = json.loads(response.content)
+        self.assertEqual(data['success'], True)
+
+
+class CastSpell(WousoTest):
+    def test_cast(self):
+        u1 = self._get_player()
+        u2 = self._get_player(2)
+        s = Spell.objects.create(due_days=0)
+        u1.magic.add_spell(s)
+
+        self.client.login(username=u1.user.username, password='test')
+
+        response = self.client.post('/api/player/{id}/cast/'.format(id=u2.id), {'spell': s.id})
+
         data = json.loads(response.content)
         self.assertEqual(data['success'], True)

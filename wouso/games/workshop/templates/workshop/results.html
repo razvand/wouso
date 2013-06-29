@@ -16,7 +16,7 @@
         <li>{% trans 'none' %}.</li>
         {% endfor %}
     </ul>
-    <a href="{% url workshop_review assessment.workshop.id %}">all</a>
+    <a href="{% url workshop_review assessment.workshop.id %}">{% trans 'Details' %}</a> {% trans 'about your reviews' %}
 </div>
 
 <p>{% trans "Assessment grade:" %} {{ assessment.grade }}</p>
@@ -26,8 +26,8 @@
 <ul class="spaced">
 {% for a in assessment.answer_set.all %}
     <li>{{ forloop.counter }}. {{ a.question.text }}
-        <p> <em>{% trans 'Your answer' %}:</em>
-            <tt>{{ a.text }}</tt>
+        <p> <em>{% trans 'Your answer' %}:</em><br/>
+            <pre>{{ a.text }}</pre>
             <ul>
             {% for r in a.review_set.all %}
                 <li>

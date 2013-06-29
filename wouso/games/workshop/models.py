@@ -4,6 +4,7 @@ from datetime import datetime, time, timedelta
 from django.db import models
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
+from django.conf import settings
 from wouso.core.game.models import Game
 from wouso.core.qpool.models import Tag, Question, Category
 from wouso.core.user.models import PlayerGroup, Player
@@ -27,27 +28,38 @@ ROOM_CHOICES = (
 
 ROOM_DEFAULT = 'eg306'
 
-WORKSHOP_TIME_MINUTES = 10
-WORKSHOP_GRACE_PERIOD = 1 # 1 minute
-
 MIN_HOUR, MAX_HOUR = 8, 20
 
 class Schedule(Tag):
     """ Schedule qpool tags per date intervals.
+    TODO: move it to qpool
     """
     start_date = models.DateField(default=datetime.today)
     end_date = models.DateField(default=datetime.today)
+    count = models.IntegerField(default=3, help_text='How many questions of this tag to select')
 
     @classmethod
     def get_current_tags(cls, timestamp=None):
         """ Return the questions tags currently active
         """
         timestamp = timestamp if timestamp else datetime.now()
-        return cls.objects.filter(start_date__lte=timestamp, end_date__gte=timestamp)
+        return cls.objects.filter(start_date__lte=timestamp, end_date__gte=timestamp).order_by('name')
 
     def is_active(self, timestamp=None):
         timestamp = timestamp if timestamp else datetime.now()
         return datetime.combine(self.start_date, time(0, 0, 0)) <= timestamp <= datetime.combine(self.end_date, time(23, 59, 59))
+
+
+class WorkshopPlayer(Player):
+    _semigroup = None
+
+    @property
+    def semigroup(self):
+        if self._semigroup is not None:
+            return self._semigroup
+
+        self._semigroup = Semigroup.get_by_player(self)
+        return self._semigroup
 
 
 class Semigroup(PlayerGroup):
@@ -72,8 +84,8 @@ class Semigroup(PlayerGroup):
     @classmethod
     def get_by_player(cls, player):
         try:
-            return Semigroup.objects.filter(players=player).all()[0]
-        except:
+            return Semigroup.objects.filter(players__id=player.id).all()[0]
+        except IndexError:
             return None
 
     @classmethod
@@ -99,7 +111,7 @@ class Workshop(models.Model):
     start_at = models.DateTimeField(blank=True, null=True)
     active_until = models.DateTimeField(blank=True, null=True)
     status = models.IntegerField(choices=STATUSES, default=0)
-    question_count = models.IntegerField(default=4, blank=True)
+    question_count = models.IntegerField(default=3, blank=True)
 
     def is_started(self):
         return self.status == 0
@@ -109,7 +121,7 @@ class Workshop(models.Model):
 
     def is_active(self, timestamp=None):
         timestamp = timestamp if timestamp else datetime.now()
-        timestamp2 = timestamp - timedelta(minutes=WORKSHOP_GRACE_PERIOD)
+        timestamp2 = timestamp - timedelta(minutes=settings.WORKSHOP_GRACE_PERIOD)
         if not self.start_at or not self.active_until:
             return False
 
@@ -140,16 +152,27 @@ class Workshop(models.Model):
             return Assessment.objects.get(player=player, workshop=self)
         except Assessment.DoesNotExist:
             return None
+        except Assessment.MultipleObjectsReturned:
+            return Assessment.objects.filter(player=player, workshop=self).order_by('id')[0]
 
     def get_or_create_assessment(self, player):
         """ Return existing or new assessment for player
         """
-        assessment, is_new = Assessment.objects.get_or_create(player=player, workshop=self)
+        try:
+            assessment, is_new = Assessment.objects.get_or_create(player=player, workshop=self)
+        except Assessment.MultipleObjectsReturned:
+            assessment, is_new = Assessment.objects.filter(player=player, workshop=self).order_by('id')[0], False
+
         if is_new:
-            questions = list(WorkshopGame.get_question_pool(self.date))
-            shuffle(questions)
-            for q in questions[:self.question_count]:
-                assessment.questions.add(q)
+            total_count = self.question_count
+            for count, questions in WorkshopGame.get_question_pool(self.date):
+                questions = list(questions)
+                shuffle(questions)
+                for q in questions[:count]:
+                    assessment.questions.add(q)
+                total_count -= count
+                if total_count <= 0:
+                    break
         return assessment
 
     def start(self, timestamp=None):
@@ -159,7 +182,7 @@ class Workshop(models.Model):
 
         if self.is_ready():
             self.start_at = timestamp
-            self.active_until = timestamp + timedelta(minutes=WORKSHOP_TIME_MINUTES)
+            self.active_until = timestamp + timedelta(minutes=settings.WORKSHOP_TIME_MINUTES)
             self.save()
             return True
 
@@ -233,9 +256,17 @@ class Assessment(models.Model):
         if self.reviews.filter(answered=True).count() == 1:
             self.reviewer_grade *= 2
 
+        count = self.questions.count()
         try:
-            self.final_grade = ceil((self.grade * 10 + self.reviewer_grade * 5)/16)
-        except TypeError: # one of the grades is None
+            """
+             Formula:
+                (grade * 10 + reviewer * 5) / 16 - when there are 4 questions
+                max(grade) = 8
+                max(reviewer) = 16
+                8 * 10 + 16 * 5 / 16 = 10 = max(final_grade)
+            """
+            self.final_grade = ceil((self.grade * 10 + self.reviewer_grade * 5) * 1.0 / (4 * count))
+        except (ZeroDivisionError, TypeError): # one of the grades is None
             self.final_grade = None
         self.save()
 
@@ -318,7 +349,7 @@ class Review(models.Model):
     feedback = models.TextField(max_length=2000, blank=True, null=True)
     answer_grade = models.IntegerField(blank=True, null=True)
 
-    review_reviewer = models.ForeignKey(Player, related_name='reviews', blank=True, null=True) #TODO
+    review_reviewer = models.ForeignKey(Player, related_name='reviews', blank=True, null=True)
     review_grade = models.IntegerField(blank=True, null=True)
 
     # Properties and methods
@@ -367,11 +398,13 @@ class WorkshopGame(Game):
 
     @classmethod
     def get_question_pool(cls, timestamp=None):
-        """ Return the question pool active right now
+        """ Return the question pool active right now as a list of querysets and and counts to be used
         """
         tags = Schedule.get_current_tags(timestamp=timestamp)
-        questions = Question.objects.filter(tags__in=tags).distinct()
-        return questions
+        result = []
+        for t in tags:
+            result.append((t.count, t.question_set.all()))
+        return result
 
     @classmethod
     def get_for_now(cls, timestamp=None):
@@ -398,7 +431,7 @@ class WorkshopGame(Game):
         if player.in_staff_group():
             return None
         timestamp = timestamp if timestamp else datetime.now()
-        timestamp2 = timestamp - timedelta(minutes=WORKSHOP_GRACE_PERIOD)
+        timestamp2 = timestamp - timedelta(minutes=settings.WORKSHOP_GRACE_PERIOD)
         ws = Workshop.objects.filter(start_at__lte=timestamp, active_until__gte=timestamp2)
         for w in ws:
             if player in w.semigroup.players.all():
@@ -423,10 +456,10 @@ class WorkshopGame(Game):
 
          Returns: False if no error, string if error.
         """
-        questions = cls.get_question_pool(date)
-
-        if not questions or questions.count() < question_count:
-            return _("No questions for this date")
+        #questions = cls.get_question_pool(date)
+        #
+        #if not questions or questions.count() < question_count:
+        #    return _("No questions for this date")
 
         if cls.get_workshop(semigroup, date):
             return _("Workshop already exists for group at date")
@@ -490,17 +523,14 @@ class WorkshopGame(Game):
         if request.user.is_anonymous():
             return ''
         player = request.user.get_profile()
+        ws_player = player.get_extension(WorkshopPlayer)
         semigroups = cls.get_semigroups()
         workshop = cls.get_for_player_now(player)
         if workshop:
             assessment = workshop.get_assessment(player)
         else:
             assessment = None
-        sm = False
-        for sg in semigroups:
-            if player in sg.players.all():
-                sm = True
-                break
+        sm = ws_player.semigroup in semigroups
 
         return render_to_string('workshop/sidebar.html',
                 {'semigroups': semigroups, 'workshop': workshop, 'semigroup_member': sm, 'assessment': assessment})

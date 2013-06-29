@@ -1,10 +1,12 @@
+from django.contrib import messages
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render_to_response, get_object_or_404, redirect
 from django.template import RequestContext
+from wouso.core.config.models import Setting, BoolSetting
 from wouso.core.user.models import Player
 from wouso.games.challenge.models import ChallengeException
 from models import ChallengeUser, ChallengeGame, Challenge, Participant
@@ -89,7 +91,7 @@ def launch(request, to_id):
         return do_result(request, error='Provocarile sunt dezactivate')
 
     if (not user_to.is_eligible()) or (not user_from.is_eligible()):
-        return do_result(request, error='Ne pare rau, doar studentii de anul I pot provoca/fi provocati')
+        return do_result(request, error=_('Sorry, challenge failed.'))
 
     if not user_from.can_launch():
         return do_result(request, _('You cannot launch another challenge today.'))
@@ -198,12 +200,12 @@ def header_link(request):
     return dict(link=url, count=count, text=_('Challenges'))
 
 def sidebar_widget(request):
-    profile = request.user.get_profile()
-    if not profile:
+    if not request.user.is_authenticated():
         return ''
-    chall_user = profile.get_extension(ChallengeUser)
+    chall_user = request.user.get_profile().get_extension(ChallengeUser)
     challs = ChallengeGame.get_active(chall_user)
     challs = [c for c in challs if c.status == 'A']
+
     # reduce noise, thanks
     if not challs:
         return ''
@@ -221,14 +223,33 @@ def history(request, playerid):
 
 
 @login_required
-def challenge_random(request):
+def challenge_player(request):
+    if request.method == 'POST':
+        try:
+            player_to_challenge = Player.objects.get(pk=int(request.POST.get('player')))
+            player_to_challenge = player_to_challenge.get_extension(ChallengeUser)
+            return launch(request, player_to_challenge.id)
+        except (ValueError, Player.DoesNotExist):
+            messages.error(request, _('Player does not exist'))
+            return redirect('challenge_index_view')
+    return redirect('challenge_index_view')
 
+@login_required
+def challenge_random(request):
+    setting = BoolSetting.get('disable-challenge-random').get_value()
+    if setting:
+        messages.error(request, _('Random challenge disabled'))
+        return redirect('challenge_index_view')
     current_player = request.user.get_profile().get_extension(ChallengeUser)
 
     # selects challengeable players
     players = ChallengeUser.objects.exclude(user = current_player.user)
     players = players.exclude(race__can_play=False)
     players = [p for p in players if current_player.can_challenge(p)]
+
+    if not players:
+        messages.error(request, _('There is no one you can challenge now.'))
+        return redirect('challenge_index_view')
 
     no_players = len(players)
 

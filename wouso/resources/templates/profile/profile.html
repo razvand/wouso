@@ -17,7 +17,7 @@
         <div class="rank">{% if top.disabled %}-{% else %}{% trans 'rank' %}: {{ top.position }}{% endif %}</div>
     </div>
 
-    <img src="{{ avatar }}" class="avatar" />
+    <img src="{% player_avatar profile %}" class="avatar" />
     <h2>{{ profile }}</h2>
     <h3>{% artifact_full profile.level %} </h3>
     <h4>{% if profile.group %}{% trans 'Group' %}: {% player_group profile.group %}{% endif %}
@@ -47,7 +47,7 @@
         {% if profile.user.id != user.id %}
             <a class="button button-min" href="{% url create_to profile.id %}" title="{% trans 'Send a message' %}">✉</a>
         {% endif %}
-        {% if not config_disable_Magic %}
+        {% if not config_disable_magic %}
             <a class="button button-min" href="{% url magic_cast profile.id%}" title="{% trans 'Cast a spell on this player' %}">✤</a>
         {% endif %}
         {% if profile.user.id == user.id %}
@@ -68,11 +68,11 @@
 
     {% if perms.config.change_setting %}
     <div class="actions">
-        <span class="button-list">Staff:</span>
+        <span class="button-list">Staff: [{{ profile.user.username }}] </span>
         <a class="button" href="{% url group_set profile.id %}">Groups</a>
-        <a class="button" href="{% url staff_toggle profile.id %}">Staff: {% if profile.in_staff_group %}<span class="ok">ON</span>{% else %}<span class="wrong">OFF</span>{% endif %}</a>
+        <a class="button" href="{% url bonus profile.id %}">Bonus</a>
+        <a class="button {% if profile.in_staff_group %}cplayer-staff{% endif %}" href="{% url staff_toggle profile.id %}">Staff: {% if profile.in_staff_group %}<span class="ok">ON</span>{% else %}<span class="wrong">OFF</span>{% endif %}</a>
         <a class="button" href="{% url artifact_set profile.id %}">Artifacts</a>
-        <a class="button button-min" href="{% url admin:auth_user_change profile.user.id %}">✍</a>
         <p class="clearer"></p>
     </div>
     {% endif %}
@@ -80,20 +80,24 @@
     <div class="actions">
         <span class="button-list">Admin:</span>
         {% autoescape off %}{{ profile_superuser_actions }}{% endautoescape %}
+        <a class="button button-min" href="{% url admin:auth_user_change profile.user.id %}">✍</a>
+        <a class="button" href="{% url impersonate profile.id %}">Impersonate</a>
     </div>
     {% endif %}
 
     <ul class="tabs">
-        <li><a href="#tab-0">{% trans 'Description' %}</a></li>
+        <!--<li><a href="#tab-0">{% trans 'Description' %}</a></li>-->
         <li><a href="#tab-1">{% trans 'Activity' %}</a></li>
         <li><a href="#tab-2">{% trans 'Position' %}</a></li>
         <li><a href="#tab-3">{% trans 'Points' %}</a></li>
     </ul>
 
     <div class="tab_container">
+        <!--
         <div id="tab-0" class="tab_content">
             <textarea id="Description" style="width: 690px; height: 200px; display:block; resize:none" readonly="readonly">{{profile.description}}</textarea>
         </div>
+        -->
         <div id="tab-1" class="tab_content">
         {% include 'activity/stream.html' %}
 
