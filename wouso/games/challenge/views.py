@@ -110,13 +110,13 @@ def launch(request, to_id):
         messages.error(request, _('Sorry, challenge failed.'))
         return redirect('challenge_index_view')
 
-    if not user_from.can_launch():
-        messages.error(request, _('You cannot launch another challenge today.'))
-        return redirect('challenge_index_view')
+    #if not user_from.can_launch():
+    #    messages.error(request, _('You cannot launch another challenge today.'))
+    #    return redirect('challenge_index_view')
 
-    if not user_from.in_same_division(user_to):
-        messages.error(request, _('You are not in the same division'))
-        return redirect('challenge_index_view')
+    #if not user_from.in_same_division(user_to):
+    #    messages.error(request, _('You are not in the same division'))
+    #    return redirect('challenge_index_view')
 
     if not user_from.has_enough_points():
         messages.error(request, _('You need at least 30 points to launch a challenge'))
