@@ -114,7 +114,7 @@ class MagicManager(object):
         """ Player is awarded an achievement. Check if achievement has already
         been awarded needs to happen in the caller. """
 
-        achievement = God.get_modifier_by_name(achievement_name, self.player)
+        achievement = God.get_achievement_by_name(achievement_name, self.player)
         if not achievement:
             logging.debug('No such achievement: %s' % achievement_name)
             return None
@@ -139,7 +139,7 @@ class MagicManager(object):
             paamount = 0
 
         if not paamount:
-            artifact = God.get_artifact_for_modifier(modifier, self.player)
+            artifact = God.get_artifact_by_name(modifier, self.player)
             if not artifact:
                 logging.debug('No such artifact: %s' % modifier)
                 return None

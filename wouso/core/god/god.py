@@ -1,6 +1,6 @@
 from django.utils.translation import ugettext as _
 from wouso.core import signals
-from wouso.core.magic.models import Artifact, ArtifactGroup, SpellHistory, NoArtifactLevel
+from wouso.core.magic.models import Artifact, ArtifactGroup, SpellHistory, NoArtifactLevel, Achievement
 from wouso.core.game import get_games
 
 class DefaultGod:
@@ -121,10 +121,17 @@ class DefaultGod:
 
         return ms
 
-    def get_artifact_for_modifier(self, modifier, player):
+    def get_achievement_by_name(self, achievement_name, player):
+        """ Return the achivement object for given name. """
+        try:
+            return Achievement.objects.get(name=achievement_name)
+        except Achievement.DoesNotExist:
+            return None
+
+    def get_artifact_by_name(self, artifact_name, player):
         """ Return the race-specific artifact object for given modifier """
         try:
-            return Artifact.objects.get(name=modifier)
+            return Artifact.objects.get(name=artifact_name)
         except Artifact.DoesNotExist:
             return None
 
