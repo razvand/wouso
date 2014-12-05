@@ -45,7 +45,7 @@ class GodTestCase(TestCase):
     def test_get_artifact(self):
         god = get_god()
 
-        self.assertFalse(god.get_artifact_for_modifier('inexistant-modifier', self.player))
+        self.assertFalse(god.get_artifact_by_name('inexistant-modifier', self.player))
 
     def test_others_are_not_elligible_for_challenge(self):
         god = get_god()
