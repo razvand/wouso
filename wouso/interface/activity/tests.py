@@ -445,7 +445,7 @@ class NotificationsTest(WousoTest):
     def test_ach_notification(self):
         player = self._get_player()
         Artifact.objects.create(group=None, name='ach-notfication')
-        Achievements.earn_achievement(player, 'ach-notfication')
+        Achievements.unlock_achievement(player, 'ach-notfication')
         self.assertEqual(len(Message.objects.all()), 1)
 
 

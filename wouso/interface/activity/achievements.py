@@ -253,17 +253,19 @@ def used_all_spells(player, mass):
 
 class Achievements(App):
     @classmethod
-    def earn_achievement(cls, player, modifier):
-        result = player.magic.give_modifier(modifier)
+    def unlock_achievement(cls, player, achievement_name):
+        if player.magic.has_achievement(achievement_name):
+            logging.debug('%s has already unlocked %s.' % (player, achievement_name))
+            return
+        result = player.magic.give_achievement(achievement_name)
         if result is not None:
-            message = ugettext_noop('earned {artifact}')
-            action_msg = 'earned-ach'
+            message = ugettext_noop('unlocked {achievement}')
             addActivity.send(sender=None, user_from=player, game=None, message=message,
-                             arguments=dict(artifact=result.artifact), action=action_msg
+                             arguments=dict(achivement=result.achievement), action='unlock-ach'
             )
-            Message.send(sender=None, receiver=player, subject="Achievement", text="You have just earned " + modifier)
+            Message.send(sender=None, receiver=player, subject="Achievement", text="Congratulations! You have unlocked the " + modifier + " achievement!")
         else:
-            logging.debug('%s would have earned %s, but there was no artifact' % (player, modifier))
+            logging.debug('%s would have unlocked %s, but an error occurred.' % (player, achievement_name))
 
     @classmethod
     def activity_handler(cls, sender, **kwargs):
@@ -280,14 +282,14 @@ class Achievements(App):
             # Check 10 qotd in a row
             if consecutive_qotd_correct(player) >= 10:
                 if not player.magic.has_modifier('ach-qotd-10'):
-                    cls.earn_achievement(player, 'ach-qotd-10')
+                    cls.unlock_achievement(player, 'ach-qotd-10')
 
         if 'chall' in action:
             # Check if number of challenge games is >= 100
             games_played = challenge_count(player)
             if games_played >= 100:
                 if not player.magic.has_modifier('ach-chall-100'):
-                    cls.earn_achievement(player, 'ach-chall-100')
+                    cls.unlock_achievement(player, 'ach-chall-100')
 
             # Check if the number of refused challenges in the past week is 0
             # also check for minimum number of challenges played = 5
@@ -295,22 +297,22 @@ class Achievements(App):
                 if refused_challenges(player) == 0 and \
                                 challenge_count(player, days=7) >= 5 and \
                                 first_seen(player) >= 7:
-                    cls.earn_achievement(player, 'ach-this-is-sparta')
+                    cls.unlock_achievement(player, 'ach-this-is-sparta')
 
             # Check if player played 10 challenges in a day"
             if not player.magic.has_modifier('ach-chall-10-a-day'):
                 if challenges_played_today(player) >= 10:
-                    cls.earn_achievement(player, 'ach-chall-10-a-day')
+                    cls.unlock_achievement(player, 'ach-chall-10-a-day')
 
         if action == 'chall-won':
             # Check for flawless victory
             if get_chall_score(kwargs.get("arguments")) == 500:
                 if not player.magic.has_modifier('ach-flawless-victory'):
-                    cls.earn_achievement(player, 'ach-flawless-victory')
+                    cls.unlock_achievement(player, 'ach-flawless-victory')
             # Check 10 won challenge games in a row
             if not player.magic.has_modifier('ach-chall-won-10'):
                 if consecutive_chall_won(player) >= 10:
-                    cls.earn_achievement(player, 'ach-chall-won-10')
+                    cls.unlock_achievement(player, 'ach-chall-won-10')
 
             # Check if player defeated 2 levels or more bigger opponent
             if not player.magic.has_modifier('ach-chall-def-big'):
@@ -321,75 +323,75 @@ class Achievements(App):
                     victories = Activity.objects.filter(user_to=player,
                                                         action='defeat-better-player')
                     if victories.count() >= 5:
-                        cls.earn_achievement(player, 'ach-chall-def-big')
+                        cls.unlock_achievement(player, 'ach-chall-def-big')
                         victories.delete()
 
             # Check if the player finished the challenge in less than 1 minute
             if not player.magic.has_modifier('ach-win-fast'):
                 seconds_no = get_challenge_time(kwargs.get("arguments"))
                 if seconds_no > 0 and seconds_no <= 60:
-                    cls.earn_achievement(player, 'ach-win-fast')
+                    cls.unlock_achievement(player, 'ach-win-fast')
 
         if action == 'message':
             # Check the number of unique users who send pm to player in the last m minutes
             if unique_users_pm(kwargs.get('user_to'), 15) >= 5:
                 if not kwargs.get('user_to').magic.has_modifier('ach-popularity'):
-                    cls.earn_achievement(kwargs.get('user_to'), 'ach-popularity')
+                    cls.unlock_achievement(kwargs.get('user_to'), 'ach-popularity')
 
         if action in ("login", "seen"):
             # Check login between 2-4 am
             if login_between_count(player, 3, 5) > 2:
                 if not player.magic.has_modifier('ach-night-owl'):
-                    cls.earn_achievement(player, 'ach-night-owl')
+                    cls.unlock_achievement(player, 'ach-night-owl')
             if login_between_count(player, 6, 8) > 2:
                 if not player.magic.has_modifier('ach-early-bird'):
-                    cls.earn_achievement(player, 'ach-early-bird')
+                    cls.unlock_achievement(player, 'ach-early-bird')
 
             if not player.magic.has_modifier('ach-god-mode-on'):
                 if check_for_god_mode(player, 5, 5):
-                    cls.earn_achievement(player, 'ach-god-mode-on')
+                    cls.unlock_achievement(player, 'ach-god-mode-on')
             # Check previous 10 seens
             if consecutive_seens(player, datetime.now()) >= 14:
                 if not player.magic.has_modifier('ach-login-10'):
-                    cls.earn_achievement(player, 'ach-login-10')
+                    cls.unlock_achievement(player, 'ach-login-10')
 
         if action == 'cast':
             # Check if player is affected by 5 or more spells
             if not player.magic.has_modifier('ach-spell-5'):
                 if spell_count(player) >= 5:
-                    cls.earn_achievement(player, 'ach-spell-5')
+                    cls.unlock_achievement(player, 'ach-spell-5')
 
             # Check if player used all non-mass spells
             if not player.magic.has_modifier('ach-use-all-spells'):
                 if used_all_spells(player, False):
-                    cls.earn_achievement(player, 'ach-use-all-spells')
+                    cls.unlock_achievement(player, 'ach-use-all-spells')
 
             # Check if player used all mass spells
             if not player.magic.has_modifier('ach-use-all-mass'):
                 if used_all_spells(player, True):
-                    cls.earn_achievement(player, 'ach-use-all-mass')
+                    cls.unlock_achievement(player, 'ach-use-all-mass')
 
         if 'buy' in action:
             # Check if player spent 500 gold on spells
             if not player.magic.has_modifier('ach-spent-gold'):
                 if spent_gold(player) >= 500:
-                    cls.earn_achievement(player, 'ach-spent-gold')
+                    cls.unlock_achievement(player, 'ach-spent-gold')
 
         if action == 'gold-won':
             # Check if player reached level 5
             if not player.magic.has_modifier('ach-level-5'):
                 if player.level_no >= 5:
-                    cls.earn_achievement(player, 'ach-level-5')
+                    cls.unlock_achievement(player, 'ach-level-5')
             # Check if player reached level 10
             if not player.magic.has_modifier('ach-level-10'):
                 if player.level_no >= 10:
-                    cls.earn_achievement(player, 'ach-level-10')
+                    cls.unlock_achievement(player, 'ach-level-10')
 
         if 'gold' in action:
             # Check if player has 300 gold
             if not player.magic.has_modifier('ach-gold-300'):
                 if gold_amount(player) >= 300:
-                    cls.earn_achievement(player, 'ach-gold-300')
+                    cls.unlock_achievement(player, 'ach-gold-300')
 
         if 'login' in action:
             # # Check if player got a head start login
@@ -399,7 +401,7 @@ class Achievements(App):
                 # hour_offset = offset from start date when player will be rewarded
                 if login_at_start(player, start_hour=20, start_day=13, start_month=10, hour_offset=2):
                     scoring.score(player, None, 'head-start', None)
-                    cls.earn_achievement(player, 'ach-head-start')
+                    cls.unlock_achievement(player, 'ach-head-start')
 
 
     @classmethod
