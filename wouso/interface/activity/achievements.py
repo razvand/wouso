@@ -263,7 +263,7 @@ class Achievements(App):
             addActivity.send(sender=None, user_from=player, game=None, message=message,
                              arguments=dict(achivement=result.achievement), action='unlock-ach'
             )
-            Message.send(sender=None, receiver=player, subject="Achievement", text="Congratulations! You have unlocked the " + modifier + " achievement!")
+            Message.send(sender=None, receiver=player, subject="Achievement", text="Congratulations! You have unlocked the " + achievement_name + " achievement!")
         else:
             logging.debug('%s would have unlocked %s, but an error occurred.' % (player, achievement_name))
 
