@@ -110,6 +110,19 @@ class MagicManager(object):
             paamount.save()
         return paamount
 
+    def give_achievement(self, achievement_name):
+        """ Player is awarded an achievement. Check if achievement has already
+        been awarded needs to happen in the caller. """
+
+        achievement = God.get_modifier_by_name(achievement_name, self.player)
+        if not achievement:
+            logging.debug('No such achievement: %s' % achievement_name)
+            return None
+
+        pa = PlayerAchievement.objects.create(player=self.player, achievement=achievement)
+        return pa
+
+    # FIXME: This function should be replaced by something generic.
     def give_modifier(self, modifier, amount=1):
         """ Add given amount to existing, or create new artifact amount
         for the current user.
