@@ -5,6 +5,7 @@ from django.utils.translation import ugettext as _
 from wouso.core import signals
 from wouso.core.god import God
 from wouso.core.magic.models import PlayerSpellDue, PlayerSpellAmount, PlayerArtifactAmount, PlayerAchievement
+import sys
 
 class MagicException(Exception): pass
 class InsufficientAmount(MagicException): pass
@@ -65,7 +66,7 @@ class MagicManager(object):
 
     def get_player_spell(self, spell_name):
         try:
-            return PlayerSpellDue.objects.filter(player=self.player, spell__name=spell_name, due__gte=datetime.now().date()).count() > 0
+            return PlayerSpellDue.objects.filter(player=self.player, spell__name=spell_name, due__gte=datetime.now().date())
         except PlayerSpellDue.DoesNotExist:
             pass
         return None
@@ -73,41 +74,41 @@ class MagicManager(object):
     def get_player_modifier(self, modifier_name):
         """ Check for an active modifier on the player. """
         pa = self.get_player_artifact(modifier_name)
-        if pa is not None:
+        if pa:
             return pa
         pa = self.get_player_achievement(modifier_name)
-        if pa is not None:
+        if pa:
             return pa
         pa = self.get_player_spell(modifier_name)
-        if pa is not None:
+        if pa:
             return pa
         return None
 
     def has_artifact(self, artifact_name):
         pa = self.get_player_artifact(artifact_name)
-        if pa is not None:
+        if pa:
             return True
         return False
 
     def has_achievement(self, achievement_name):
         pa = self.get_player_achievement(achievement_name)
-        if pa is not None:
+        if pa:
             return True
         return False
 
     def has_spell(self, spell_name):
         pa = self.get_player_spell(spell_name)
-        if pa is not None:
+        if pa:
             return True
         return False
 
     def has_modifier(self, modifier_name):
         """ Check for an active modifier on the player. """
-        if self.has_artifact(modifier_name):
+        if self.has_artifact(modifier_name) is True:
             return True
-        if self.has_achievement(modifier_name):
+        if self.has_achievement(modifier_name) is True:
             return True
-        if self.has_spell(modifier_name):
+        if self.has_spell(modifier_name) is True:
             return True
         return False
 
