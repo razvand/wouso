@@ -113,6 +113,8 @@
                 <li {% if url in request.path %}class="active"{% endif %}><a href="{% url spells %}">Spells</a></li>
                 {% url artifact_home as url %}
                 <li {% if url in request.path %}class="active"{% endif %}><a href="{% url artifact_home %}">Artifacts</a></li>
+                {% url achievements_home as url %}
+                <li {% if url in request.path %}class="active"{% endif %}><a href="{% url achievements_home %}">Achievements</a></li>
                 {% url all_players as url %}
                 <li {% if url in request.path %}class="active"{% endif %}><a href="{% url all_players %}">Players</a></li>
                 {% url races_groups as url %}

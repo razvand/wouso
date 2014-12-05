@@ -21,7 +21,7 @@ from wouso.core.config.models import Setting
 from wouso.core.decorators import staff_required
 from wouso.core.ui import get_sidebar
 from wouso.core.user.models import Player, PlayerGroup, Race
-from wouso.core.magic.models import Artifact, ArtifactGroup, Spell
+from wouso.core.magic.models import Artifact, ArtifactGroup, Spell, Achievement
 from wouso.core.qpool.models import Schedule, Question, Tag, Category, Answer
 from wouso.core.qpool import get_questions_with_category
 from wouso.core.god import God
@@ -814,6 +814,25 @@ def artifact_del(request, id):
         go_back = reverse('wouso.interface.cpanel.views.artifact_home')
 
     return HttpResponseRedirect(go_back)
+
+class AchievementsHomeView(ListView):
+    template_name = 'cpanel/achievements_home.html'
+    context_object_name = 'achievements'
+
+    def get_queryset(self):
+        achievements = Achievement.objects.all()
+        return achievements
+
+    def get_context_data(self, **kwargs):
+        context = super(AchievementsHomeView, self).get_context_data(**kwargs)
+        achievements = Achievement.objects.all()
+        modifiers = God.get_all_modifiers()
+        context.update({'achievements': achievements, 'modifiers': modifiers})
+        return context
+
+achievements_home = permission_required('config.change_setting')(
+    AchievementsHomeView.as_view())
+
 
 
 @permission_required('config.change_setting')

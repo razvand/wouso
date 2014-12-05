@@ -1,0 +1,47 @@
+{% extends 'cpanel/index.html' %}
+{% load i18n %}
+{% load artifacts %}
+{% load django_bootstrap_breadcrumbs %}
+
+{% block sectiontitle %}
+    Achivements
+{% endblock %}
+
+{% block breadcrumbs %}
+    {{ block.super }}
+    {% breadcrumb "Achievements" "achievements_home" %}
+{% endblock %}
+
+{% block sectioncontent %}
+
+{% block tabcontent %}
+<div class="col-md-9">
+<table class="table table-bordered table-hover">
+    <tr>
+        <th>Identifier</th>
+        <th>Title</th>
+        <th>Path</th>
+        <th>Active</th>
+    </tr>
+    {% for a in achievements %}
+        <tr>
+            <td>{{ a.name }}</td>
+            <td>{{ a.title }}</td>
+            <td>{{ a.path }}</td>
+        </tr>
+    {% empty %}
+        <tr><td colspan="0">No achievements added.</td></tr>
+    {% endfor %}
+</table>
+</div>
+<div class="panel panel-default col-md-3">
+    <div class="panel-body">
+        <h3>Modifiers</h3>
+        <p>In game enabled modifiers:<br/>
+        {% for m in modifiers %}<em>{{ m }}</em><br/>{% endfor %}
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% endblock %}
