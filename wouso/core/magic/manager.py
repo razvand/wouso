@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from django.utils.translation import ugettext as _
 from wouso.core import signals
 from wouso.core.god import God
-from wouso.core.magic.models import PlayerSpellDue, PlayerSpellAmount, PlayerArtifactAmount
+from wouso.core.magic.models import PlayerSpellDue, PlayerSpellAmount, PlayerArtifactAmount, PlayerAchievement
 
 class MagicException(Exception): pass
 class InsufficientAmount(MagicException): pass
@@ -49,46 +49,77 @@ class MagicManager(object):
                 pass
         return players
 
-    def has_artifact(self, artifact):
+    def get_player_artifact(self, artifact_name):
         try:
-            return PlayerArtifactAmount.objects.get(player=self.player, artifact__name=artifact)
+            return PlayerArtifactAmount.objects.get(player=self.player, artifact__name=artifact_name)
         except PlayerArtifactAmount.DoesNotExist:
             pass
-        return False
+        return None
 
-    def has_achievement(self, achievement):
+    def get_player_achievement(self, achievement_name):
         try:
-            return PlayerAchievement.objects.get(player=self.player, achievement__name=achievement)
+            return PlayerAchievement.objects.get(player=self.player, achievement__name=achievement_name)
         except PlayerAchievement.DoesNotExist:
             pass
-        return False
+        return None
 
-    def has_spell(self, spell):
+    def get_player_spell(self, spell_name):
         try:
-            return PlayerSpellDue.objects.filter(player=self.player, spell__name=modifier, due__gte=datetime.now().date()).count() > 0
+            return PlayerSpellDue.objects.filter(player=self.player, spell__name=spell_name, due__gte=datetime.now().date()).count() > 0
         except PlayerSpellDue.DoesNotExist:
             pass
-        return False
+        return None
 
-    def has_modifier(self, modifier):
+    def get_player_modifier(self, modifier_name):
         """ Check for an active modifier on the player. """
-        if modifier.__class__.__name__ == "Artifact":
-            return has_artifact()
-        if modifier.__class__.__name__ == "Achievement":
-            return has_achievement()
-        if modifier.__class__.__name__ == "Spell":
-            return has__spell()
+        pa = self.get_player_artifact(modifier_name)
+        if pa is not None:
+            return pa
+        pa = self.get_player_achievement(modifier_name)
+        if pa is not None:
+            return pa
+        pa = self.get_player_spell(modifier_name)
+        if pa is not None:
+            return pa
+        return None
+
+    def has_artifact(self, artifact_name):
+        pa = self.get_player_artifact(artifact_name)
+        if pa is not None:
+            return True
         return False
 
-    def modifier_percents(self, modifier):
+    def has_achievement(self, achievement_name):
+        pa = self.get_player_achievement(achievement_name)
+        if pa is not None:
+            return True
+        return False
+
+    def has_spell(self, spell_name):
+        pa = self.get_player_spell(spell_name)
+        if pa is not None:
+            return True
+        return False
+
+    def has_modifier(self, modifier_name):
+        """ Check for an active modifier on the player. """
+        if self.has_artifact(modifier_name):
+            return True
+        if self.has_achievement(modifier_name):
+            return True
+        if self.has_spell(modifier_name):
+            return True
+        return False
+
+    def modifier_percents(self, modifier_name):
         """ Return the percents integer value of given modifier
         """
         percents = 100
-        res = PlayerArtifactAmount.objects.filter(player=self.player, artifact__name=modifier)
+        res = PlayerArtifactAmount.objects.filter(player=self.player, artifact__name=modifier_name)
         for a in res:
             percents += a.amount * a.artifact.percents
             # now add spells to that
-        res = PlayerSpellDue.objects.filter(player=self.player, spell__name=modifier)
+        res = PlayerSpellDue.objects.filter(player=self.player, spell__name=modifier_name)
         for a in res:
             percents += a.spell.percents
         return percents
@@ -99,7 +130,7 @@ class MagicManager(object):
         If the amount after substraction is zero, delete the corresponding
         artifact amount object.
         """
-        paamount = self.has_modifier(modifier)
+        paamount = self.get_player_modifier(modifier)
         if amount > paamount.amount:
             raise InsufficientAmount()
 
