@@ -68,6 +68,18 @@ class Artifact(CachedItem, Modifier):
         self.full_name = "%s-%s-%s" % (self.name, self.group.name.lower() if self.group else 'default', self.percents)
         return super(Artifact, self).save(**kwargs)
 
+class Achievement(Modifier):
+    """Achivement model. Should contain a name, title description and image
+    path, as inherited from the modifier."""
+    def __unicode__(self):
+        if self.title:
+            return u"%s" % self.title
+        if self.name:
+            return u"%s" % self.name
+        return u"None"
+
+    def save(self, **kwargs):
+        return super(Achievement, self).save(**kwargs)
 
 class NoArtifactLevel(object):
     """
