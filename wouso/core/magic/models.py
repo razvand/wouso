@@ -282,7 +282,6 @@ class Bazaar(App):
     def management_task(cls, datetime=lambda: datetime.now(), stdout=sys.stdout):
         spells = PlayerSpellDue.get_expired(datetime)
 
-        stdout.write(" %d expired spells\n" % spells.count())
         for s in spells:
             SpellHistory.expired(s.player, s.spell)
 
