@@ -208,6 +208,18 @@ class GroupArtifactAmount(models.Model):
     amount = models.IntegerField(default=1)
 
 
+class PlayerAchievement(models.Model):
+    """ Tie achievement to the owner user. """
+    class Meta:
+        unique_together = ('player', 'achievement')
+    player = models.ForeignKey('user.Player')
+    achievement = models.ForeignKey(Achievement)
+    amount = 1
+
+    def __unicode__(self):
+        return u"%s has %s" % (self.player, self.achievement)
+
+
 class PlayerArtifactAmount(models.Model):
     """ Tie artifact and amount to the owner user """
     class Meta:
