@@ -49,19 +49,35 @@ class MagicManager(object):
                 pass
         return players
 
-    def has_modifier(self, modifier):
-        """ Check for an artifact with id = modifier
-        or for an active spell cast on me with id = modifier
-        """
+    def has_artifact(self, artifact):
         try:
-            return PlayerArtifactAmount.objects.get(player=self.player, artifact__name=modifier)
+            return PlayerArtifactAmount.objects.get(player=self.player, artifact__name=artifact)
         except PlayerArtifactAmount.DoesNotExist:
             pass
+        return False
 
+    def has_achievement(self, achievement):
+        try:
+            return PlayerAchievement.objects.get(player=self.player, achievement__name=achievement)
+        except PlayerAchievement.DoesNotExist:
+            pass
+        return False
+
+    def has_spell(self, spell):
         try:
             return PlayerSpellDue.objects.filter(player=self.player, spell__name=modifier, due__gte=datetime.now().date()).count() > 0
         except PlayerSpellDue.DoesNotExist:
             pass
+        return False
+
+    def has_modifier(self, modifier):
+        """ Check for an active modifier on the player. """
+        if modifier.__class__.__name__ == "Artifact":
+            return has_artifact()
+        if modifier.__class__.__name__ == "Achievement":
+            return has_achievement()
+        if modifier.__class__.__name__ == "Spell":
+            return has__spell()
         return False
 
     def modifier_percents(self, modifier):
