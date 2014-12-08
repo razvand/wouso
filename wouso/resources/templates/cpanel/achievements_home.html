@@ -1,6 +1,5 @@
 {% extends 'cpanel/index.html' %}
 {% load i18n %}
-{% load artifacts %}
 {% load django_bootstrap_breadcrumbs %}
 
 {% block sectiontitle %}
@@ -18,19 +17,25 @@
 <div class="col-md-9">
 <table class="table table-bordered table-hover">
     <tr>
-        <th>Identifier</th>
-        <th>Title</th>
-        <th>Image</th>
+        <th width="10%">Image</th>
+        <th width="20%">Identifier</th>
+        <th width="15%">Title</th>
         <th>Description</th>
-        <th>Active</th>
+        <th width="10%">Active</th>
     </tr>
     {% for a in achievements %}
         <tr>
-            <td>{{ a.name }}</td>
-            <td>{{ a.title }}</td>
-            <td>{{ a.path }}</td>
+            <td width="10%"><img src="{{ a.path }}" alt="{{ a.title }}" title="{{ a.title}}" height="24" width="24"/></td>
+            <td width="20%">{{ a.name }}</td>
+            <td width="15%">{{ a.title }}</td>
             <td>{{ a.description }}</td>
-            <td>{{ a.active }}</td>
+            <td width="10%">
+                {% if a.active %}
+                    <a class="btn btn-success btn-xs" href="{% url switch_active a.id %}">{% trans 'Yes' %}</a>
+                {% else %}
+                    <a class="btn btn-danger btn-xs" href="{% url switch_active a.id %}">{% trans 'No' %}</a>
+                {% endif %}
+            </td>
         </tr>
     {% empty %}
         <tr><td colspan="0">No achievements added.</td></tr>
