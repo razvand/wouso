@@ -48,6 +48,7 @@ upat = [
     url(r'^artifact/(?P<group>\w+)/$', 'wouso.interface.cpanel.views.artifact_home', name='artifact_home'),
 
     url(r'^achievements/$', 'wouso.interface.cpanel.views.achievements_home', name='achievements_home'),
+    url(r'^achievements/switch_active/(?P<id>\d+)/$', 'wouso.interface.cpanel.views.achievement_switch_active', name='achievement_switch_active'),
 
     url(r'^spells/$','wouso.interface.cpanel.views.spells', name='spells'),
     url(r'^spells/edit_spell/(?P<pk>\d+)$','wouso.interface.cpanel.views.edit_spell',name='edit_spell'),

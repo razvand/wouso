@@ -31,9 +31,9 @@
             <td>{{ a.description }}</td>
             <td width="10%">
                 {% if a.active %}
-                    <a class="btn btn-success btn-xs" href="{% url switch_active a.id %}">{% trans 'Yes' %}</a>
+                    <a class="btn btn-success btn-xs" href="{% url achievement_switch_active a.id %}">{% trans 'Yes' %}</a>
                 {% else %}
-                    <a class="btn btn-danger btn-xs" href="{% url switch_active a.id %}">{% trans 'No' %}</a>
+                    <a class="btn btn-danger btn-xs" href="{% url achievement_switch_active a.id %}">{% trans 'No' %}</a>
                 {% endif %}
             </td>
         </tr>

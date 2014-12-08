@@ -834,6 +834,17 @@ achievements_home = permission_required('config.change_setting')(
     AchievementsHomeView.as_view())
 
 
+@permission_required('config.change_setting')
+def achievement_switch_active(request, id):
+    """ Switch achievement from active to inactive or viceversa.
+    """
+    achievement = get_object_or_404(Achievement, pk=id)
+
+    achievement.active = not achievement.active
+    achievement.save()
+
+    return HttpResponseRedirect(reverse('achievements_home'))
+
 
 @permission_required('config.change_setting')
 def groupset(request, id):
