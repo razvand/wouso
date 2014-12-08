@@ -6,6 +6,9 @@ from wouso.core.magic.utils import setup_magic
 from wouso.core.scoring import check_setup, setup_scoring
 from wouso.core.user.models import update_display_name, Player
 from wouso.core.user.utils import setup_user_groups, setup_staff_groups
+from django.conf import settings
+import os
+import shutil
 
 
 def update_all_display_names():
@@ -77,6 +80,12 @@ class Command(BaseCommand):
                 self.stdout.write('OK.\n')
 
         elif options['setup']:
+            self.stdout.write('Add default achievement icons...')
+            src_file_list = os.listdir(settings.DEFAULT_ACHIEVEMENT_ICONS_DIR)
+            for f in src_file_list:
+                shutil.copy(os.path.join(settings.DEFAULT_ACHIEVEMENT_ICONS_DIR, f), settings.MEDIA_ARTIFACTS_DIR)
+            self.stdout.write('\n')
+
             if options['noinput']:
                 call_command('syncdb', interactive=False)
             else:

@@ -1,0 +1,152 @@
+[
+  {
+    "pk": 1,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-login-10",
+      "title": "Vegeta",
+      "description": "Login daily, for 14 days in a row",
+      "image": "ach-login-10.png"
+    }
+  },
+  {
+    "pk": 2,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-night-owl",
+      "title": "Morpheus",
+      "description": "Login between 3-5 AM for 3 days (not in a row)",
+      "image": "ach-night-owl.png"
+    }
+  },
+  {
+    "pk": 3,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-early-bird",
+      "title": "Eos",
+      "description": "Login between 6-8 AM for 3 days (not in a row)",
+      "image": "ach-early-bird.png"
+    }
+  },
+  {
+    "pk": 4,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-popularity",
+      "title": "Elvis",
+      "description": "Get messages from 5 different persons in 15 mins",
+      "image": "ach-popularity.png"
+    }
+  },
+  {
+    "pk": 5,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-qotd-10",
+      "title": "Hawkeye",
+      "description": "Answer qotd correctly 10 times in a row",
+      "image": "ach-qotd-10.png"
+    }
+  },
+  {
+    "pk": 6,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-chall-won-10",
+      "title": "Hercules",
+      "description": "Win 10 challenges in a row",
+      "image": "ach-chall-won-10.png"
+    }
+  },
+  {
+    "pk": 7,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-chall-def-big",
+      "title": "David",
+      "description": "Defeat 5 better players (level difference > 2)",
+      "image": "ach-chall-def-big.png"
+    }
+  },
+  {
+    "pk": 8,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-win-fast",
+      "title": "Flash",
+      "description": "Win a challenge in less than a minute",
+      "image": "ach-win-fast.png"
+    }
+  },
+  {
+    "pk": 9,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-chall-100",
+      "title": "Gambit",
+      "description": "Play a total of 100 challenges or more",
+      "image": "ach-chall-100.png"
+    }
+  },
+  {
+    "pk": 10,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-this-is-sparta",
+      "title": "Juggernaut",
+      "description": "Accept all incoming challenges in the last 7 days (min 5 challenges)",
+      "image": "ach-this-is-sparta.png"
+    }
+  },
+  {
+    "pk": 11,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-flawless-victory",
+      "title": "Einstein",
+      "description": "Win a challenge with 500 points",
+      "image": "ach-flawless-victory.png"
+    }
+  },
+  {
+    "pk": 12,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-god-mode-on",
+      "title": "Akira",
+      "description": "Win all challenges and answer correctly to all questions of the day 5 days in a row (min 5 challenges, all questions of the day answered)",
+      "image": "ach-god-mode-on.png"
+    }
+  },
+  {
+    "pk": 13,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-chall-10-a-day",
+      "title": "Maverick",
+      "description": "Play a total of 10 challenges in a day",
+      "image": "ach-chall-10-a-day.png"
+    }
+  },
+  {
+    "pk": 14,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-spell-5",
+      "title": "Illidan",
+      "description": "Be affected by 5 spells simultaneously",
+      "image": "ach-spell-5.png"
+    }
+  },
+  {
+    "pk": 15,
+    "model": "magic.achievement",
+    "fields": {
+      "name": "ach-head-start",
+      "title": "Head Start",
+      "description": "Log in the head start period",
+      "image": "ach-head-start.png"
+    }
+  }
+]
