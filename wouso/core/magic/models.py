@@ -71,6 +71,9 @@ class Artifact(CachedItem, Modifier):
 class Achievement(Modifier):
     """Achivement model. Should contain a name, title description and image
     path, as inherited from the modifier."""
+
+    active = models.BooleanField(default=True)
+
     def __unicode__(self):
         if self.title:
             return u"%s" % self.title
