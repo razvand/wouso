@@ -11,6 +11,15 @@
     <script type="text/javascript" src="{{ basepath }}/static/js/bootstrap.min.js"></script>
 
     <title>{% block title %}{% endblock %}</title>
+    <style type="text/css">
+        @import url("{{ basepath }}/static/css/autocomplete.css");
+        {% if config_logo %}
+        div#logo {
+            background: url({{ config_logo}}) no-repeat;
+        }
+        {% endif %}
+        {% block css %}{% endblock %}
+    </style>
 </head>
 <body>
     <div class="container">

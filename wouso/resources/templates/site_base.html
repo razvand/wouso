@@ -91,17 +91,6 @@
 
     <div id="footer">
         {% block footer %}
-        <div id="footer_links">
-            {% render_footer %}
-            {% autoescape off %}
-                | {{ static_pages|join:" | " }}
-            {% endautoescape %}
-        <br/>
-        <span id="poweredby">
-        <br />{% trans 'Powered by:' %}<br />
-        <a href="http://www.rosedu.org/"></a>
-        </span>
-        </div>
         {% endblock %}
     </div>
 

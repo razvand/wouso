@@ -10,13 +10,13 @@ body {
 
 #floater {
 	position:relative; float:left;
-	height:50%;	margin-bottom:-200px;
+	height:50%;	margin-bottom:-250px;
 	width:1px;
 }
 
 #centered {
 	position:relative; clear:left;
-	height:300px; width:80%; max-width:600px; min-width:300px;
+	height:450px; width:100%; max-width:600px; min-width:300px;
 	margin:0 auto;
 	background:#fff;
 	border-top:1px solid #666;
@@ -29,10 +29,10 @@ body {
 
 #logo {
     background:url('../img/logo.png') 50% 50% no-repeat;
-    height: 100px;
+    height: 250px;
 }
 #side {
-	position:absolute; left:0; top:250px; bottom:0; right:0;
+	position:absolute; left:0; top:400px; bottom:0; right:0;
 	padding:10px; margin:5px;
     background: #ddd;
     text-align: right;
@@ -41,7 +41,7 @@ body {
 }
 
 #content {
-	position:absolute; left:0; right:0; top:18%; bottom:0;
+	position:absolute; left:0; right:0; top:200px; bottom:0;
 	overflow:auto; 
 	padding:20px; margin:10px;
     text-align: center;
