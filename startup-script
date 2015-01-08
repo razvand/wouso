@@ -1,0 +1,8 @@
+#!/bin/bash
+
+toplevel_dir=/home/wouso/wouso-iulianr-fork.git
+virtualenv_dir=/home/wouso/wouso-iulianr-fork.git/sandbox
+
+cd $toplevel_dir
+source $virtualenv_dir/bin/activate
+uwsgi --ini wouso_uwsgi.ini
