@@ -10,13 +10,13 @@ body {
 
 #floater {
 	position:relative; float:left;
-	height:50%;	margin-bottom:-250px;
+	height:50%;	margin-bottom:-18%;
 	width:1px;
 }
 
 #centered {
 	position:relative; clear:left;
-	height:450px; width:100%; max-width:600px; min-width:300px;
+	height:450px; width:100%; max-width:650px; min-width:300px;
 	margin:0 auto;
 	background:#fff;
 	border-top:1px solid #666;
