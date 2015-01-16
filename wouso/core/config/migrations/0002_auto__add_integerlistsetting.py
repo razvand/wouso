@@ -36,4 +36,8 @@ class Migration(SchemaMigration):
         }
     }
 
+<<<<<<< HEAD
     complete_apps = ['config']
+=======
+    complete_apps = ['config']
+>>>>>>> 6b45c8d... Add config migrations
