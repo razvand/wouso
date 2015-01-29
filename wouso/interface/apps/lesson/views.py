@@ -41,7 +41,9 @@ class LessonView(View):
             self.through = None
 
         # get YouTube embed video url
-        match = re.search(r'^(http|https)\:\/\/www\.youtube\.com\/watch\?v\=(\w*)(\&(.*))?$', self.lesson.youtube_url)
+        match = re.search(r'^(http|https)\:\/\/www\.youtube\.com\/watch\?v\=([0-9a-zA-z_\-]*)(\&(.*))?$', self.lesson.youtube_url)
+        print self.lesson.youtube_url
+        print match.group(2)
         if match:
             embed_url = '//www.youtube.com/embed/%s' % (match.group(2))
         else:
