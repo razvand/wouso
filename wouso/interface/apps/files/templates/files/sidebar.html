@@ -1,7 +1,7 @@
 {% extends 'interface/sidebar_widget.html' %}
 {% load i18n %}
 
-{% block title %}{%  trans 'Files' %}{% endblock %}
+{% block title %}<a href="{% url files_index_view %}">{%  trans 'Files' %}</a>{% endblock %}
 
 {% block content %}
 
@@ -10,6 +10,8 @@
     {% else %}
         {% trans 'No files are available.' %}
     {% endif %}
+    <!-- RD: Disable link
     <a href="{% url files_index_view %}">{% trans 'View all' %}</a>
+    -->
 
 {% endblock %}
