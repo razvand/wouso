@@ -8,7 +8,7 @@
 
 {% block sectioncontent %}
 {% if top.disabled %}
-    {% trans 'Top has been disabled.' %}
+    {% trans 'Leaderboard has been disabled.' %}
 {% else %}
     <!-- RD: Only do races
     <h3><a href="{% url top_races %}">Top Races</a></h3>
@@ -17,7 +17,7 @@
     <table border="0" cellspacing="0" cellpadding="0">
         <tr>
             <th>{% trans '#' %}</th>
-            <th>{% trans 'Race' %}</th>
+            <th>{% trans 'Group' %}</th>
             <th>{% trans 'Points' %}</th>
         </tr>
         {% for r in races %}
