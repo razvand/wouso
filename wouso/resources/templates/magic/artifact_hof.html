@@ -3,39 +3,15 @@
 {% load artifacts %}
 {% load user %}
 
-{% block title %}{% trans 'Hall of Fame' %}{% endblock %}
-{% block sectiontitle %}{% trans 'Hall of Fame' %}{% endblock %}
+{% block title %}{% trans 'Achievements' %}{% endblock %}
+{% block sectiontitle %}{% trans 'Achievements' %}{% endblock %}
 
 {% block sectioncontent %}
 
-{% if artifact %}
-    <h3>{{ artifact.title }}</h3>
-
-    <p>{% autoescape off %}{{ artifact.description }}{% endautoescape %}</p>
-    <ul>
-        {% for pa in artifact.playerartifactamount_set.all %}
-        <li>{% player pa.player %}</li>
-        {% endfor %}
-    </ul>
-
-    <a href="{% url artifact_hof %}">{% trans "Back" %}</a>
-{% else %}
-    <h3>{% trans 'Achievements' %}</h3>
-    <ol>
         {% for a in artifacts %}
-        <li><a href="{% url artifact_hof a.id %}">{% artifact a %} {{ a.title }}</a> - {% autoescape off %}{{ a.description }}{% endautoescape %} ({{ a.used }})</li>
+        <p><a href="{% url artifact_hof a.id %}">{% artifact a %} {{ a.title }}</a> - {% autoescape off %}{{ a.description }}{% endautoescape %} ({{ a.used }})</p>
         {% empty %}
-        <li>{% trans 'No achievements received yet. Stay tuned!' %}</li>
+        <p>{% trans "You haven't unlocked any achievements yet." %}</p>
         {% endfor %}
-    </ol>
 
-    {% if artifacts %}
-    <h3>{% trans 'Players' %}</h3>
-    <ol>
-        {% for p in players %}
-        <li>{% player p %} - {{ p.magic.artifact_amounts.count }}</li>
-        {% endfor %}
-    </ol>
-    {% endif %}
-{% endif %}
 {% endblock %}
