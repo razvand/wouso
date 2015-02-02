@@ -6,6 +6,7 @@
 {% block sectiontitle %}{% trans 'Files' %}{% endblock %}
 
 {% block sectioncontent %}
+{% if categories %}
     {% for c in categories %}
         <h3>{{ c }}</h3>
         {% if c.files %}
@@ -16,4 +17,7 @@
         </ol>
         {% endif %}
     {% endfor %}
+{% else %}
+    {% trans 'No files have been added.' %}
+{% endif %}
 {% endblock %}
