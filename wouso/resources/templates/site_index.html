@@ -33,13 +33,11 @@
     <div id="news">
     {% block news %}
         <h2>{% trans 'News' %}</h2>
-        <ul>
         {% for n in news %}
-            <li><a href="{% url news_item_view n.pk %}">{{n.title}}</a></li>
+            <p><a href="{% url news_item_view n.pk %}">{{n.title}}</a></p>
         {% empty %}
-            <li class="empty">{% trans 'No news' %}</li>
+            <p class="empty">{% trans 'No news.' %}</p>
         {% endfor %}
-        </ul>
     {% if more %}
         <a href="{% url news_index_view %}">{% trans 'All news' %}</a>
     {% endif %}
