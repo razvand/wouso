@@ -1,7 +1,7 @@
 {% extends 'interface/sidebar_widget.html' %}
 {% load i18n %}
 
-{% block title %}{%  trans 'Quizzes' %}{% endblock %}
+{% block title %}<a href="{% url quiz_index_view %}">{%  trans 'Quizzes' %}</a>{% endblock %}
 
 {% block content %}
 
@@ -10,6 +10,8 @@
     {% else %}
         <p>No active quizzes available.</p>
     {% endif %}
+    <!-- RD: Nu avem nevoie de alt link>
     <a href="{% url quiz_index_view %}">{% trans 'View all' %}</a>
+    -->
 
 {% endblock %}
