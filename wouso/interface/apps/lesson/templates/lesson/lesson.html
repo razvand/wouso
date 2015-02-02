@@ -3,9 +3,7 @@
 {% load i18n %}
 
 {% block title %}
-    {% trans 'Lesson ' %} {{ lesson.name }}
-    <br/>
-    {{ lesson.category }}
+    {{ lesson.name }}
 {% endblock %}
 
 {% block scripts %}
@@ -26,7 +24,13 @@
 
 {% block sectioncontent %}
 
+    <h3>{{ lesson.category }}</h3>
+
+    <hr class="thin" />
+
+    <p>
     {{ lesson.content|safe }}
+    </p>
 
     {% if lesson.youtube_url %}
     <iframe width="853" height="480" src="{{ embed_url }}?vq=large" frameborder="0" allowfullscreen></iframe>
@@ -51,8 +55,6 @@
                 <button id="quizbutton" class="disabled" type="button" disabled>Start Quiz!</button>
             </a>
         {% endif %}
-     {% else %}
-        <div>This lesson has no quiz attached.</div>
      {% endif %}
 
 {% endblock %}
