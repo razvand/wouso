@@ -10,7 +10,9 @@
 {% if top.disabled %}
     {% trans 'Top has been disabled.' %}
 {% else %}
+    <!-- RD: Only do races
     <h3><a href="{% url top_races %}">Top Races</a></h3>
+    -->
 
     <table border="0" cellspacing="0" cellpadding="0">
         <tr>
@@ -27,6 +29,7 @@
         {% endfor %}
     </table>
 
+    <!-- RD: No groups
     <h3><a href="{% url top_classes %}">Top Groups</a></h3>
 
     <table border="0" cellspacing="0" cellpadding="0">
@@ -46,6 +49,7 @@
         {% endfor %}
     </table>
     <a href="{% url top_classes %}">{% trans 'Full list..' %}</a>
+    -->
 
 {% endif %}
 {% endblock %}
