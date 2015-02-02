@@ -8,8 +8,9 @@
     {% if is_homepage %}
     {% endif %}
 
+    {% comment "Do not use wall activities" %}
     <div id="wall-container">
-        <h2>{% trans 'Activity' %}</h2>
+        <h2>{% trans 'Activities' %}</h2>
         <div id="wall">
             {% include 'activity/stream.html' %}
         </div>
@@ -22,9 +23,12 @@
             <a href="{% url homepage page=activity.next_page_number %}"> &laquo;</a>
         {% endif %}
 
-            <span class="points"><a href="{% url all_activity %}">All &raquo;</a></span>
+        <!-- RD: for the moment this may not be required
+        <span class="points"><a href="{% url all_activity %}">{% trans 'All activities' %} &raquo;</a></span>
+            -->
         </div>
-   </div>
+    </div>
+    {% endcomment %}
 
     <div id="news">
     {% block news %}
