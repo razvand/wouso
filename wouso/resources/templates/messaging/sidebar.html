@@ -1,0 +1,14 @@
+{% extends 'interface/sidebar_widget.html' %}
+{% load i18n %}
+
+{% block title %}<a href="{% url messaging %}">{%  trans 'Messaging' %}</a>{% endblock %}
+
+{% block content %}
+
+    {% if number_of_received_messages %}
+        {% trans 'You received' %} {{ number_of_received_messages }} {% trans 'messages.' %}
+    {% else %}
+        {% trans "You didn't receive any messages." %}
+    {% endif %}
+
+{% endblock %}
