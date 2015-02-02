@@ -718,3 +718,10 @@ input.inline, label.inline {
 	background : transparent url(library/images/icons/ach-head-start.png) 0 center no-repeat;
 }
 
+hr.thin {
+    height: 1px;
+    border: 0;
+    color: #CCC;
+    background-color: #CCC;
+    width: 100%;
+}
