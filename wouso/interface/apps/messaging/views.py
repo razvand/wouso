@@ -4,9 +4,11 @@ from django.shortcuts import get_object_or_404
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response
+from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.utils.translation import ugettext as _
 from wouso.core.ui import register_header_link
+from wouso.core.ui import register_sidebar_block
 from wouso.core.user.models import Player
 from wouso.interface.apps.messaging.models import Message, MessagingUser, MessageApp
 from wouso.interface.apps.messaging.forms import ComposeForm
@@ -133,3 +135,21 @@ def header_link(context):
 
 
 register_header_link('messaging', header_link)
+
+
+def sidebar_widget(context):
+    user = context.get('user', None)
+    if not user or not user.is_authenticated():
+        return ''
+
+    if MessageApp.disabled():
+        return ''
+
+    profile = user.get_profile()
+    msg_user = profile.get_extension(MessagingUser)
+
+    number_of_received_messages = Message.objects.filter(receiver=msg_user).count()
+    return render_to_string('messaging/sidebar.html',
+            {'number_of_received_messages': number_of_received_messages})
+
+register_sidebar_block('messaging', sidebar_widget)
