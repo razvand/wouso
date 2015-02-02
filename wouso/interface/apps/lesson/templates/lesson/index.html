@@ -8,18 +8,16 @@
 {% block sectioncontent %}
 
 {% if categories %}
-    <ul>
-        {% for c in categories %}
-            <h3>{{ c }}</h3>
-            {% if c.lessons %}
-            <ol>
-                {% for l in c.active_lessons %}
-                <li><a href="{% url lesson_view l.id %}">{{ l }}</a></li>
-                {% endfor %}
-            </ol>
-            {% endif %}
-        {% endfor %}
-    </ul>
+    {% for c in categories %}
+        <h3>{{ c }}</h3>
+        {% if c.lessons %}
+        <ol>
+            {% for l in c.active_lessons %}
+            <li><a href="{% url lesson_view l.id %}">{{ l }}</a></li>
+            {% endfor %}
+        </ol>
+        {% endif %}
+    {% endfor %}
 {% else %}
     No categories have been added yet.
 {% endif %}
