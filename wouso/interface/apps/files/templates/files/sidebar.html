@@ -5,6 +5,11 @@
 
 {% block content %}
 
+    {% if number_of_files %}
+        {{ number_of_files }} {% trans 'files are available.' %}
+    {% else %}
+        {% trans 'No files are available.' %}
+    {% endif %}
     <a href="{% url files_index_view %}">{% trans 'View all' %}</a>
 
 {% endblock %}

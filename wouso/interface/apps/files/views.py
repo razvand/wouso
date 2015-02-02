@@ -26,7 +26,9 @@ def sidebar_widget(context):
     if File.disabled():
         return ''
 
-    return render_to_string('files/sidebar.html', {})
+    number_of_files = File.objects.all().count()
+    return render_to_string('files/sidebar.html',
+            {'number_of_files': number_of_files})
 
 
 register_sidebar_block('files', sidebar_widget)
