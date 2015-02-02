@@ -41,8 +41,10 @@ button {
 </td></tr>
 </table>
 
+{% comment "Do not use mobile interface" %}
 {% load url from future %}
-<a href="{% url 'social:begin' "clef" %}">Log in with your Phone</a>
+<a href="{% url 'social:begin' "clef"  %}">Log in with your Phone</a>
+{% endcomment %}
 
 <input type="hidden" name="next" value="{{ next }}" />
 {% csrf_token %}

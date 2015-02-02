@@ -94,11 +94,13 @@
     {{ config_hidden_footer }}
 	{% endautoescape %}
 
+    {% comment "Do not use mobile interface" %}
     {% if has_mobile %}
     <div id="mobile-footer">
         <a href="{% url homepage %}?mobile=0">Desktop</a> |
         <a href="{% url homepage %}?mobile=1">Mobile</a>
     </div>
     {% endif %}
+    {% endcomment %}
 </BODY>
 </HTML>
