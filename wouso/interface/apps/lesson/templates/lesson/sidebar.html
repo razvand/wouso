@@ -5,6 +5,11 @@
 
 {% block content %}
 
+    {% if number_of_active_lessons %}
+        {{ number_of_active_lessons }} {% trans 'lessons are active.' %}
+    {% else %}
+        {% trans 'No lessons are active.' %}
+    {% endif %}
     <a href="{% url lesson_index_view %}">{% trans 'View all' %}</a>
 
 {% endblock %}

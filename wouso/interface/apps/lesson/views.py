@@ -66,7 +66,9 @@ def sidebar_widget(context):
     if Lesson.disabled():
         return ''
 
-    return render_to_string('lesson/sidebar.html', {})
+    number_of_active_lessons = Lesson.objects.filter(active='True').count()
+    return render_to_string('lesson/sidebar.html',
+            {'number_of_active_lessons': number_of_active_lessons})
 
 
 register_sidebar_block('lesson', sidebar_widget)
