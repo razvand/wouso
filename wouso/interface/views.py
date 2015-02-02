@@ -11,9 +11,11 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.http import Http404, HttpResponseRedirect, HttpResponse
 from django.shortcuts import render_to_response, get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.template import RequestContext
 from django.views.decorators.csrf import csrf_exempt
 
+from wouso.core.ui import register_sidebar_block
 from wouso.core import signals
 from wouso.interface import logger, detect_mobile
 from wouso.interface.apps.pages.models import NewsItem
@@ -112,8 +114,6 @@ def homepage(request, page=u'1'):
 
     profile = request.user.get_profile()
     # gather users online in the last ten minutes
-    oldest = datetime.datetime.now() - datetime.timedelta(minutes = 10)
-    online_last10 = Player.objects.filter(last_seen__gte=oldest).order_by('-last_seen')
     activity = get_wall(page)
 
     topuser = profile.get_extension(TopUser)
@@ -133,7 +133,7 @@ def homepage(request, page=u'1'):
     news = news[:10]
 
     return render_to_response(template,
-                              {'last10': online_last10, 'activity': activity,
+                              {'activity': activity,
                               'is_homepage': True,
                               'top': topuser,
                               'topgroups': topgroups,
@@ -319,3 +319,21 @@ def division_view(request):
     return render_to_response('division.html',
                               {'division': division},
                               context_instance=RequestContext(request))
+
+@login_required()
+def online_players_view(request):
+    oldest = datetime.datetime.now() - datetime.timedelta(minutes = 10)
+    online_last10 = Player.objects.filter(last_seen__gte=oldest).order_by('-last_seen')
+    return render_to_response('interface/online_players.html',
+                              {'online_last10': online_last10},
+                              context_instance=RequestContext(request))
+
+
+def sidebar_widget(context):
+    oldest = datetime.datetime.now() - datetime.timedelta(minutes = 10)
+    number_of_online_players = Player.objects.filter(last_seen__gte=oldest).count()
+
+    return render_to_string('interface/online_players_sidebar.html',
+            {'number_of_online_players': number_of_online_players})
+
+register_sidebar_block('online_players', sidebar_widget)

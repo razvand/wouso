@@ -1,0 +1,17 @@
+{% extends 'interface/section_base.html' %}
+
+{% load i18n %}
+{% load user %}
+
+{% block title %}{% trans 'Online Players' %}{% endblock %}
+{% block sectiontitle %}{% trans 'Online Players' %}{% endblock %}
+
+{% block sectioncontent %}
+
+{% if online_last10 %}
+    {% for u in online_last10 %}
+        {% player u %}
+    {% endfor %}
+{% endif %}
+
+{% endblock %}

@@ -91,6 +91,10 @@ urlpatterns = patterns('',
         {'document_root': settings.MEDIA_ROOT}),
 
     url('', include('social.apps.django_app.urls', namespace='social')),
+
+    # Add online players page.
+    url(r'^online/','wouso.interface.views.online_players_view', name='online_players'),
+
 )
 
 # API only when we have piston

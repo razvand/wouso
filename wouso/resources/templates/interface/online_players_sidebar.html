@@ -1,0 +1,14 @@
+{% extends 'interface/sidebar_widget.html' %}
+{% load i18n %}
+
+{% block title %}<a href="{% url online_players %}">{%  trans 'Online Players' %}</a>{% endblock %}
+
+{% block content %}
+
+    {% if number_of_online_players %}
+        {{ number_of_online_players }} {% trans 'players are online.' %}
+    {% else %}
+        {% trans 'No players are online.' %}
+    {% endif %}
+
+{% endblock %}
