@@ -64,6 +64,7 @@
     <div id="sidebar">
         {% render_sidebar %}
 
+        {% comment %}
         {% if last10 %}
             <div class="widget">
                 <h2>{% trans 'Online players' %}</h2>
@@ -72,6 +73,7 @@
                     {% endfor %}
             </div>
         {% endif %}
+        {% endcomment %}
     </div>
 
     <div id="content">
