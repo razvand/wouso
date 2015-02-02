@@ -1,7 +1,7 @@
 {% extends 'interface/sidebar_widget.html' %}
 {% load i18n %}
 
-{% block title %}{%  trans 'Lessons' %}{% endblock %}
+{% block title %}<a href="{% url lesson_index_view %}">{%  trans 'Lessons' %}</a>{% endblock %}
 
 {% block content %}
 
@@ -10,6 +10,8 @@
     {% else %}
         {% trans 'No lessons are active.' %}
     {% endif %}
+<!-- RD: Nu mai punem link.
     <a href="{% url lesson_index_view %}">{% trans 'View all' %}</a>
+    -->
 
 {% endblock %}
