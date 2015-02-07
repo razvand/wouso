@@ -1,0 +1,9 @@
+{% load user %}
+{% load i18n %}
+{% load ui %}
+
+{% if user.is_authenticated %}
+<div id="leaderboard" class="row well">
+	<h4> Leaderboard </h4>
+</div>
+{% endif %}
