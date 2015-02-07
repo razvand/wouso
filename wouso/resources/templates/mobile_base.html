@@ -1,19 +1,22 @@
 {% load user %}
 {% load artifacts %}
 {% load i18n %}
+
 <!DOCTYPE html>
 <HTML xmlns="http://www.w3.org/1999/xhtml">
 <HEAD>
-<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<TITLE>{% block title %}{{config_title}}{% endblock %}</TITLE>
-<LINK rel="stylesheet" type="text/css" href="{{ basepath }}/static/css/style.css" />
-<LINK rel="stylesheet" type="text/css" href="{{ basepath }}/static/css/jquery.mobile-1.1.1.min.css" />
-<script type="text/javascript" src="{{ basepath }}/static/js/jquery-1.6.2.min.js"></script>
-<script type="text/javascript" src="{{ basepath }}/static/js/jquery.mobile-1.1.1.min.js"></script>
-<script type="text/javascript" src="{{ basepath }}/static/js/jquery.autocomplete.js"></script>
-<script type="text/javascript" src="{{ basepath }}/static/js/format.item.js"></script>
-{% block scripts %}{% endblock %}
+	<META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<TITLE>{% block title %}{{config_title}}{% endblock %}</TITLE>
+	<!-- <LINK rel="stylesheet" type="text/css" href="{{ basepath }}/static/css/style.css" /> -->
+
+	<LINK rel="stylesheet" type="text/css" href="{{ basepath }}/static/css/jquery.mobile-1.1.1.min.css" />
+
+	<script type="text/javascript" src="{{ basepath }}/static/js/jquery-1.6.2.min.js"></script>
+	<script type="text/javascript" src="{{ basepath }}/static/js/jquery.mobile-1.1.1.min.js"></script>
+	<script type="text/javascript" src="{{ basepath }}/static/js/jquery.autocomplete.js"></script>
+	<script type="text/javascript" src="{{ basepath }}/static/js/format.item.js"></script>
+	{% block scripts %}{% endblock %}
 </HEAD>
 
 <BODY>
