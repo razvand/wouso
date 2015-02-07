@@ -648,6 +648,7 @@ msgid ""
 msgstr ""
 "\n"
 "Disponibil până la %(end)s. Progresul tău: %(time_took)s\n"
+"                "
 
 #: games/quest/templates/quest/index.html:19
 msgid "Quest finished!"
@@ -662,6 +663,7 @@ msgid ""
 msgstr ""
 "\n"
 "Ai trecut %(count)s niveluri în %(time_took)s.\n"
+"                    "
 
 #: games/quest/templates/quest/index.html:30
 msgid "Current level"
