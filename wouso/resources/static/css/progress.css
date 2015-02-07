@@ -1,0 +1,62 @@
+/* Copied from bootstrap. */
+
+.player-info {
+    width: 275px;
+}
+
+#progress .well {
+	border: none;
+
+	-webkit-box-shadow: 0 0 25px rgba(0, 0, 0, 0.04);
+	-moz-box-shadow: 0 0 25px rgba(0, 0, 0, 0.04);
+	box-shadow: 0 0 25px rgba(0, 0, 0, 0.04);
+}
+
+#progress .info {
+	overflow: hidden;
+}
+
+#progress .info .name {
+	text-align: right;
+}
+
+#progress .avatar {
+	float: right;
+}
+
+#progress .progress {
+	width: 100%;
+	margin: 20px 0 0 0;
+	padding: 0;
+	position: relative;
+}
+
+#progress .xp-icon {
+	width: 32px;
+	height: 20px;
+	margin: 0 0 0 0;
+	/*background: #1CAFF6;*/
+	color: #FFF;
+	line-height: 20px;
+	text-align: center;
+	font-weight: bold;
+
+	position: absolute;
+	left: 8px;
+}
+
+#progress .xp-value {
+	color: #1CAFF6;
+	display:inline-block;
+	vertical-align:middle;
+}
+
+#progress .achivement {
+	display: none;
+}
+
+#progress .activity-achivement {
+	vertical-align: middle;
+	display: inline-block;
+	color: #FFA200;
+}

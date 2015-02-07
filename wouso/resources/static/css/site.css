@@ -1,0 +1,27 @@
+body {
+	padding-top: 80px;
+	background: url(../img/geometry2.png) repeat top fixed;
+	font-family: 'Open Sans', 'Arial', sans-serif;
+	text-rendering: optimizeLegibility;
+	-webkit-text-size-adjust: 100%;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+h1,h2,h3,h4,h5,h6 {
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+a:focus {
+	outline: none;
+}
+
+#search-bar {
+	margin: 0 0 10px 0;
+}
+
+
+#sidebar {
+	float: right;
+}

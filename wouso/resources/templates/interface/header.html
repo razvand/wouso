@@ -2,42 +2,40 @@
 {% load i18n %}
 {% load ui %}
 
-<!-- Logo -->
-<div id="logo" class="pull-left">
-    <a href="{% url homepage %}" id="logo" title="{{config_title}}"></a>
-</div>
+<header id="header" class="navbar navbar-fixed-top navbar-learningpark">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+				<span class="sr-only">Toggle navigation</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" style="padding:0 15px;" href="#">
+				<img src="{{ basepath }}/static/img/owl_small.png" width="38px"></a>
+			<a class="navbar-brand" href="/">LearningPark</a>
+		</div>
 
-<!-- Buttons -->
-<div class="pull-right">
-    <div class="first-line">
-    {% if user.is_authenticated %}
-        {% if user.real_user %}
-            Impersonated by {{ user.real_user }} <a href="{% url impersonate_clear %}">clear</a>
-        {% endif %}
-        <a id="head-forum" href="{% url forums_overview %}">Forum</a>
-        {% if perms.config.change_setting %}
-        <a id="head-cpanel" href="{% url status %}">CPanel</a>
-        {% endif %}
-
-        <a id="head-logout" href="{% url logout_view %}" onclick="remove_storage()">{% trans "Logout" %} &raquo;</a>
-    {% else %}
-    {% trans 'Anonymous' %}, <a href="{% url login_view %}">{% trans "Login" %} &raquo;</a>
-    {% endif %}
-    </div>
-    <!-- Avatar -->
-    {% if user.is_authenticated %}
-    <div class="media player-info">
-        <a class="pull-right" href="{% url player_profile player.id %}">
-            <img src="{% player_avatar player %}" class="media-object avatar avatar-med" />
-        </a>
-        <div class="media-body" style="padding-top: 10px">
-            <h4 class="media-heading" style="text-align: right">{% player player %}</h4>
-            <div class="player-info-text">
-                {% trans 'Level' %} {{ player.level_no }}
-                {% coin_amount player %}
-                {% coin_amount player 'gold' %}
-            </div>
-        </div>
-    </div>
-    {% endif %}
-</div>
+		<div class="collapse navbar-collapse">
+			<ul class="nav navbar-nav">
+				<li><a href="/lessons">{% trans 'Lessons' %}</a></li>
+				<li><a href="/g/quiz">{% trans 'Quiz' %}</a></li>
+				<li><a href="/files">{% trans 'Files' %}</a></li>
+				<li><a href="{% url forums_overview %}">{% trans 'Forum' %}</a></li>
+				{% if perms.config.change_setting %}
+				<li><a href="{% url status %}">CPanel</a></li>
+				{% endif %}
+			</ul>
+			<form class="form-inline navbar-form navbar-right">
+				{% if user.is_authenticated %}
+					{% if user.real_user %}
+						Impersonated by {{ user.real_user }} <a href="{% url impersonate_clear %}">clear</a>
+					{% endif %}
+					<a class="btn btn-success" href="{% url logout_view %}" onclick="remove_storage()">{% trans "Logout" %} &raquo;</a>
+				{% else %}
+				{% trans 'Anonymous' %}, <a class="btn btn-success" href="{% url login_view %}">{% trans "Login" %} &raquo;</a>
+				{% endif %}
+			</form>
+		</div>
+	</div>
+</header>
