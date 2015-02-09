@@ -4,16 +4,11 @@
 {% load i18n %}
 
 {% block title %}{{ race }}{% endblock %}
-{% block scripts %}
-	<script type="text/javascript" src="{{ basepath }}/static/js/tabs.js"></script>
-	<script type="text/javascript" src="{{ basepath }}/static/js/jquery.flot.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="{{ basepath }}/static/css/tabs.css" />
-{% endblock %}
 
 {% block content %}
 <div class="section">
 	<!-- TODO: WHAT's with the profile and group classes -->
-	<!-- TODO: @by Gabriel Ivanica  -->
+	<!-- TODO: @Gabriel Ivanica  -->
 	<div class="profile group-{{ race.name.lower }} race-{{ race.id }}">
 		<div class="section_title">
 			<div class="row">
@@ -151,4 +146,5 @@
 		</div>
 	</div>
 </div>
+
 {% endblock %}
