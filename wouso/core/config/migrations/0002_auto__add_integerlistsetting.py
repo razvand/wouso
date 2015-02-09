@@ -36,12 +36,4 @@ class Migration(SchemaMigration):
         }
     }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
     complete_apps = ['config']
-=======
-    complete_apps = ['config']
->>>>>>> 6b45c8d... Add config migrations
-=======
-    complete_apps = ['config']
->>>>>>> f326c87... Add EOF newline
