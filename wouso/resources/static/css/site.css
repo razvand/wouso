@@ -13,8 +13,7 @@ h1,h2,h3,h4,h5,h6 {
 	margin-bottom: 10px;
 }
 
-.btn:active:focus, .btn:focus,
-a:focus {
+.btn:active:focus, .btn:focus, input, a:focus, label {
 	outline: none;
 }
 
@@ -91,7 +90,6 @@ a:focus {
 
 }
 
-
 #content #files .files h4 {
 	padding: 10px 20px;
 	margin: 10px 0 0 0;
@@ -102,3 +100,105 @@ a:focus {
 #content table {
 	border: 1px solid #DDD;
 }
+
+/*
+ * QUIZZES
+ */
+
+.timer {
+	padding: 6px;
+	background-color: #FFF;
+	text-align: center;
+	font-size: 24px;
+
+	border: 2px solid #DDD;
+	border-radius: 5px;
+
+	position: fixed;
+	top: 10px;
+	left: 65%;
+	z-index: 1500;
+}
+
+.timer[data-warning] {
+	color: red;
+}
+
+.quiz {
+	padding: 20px 0;
+	border: 1px solid #EEE;
+}
+
+.quiz ol {
+	margin: 0;
+}
+
+.quiz ol li {
+	font-size: 1.3em;
+	color: #FFF;
+}
+
+.quiz .question {
+	margin: 10px 0 10px -40px;
+	padding: 5px 5px 5px 40px;
+	background: #60C6F4;
+	color: #F5F5F5;
+}
+
+.quiz .answers {
+	background: #FFF;
+}
+
+.quiz .radio label {
+	width: 100%;
+	margin: 0 0 0 -20px;
+	padding: 5px 10px 5px 30px;
+	border-radius: 5px;
+}
+
+.quiz .radio label:hover {
+	background: #F5F5F5;
+}
+
+.quiz .actions {
+	width: 100px;
+	margin: 0 auto;
+}
+
+.quiz button {
+	width: 100%;
+}
+
+.quiz-answer .result-message {
+	margin: 50px 0;
+	text-align: center;
+}
+
+.center-action-button {
+	width: 100px;
+	margin: 0 auto;
+}
+
+.bg-message p {
+	padding: 15px;
+}
+
+/*
+ * Messages
+ */
+
+.create-message-btn {
+	float: right;
+}
+
+#compose-message {
+	margin-top: 30px;
+	margin-bottom: 30px;
+}
+
+#compose-message .actions button {
+	width: 100px;
+	float: right;
+	margin: 0 0 0 10px;
+}
+
