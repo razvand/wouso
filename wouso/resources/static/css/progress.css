@@ -16,14 +16,6 @@
 	overflow: hidden;
 }
 
-#progress .info .name {
-	text-align: right;
-}
-
-#progress .avatar {
-	float: right;
-}
-
 #progress .progress {
 	width: 100%;
 	margin: 20px 0 0 0;
@@ -47,8 +39,8 @@
 
 #progress .xp-value {
 	color: #1CAFF6;
-	display:inline-block;
-	vertical-align:middle;
+	display: block;
+	float: left;
 }
 
 #progress .achivement {

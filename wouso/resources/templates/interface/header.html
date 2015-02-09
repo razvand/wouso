@@ -3,39 +3,44 @@
 {% load ui %}
 
 <header id="header" class="navbar navbar-fixed-top navbar-learningpark">
-	<div class="container">
-		<div class="navbar-header">
-			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-				<span class="sr-only">Toggle navigation</span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-				<span class="icon-bar"></span>
-			</button>
-			<a class="navbar-brand" style="padding:0 15px;" href="#">
-				<img src="{{ basepath }}/static/img/owl_small.png" width="38px"></a>
-			<a class="navbar-brand" href="/">LearningPark</a>
-		</div>
+	<nav class="navbar navbar-fixed-top navbar-learningpark">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+					<span class="sr-only">Toggle navigation</span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" style="padding:0 15px;" href="#">
+					<img src="{{ basepath }}/static/img/owl_small.png" width="38px"></a>
+				<a class="navbar-brand" href="/">LearningPark</a>
+			</div>
 
-		<div class="collapse navbar-collapse">
-			<ul class="nav navbar-nav">
-				<li><a href="/lessons">{% trans 'Lessons' %}</a></li>
-				<li><a href="/g/quiz">{% trans 'Quiz' %}</a></li>
-				<li><a href="/files">{% trans 'Files' %}</a></li>
-				<li><a href="{% url forums_overview %}">{% trans 'Forum' %}</a></li>
-				{% if perms.config.change_setting %}
-				<li><a href="{% url status %}">CPanel</a></li>
-				{% endif %}
-			</ul>
-			<form class="form-inline navbar-form navbar-right">
-				{% if user.is_authenticated %}
-					{% if user.real_user %}
-						Impersonated by {{ user.real_user }} <a href="{% url impersonate_clear %}">clear</a>
+			<div id="navbar" class="collapse navbar-collapse">
+				<ul class="nav navbar-nav">
+					<li><a href="/lessons">{% trans 'Lessons' %}</a></li>
+					<li><a href="/g/quiz">{% trans 'Quiz' %}</a></li>
+					<li><a href="/files">{% trans 'Files' %}</a></li>
+					<li><a href="/m">{% trans 'Messages' %}</a></li>
+					<li><a href="/leaderboard">{% trans 'Leaderboard' %}</a></li>
+					<li><a href="{% url forums_overview %}">{% trans 'Forum' %}</a></li>
+					{% if perms.config.change_setting %}
+					<li><a href="{% url status %}">CPanel</a></li>
 					{% endif %}
-					<a class="btn btn-success" href="{% url logout_view %}" onclick="remove_storage()">{% trans "Logout" %} &raquo;</a>
-				{% else %}
-				{% trans 'Anonymous' %}, <a class="btn btn-success" href="{% url login_view %}">{% trans "Login" %} &raquo;</a>
-				{% endif %}
-			</form>
+				</ul>
+				<form class="form-inline navbar-form navbar-right">
+					{% if user.is_authenticated %}
+						{% if user.real_user %}
+							Impersonated by {{ user.real_user }} <a href="{% url impersonate_clear %}">clear</a>
+						{% endif %}
+						<a class="btn" href="{% url logout_view %}" onclick="remove_storage()">{% trans "Logout" %} &raquo;</a>
+					{% else %}
+					{% trans 'Anonymous' %}
+					<a class="btn" href="{% url login_view %}">{% trans "Login" %} &raquo;</a>
+					{% endif %}
+				</form>
+			</div>
 		</div>
-	</div>
+	</nav>
 </header>

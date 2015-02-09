@@ -1,0 +1,45 @@
+
+
+.course {
+	padding: 20px;
+	overflow: hidden;
+}
+
+.course-container {
+	height: 200px;
+	border: 1px solid #EEE;
+	position: relative;
+	overflow: hidden;
+}
+
+@media all and (max-width: 991px) and (min-width: 480px) {
+	.course-container {
+		height: 300px;
+	}
+}
+
+
+.course:hover .title {
+	padding: 20px;
+	background: rgba(28, 175, 246, .8);
+	color: #FFF;
+}
+
+.course .title {
+	width: 100%;
+	padding: 10px 20px;
+	margin: 0;
+	background: rgba(0, 0, 0, 0.6);
+	color: #DDD;
+	text-align: center;
+	font-weight: bold;
+
+	position: absolute;
+	bottom: 0;
+
+	transition: all 0.2s ease-out;
+}
+
+.course .course-img {
+	width: 100%;
+}
