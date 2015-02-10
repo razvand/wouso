@@ -54,8 +54,8 @@ class Question(models.Model):
     Dynamic questions also store a validation code, that run against
     the given answer should return True or False if the answer is valid.
     """
-    text = models.TextField()
-    rich_text = RichTextField()
+    text = models.TextField(null=True, blank=True, default="")
+    rich_text = RichTextField(null=True, blank=True, default="")
     proposed_by = models.ForeignKey(User, null=True, blank=True, related_name="%(app_label)s_%(class)s_proposedby_related")
     endorsed_by = models.ForeignKey(User, null=True, blank=True, related_name="%(app_label)s_%(class)s_endorsedby_related")
     active = models.BooleanField()
@@ -157,7 +157,7 @@ class Question(models.Model):
 class Answer(models.Model):
     question = models.ForeignKey(Question)
     text = models.TextField()
-    rich_text = RichTextField()
+    rich_text = RichTextField(null=True, blank=True)
     explanation = models.TextField(null=True, default='', blank=True)
     correct = models.BooleanField()
     active = models.BooleanField(default=True)

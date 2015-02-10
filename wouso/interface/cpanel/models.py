@@ -15,7 +15,7 @@ class Customization(ConfigGroup):
         einfo = HTMLSetting.get('extrainfo')
         hf = HTMLSetting.get('hidden_footer')
         theme = ChoicesSetting.get('theme')
-        theme.choices = [(t,t) for t in get_themes()]
+        theme.choices = [(t, t) for t in get_themes()]
         logo = Setting.get('logo')
 
         default_group = ChoicesSetting.get('default_group')
@@ -24,7 +24,12 @@ class Customization(ConfigGroup):
         default_race = ChoicesSetting.get('default_race')
         default_race.choices = [(unicode(g), str(g.id)) for g in Race.objects.all()]
 
-        return [title, intro, theme, logo, hf, default_group, default_race, einfo]
+        question_number_of_answers = IntegerSetting.get('question_number_of_answers')
+
+        level_limits = IntegerListSetting.get('level_limits')
+
+        return [title, intro, theme, logo, hf, default_group, default_race, einfo, question_number_of_answers,
+                level_limits]
 
 
 class Switchboard(ConfigGroup):
