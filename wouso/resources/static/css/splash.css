@@ -20,7 +20,10 @@ body {
 }
 
 #logo {
-	background: url('../img/logo.png') 50% 50% no-repeat;
+	background: url('../img/csapcslogo512.png');
+	background-size: contain;
+	background-repeat: no-repeat;
+	background-position: center;
 	height: 220px;
 }
 
@@ -31,7 +34,6 @@ body {
 }
 
 .login-box {
-	height: 300px;
 	background: #1493D1;
 	background: rgba(255, 255, 255, 0.4);
 }
@@ -44,7 +46,6 @@ body {
 }
 
 #login {
-	height: 100%;
 	background: #FFF;
 	padding: 20px 20px;
 	border: 5px solid #6FCBF5;
@@ -75,6 +76,12 @@ body {
 
 #login .help {
 	font-size: 12px;
-	position: absolute;
-	bottom: 10px;
+	margin: 40px 0 0 0;
+	text-align: center;
+}
+
+#login .error {
+	color: #F25345;
+	margin: 10px 0;
+	text-align: center;
 }
