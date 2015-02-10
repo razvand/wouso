@@ -29,10 +29,9 @@
 	</div>
 
 	<div class="progress row">
-		<div class="progress-bar progress-bar-warning active" role="progressbar"
+		<div class="progress-bar progress-bar-success active" role="progressbar"
 			aria-valuenow="60" aria-valuemin="0" aria-valuemax="100" style="width: 0%">
-			<span class="sr-only">60% Complete (warning)</span>
-			<span class="xp-label">XP </span>
+			<span class="xp-label"></span>
 			<span class="current-level level">{{ player.level_no }} </span>
 			<span class="next-level level">{{ player.level_progress.next_level }}</span>
 		</div>
@@ -52,6 +51,7 @@
 			var progress = document.querySelector('#progress .progress-bar');
 			progress.style.width = percentage + '%';
 			progress.setAttribute('aria-valuenow', percentage);
+			progress.firstChild.textContent = percentage + ' %';
 		});
 	</script>
 
