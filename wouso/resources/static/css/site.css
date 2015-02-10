@@ -134,15 +134,15 @@ h1,h2,h3,h4,h5,h6 {
 }
 
 .quiz ol li {
-	font-size: 1.3em;
-	color: #FFF;
+	font-size: 1.2em;
+	color: #333;
 }
 
 .quiz .question {
 	margin: 10px 0 10px -40px;
-	padding: 5px 5px 5px 40px;
-	background: #60C6F4;
-	color: #F5F5F5;
+	padding: 10px 5px 10px 40px;
+	background: #EEE;
+	color: #333;
 }
 
 .quiz .answers {
