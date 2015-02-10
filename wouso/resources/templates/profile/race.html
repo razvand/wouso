@@ -43,6 +43,30 @@
 		</div>
 	</div>
 
+	<section class="subgroups">
+		<table class="table table-striped table-hover">
+			<tr>
+				<th>{% trans 'Name' %}</th>
+				<th>{% trans 'Score' %}</th>
+				<th>{% trans '#' %}</th>
+			</tr>
+			{% for u in top_users %}
+				<tr>
+					<td>{% player u %}</td>
+					<td>{{ u.points }}</td>
+					{% if not race.parent %}
+						<td>{% player_group u.group %}</td>
+					{% endif %}
+				</tr>
+				{% empty %}
+				<li class="empty">{% trans 'Sorry, no users in this race' %}</li>
+			{% endfor %}
+		</table>
+	</section>
+
+	<!-- TODO: @Gabriel Ivanica  -->
+	<!-- Uncoment this when Activity and Evolution will be implemented -->
+	<!--
 	<div role="tabpanel">
 		<ul class="nav nav-tabs nav-justified" role="tablist">
 			<li role="presentation" class="active">
@@ -144,6 +168,7 @@
 			</div>
 		</div>
 	</div>
+	-->
 </div>
 
 {% endblock %}
