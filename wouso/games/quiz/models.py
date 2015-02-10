@@ -1,6 +1,10 @@
+import os
+import pickle
+
 from datetime import datetime
 from random import shuffle
 
+from django.conf import settings
 from django.db import models
 from django.utils.translation import ugettext as _
 
@@ -10,6 +14,22 @@ from wouso.core.user.models import Player
 from wouso.core.game.models import Game
 from wouso.core.qpool import register_category, get_questions_with_tag_and_category
 from wouso.core.qpool.models import Question, Tag
+
+
+class QuizCategory(models.Model):
+    name = models.CharField(max_length=100)
+    logo = models.ImageField(upload_to=settings.MEDIA_QUIZCATEGORY_LOGO_DIR, null=True, blank=True)
+
+    @property
+    def quizzes(self):
+        return self.quiz_set.all()
+
+    @property
+    def logo_url(self):
+        return os.path.join(settings.MEDIA_QUIZCATEGORY_LOGO_URL, os.path.basename(str(self.logo))) if self.logo else ""
+
+    def __unicode__(self):
+        return self.name
 
 
 class Quiz(models.Model):
@@ -24,8 +44,9 @@ class Quiz(models.Model):
         ('L', 'Lesson')
     }
 
+    category = models.ForeignKey(QuizCategory, null=True, blank=True)
+
     name = models.CharField(max_length=100)
-    number_of_questions = models.IntegerField(default=5)
     time_limit = models.IntegerField(default=300)
 
     type = models.CharField(max_length=1, choices=TYPES)
@@ -33,7 +54,7 @@ class Quiz(models.Model):
     points_reward = models.IntegerField(default=100)
     gold_reward = models.IntegerField(default=30)
 
-    tags = models.ManyToManyField(Tag)
+    tags = models.TextField(blank=True, null=True)
 
     start = models.DateTimeField()
     end = models.DateTimeField()
@@ -92,8 +113,8 @@ class Quiz(models.Model):
             if checked_answer_id == correct_answer_id:
                 correct_count += 1
 
-        points = int((correct_count / total_count) * self.points_reward)
-        gold = int((correct_count / total_count) * self.gold_reward)
+        points = int((correct_count / total_count) * int(self.points_reward))
+        gold = int((correct_count / total_count) * int(self.gold_reward))
         return points, gold
 
     def __unicode__(self):
@@ -117,9 +138,6 @@ class QuizGame(Game):
         super(QuizGame, self).__init__(*args, **kwargs)
 
 
-register_category(QuizGame.QPOOL_CATEGORY, QuizGame)
-
-
 class QuizUser(Player):
     """
      Extension of the User object, customized for quiz
@@ -134,6 +152,12 @@ class QuizUser(Player):
         return active_quizzes
 
     @property
+    def inactive_quizzes(self):
+        through = UserToQuiz.objects.filter(user=self)
+        inactive_quizzes = [t for t in through if t.quiz.is_inactive() and t.quiz.is_public()]
+        return inactive_quizzes
+
+    @property
     def expired_quizzes(self):
         through = UserToQuiz.objects.filter(user=self)
         expired_quizzes = [t for t in through if t.quiz.is_expired()]
@@ -146,6 +170,8 @@ class QuizUser(Player):
 
 
 Player.register_extension('quiz', QuizUser)
+
+register_category(QuizGame.QPOOL_CATEGORY, QuizGame)
 
 
 class UserToQuiz(models.Model):
@@ -163,7 +189,6 @@ class UserToQuiz(models.Model):
     questions = models.ManyToManyField(Question)
     state = models.CharField(max_length=1, choices=CHOICES, default='N')
     start = models.DateTimeField(blank=True, null=True)
-    attempts = models.ManyToManyField('QuizAttempt')
 
     @property
     def all_attempts(self):
@@ -184,9 +209,19 @@ class UserToQuiz(models.Model):
     def make_questions(self):
         if self.questions.count() != 0:
             return
-        questions = [q for q in get_questions_with_tag_and_category(list(self.quiz.tags.all()), 'quiz')]
+
+        t = pickle.loads(self.quiz.tags)
+        questions = []
+        for k in t:
+            q = get_questions_with_tag_and_category(k, 'quiz')
+            # Cannot shuffle a queryset, create list from it
+            q = list(q)
+            shuffle(q)
+            for i in q[:t[k]]:
+                questions.append(i)
+
         shuffle(questions)
-        self.questions = questions[:self.quiz.number_of_questions]
+        self.questions = questions
 
     def _give_bonus(self, points, gold):
         if self.best_attempt is not None:
@@ -214,12 +249,15 @@ class UserToQuiz(models.Model):
         self.start = datetime.now()
         self.save()
 
-    def set_played(self, points, gold):
+    def set_played(self, results, points, gold):
         # Bonus must be given before creating a new attempt, otherwise
         # player will not be bonused in case of new highscore
         self.state = 'P'
-        self._give_bonus(points=points, gold=gold)
-        self.attempts.create(date=datetime.now(), points=points, gold=gold)
+        self._give_bonus(points, gold)
+        a = QuizAttempt.objects.create(results=str(results),
+                                       points=points,
+                                       gold=gold)
+        self.attempts.add(a)
         self.save()
 
     @property
@@ -250,6 +288,8 @@ class QuizAttempt(models.Model):
     """
      Stores information about each quiz attempt
     """
-    date = models.DateTimeField(blank=True, null=True)
+    user_to_quiz = models.ForeignKey(UserToQuiz, related_name='attempts', blank=True, null=True)
+    date = models.DateTimeField(auto_now_add=True, default=True, null=True)
+    results = models.TextField(blank=True, null=True)
     points = models.IntegerField(default=-1)
     gold = models.IntegerField(default=0)

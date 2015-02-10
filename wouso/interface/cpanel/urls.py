@@ -8,6 +8,8 @@ upat = [
     url(r'^customization/games/$', 'wouso.interface.cpanel.views.customization_games', name='customization_games'),
     url(r'^customization/features/$', 'wouso.interface.cpanel.views.customization_features', name='customization_features'),
     url(r'^customization/display/$', 'wouso.interface.cpanel.views.customization_display', name='customization_display'),
+    url(r'^customization/levels/$', 'wouso.interface.cpanel.views.customization_levels', name='customization_levels'),
+    url(r'^customization/set_levels/$', 'wouso.interface.cpanel.views.customization_set_levels', name='customization_set_levels'),
 
     url(r'^leaderboards/$', 'wouso.interface.cpanel.views.leaderboards', name='leaderboards'),
 
@@ -17,12 +19,8 @@ upat = [
     url(r'^qpool/$', 'wouso.interface.cpanel.views.qpool_home', name='qpool_home'),
     url(r'^qpool/(?P<page>\d+)/$', 'wouso.interface.cpanel.views.qpool_home', name='qpool_home'),
     url(r'^qpool/tag_questions/$', 'wouso.interface.cpanel.views.qpool_tag_questions', name='tag_questions'),
-    url(r'^qpool/edit/(?P<pk>\d+)/add_answer', 'wouso.interface.cpanel.views.qpool_add_answer', name='add_answer'),
-    url(r'^qpool/edit/(?P<id>\d+)/$', 'wouso.interface.cpanel.views.qpool_edit', name='question_edit'),
     url(r'^qpool/del/(?P<id>\d+)/$', 'wouso.interface.cpanel.views.qpool_delete', name='question_del'),
-    url(r'^qpool/del/(?P<question_id>\d+)/(?P<answer_id>\d+)/$', 'wouso.interface.cpanel.views.qpool_delete_answer', name='answer_del'),
     url(r'^qpool/set_active_categories', 'wouso.interface.cpanel.views.qpool_set_active_categories', name='set_active_categories'),
-    url(r'^qpool/new/$', 'wouso.interface.cpanel.views.qpool_new', name='question_new'),
     url(r'^qpool/switch_active/(?P<id>\d+)/$', 'wouso.interface.cpanel.views.question_switch', name='switch_active'),
     url(r'^qpool/importer/$', 'wouso.interface.cpanel.views.qpool_importer', name='importer'),
     url(r'^qpool/importer/send$', 'wouso.interface.cpanel.views.qpool_import_from_upload', name='importer_send'),
