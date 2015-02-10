@@ -10,17 +10,17 @@
 {% if categories %}
     {% for c in categories %}
         <h3>{{ c }}</h3>
-        {% if c.lessons %}
-        <ol>
-            {% for l in c.active_lessons %}
-            <li><a href="{% url lesson_view l.id %}">{{ l }}</a></li>
-            {% endfor %}
-        </ol>
-        {% endif %}
+        {% for t in c.tags.all %}
+        <strong>{{ t }}</strong>
+            <ol>
+                {% for l in t.active_lessons %}
+                <li><a href="{% url lesson_view l.id %}">{{ l }}</a></li>
+                {% endfor %}
+            </ol>
+        {% endfor %}
     {% endfor %}
 {% else %}
     {% trans 'No lessons have been added.' %}
 {% endif %}
-
 
 {% endblock %}
