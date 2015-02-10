@@ -82,8 +82,12 @@
         {% endif %}
         {% endcomment %}
 
+        {% if profile.user.id == user.id and user.has_usable_password %}
+        <a class="button" href="{% url password_change %}" title="{% trans 'Change password' %}">{% trans 'Change password' %}</a>
+        {% endif %}
+
         {% comment "No reporting" %}
-        <a class="button" href="{% url report_player profile.id%}">{% trans 'Report' %}</a>
+        <a class="button" href="{% url report_player profile.id%}" title="Report this player to the game administators">{% trans 'Report' %}</a>
         {% endcomment %}
     </div>
 
