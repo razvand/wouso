@@ -106,16 +106,16 @@ h1,h2,h3,h4,h5,h6 {
  */
 
 .timer {
-	padding: 6px;
+	padding: 3px 20px;
 	background-color: #FFF;
 	text-align: center;
 	font-size: 24px;
 
-	border: 2px solid #DDD;
+	border: 1px solid #DDD;
 	border-radius: 5px;
 
 	position: fixed;
-	top: 10px;
+	top: 15px;
 	left: 65%;
 	z-index: 1500;
 }
