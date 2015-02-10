@@ -1,14 +1,13 @@
-{% extends 'interface/sidebar_widget.html' %}
+{% load user %}
+{% load ui %}
+{% load artifacts %}
 {% load i18n %}
 
-{% block title %}<a href="{% url messaging %}">{%  trans 'Messaging' %}</a>{% endblock %}
 
-{% block content %}
-
-    {% if number_of_received_messages %}
-        {% trans 'You received' %} {{ number_of_received_messages }} {% trans 'messages.' %}
-    {% else %}
-        {% trans "You didn't receive any messages." %}
-    {% endif %}
-
-{% endblock %}
+{% if number_of_received_messages %}
+	<div class="well">
+		<a href="/m" class="text-danger">
+			{% trans 'You have' %} {{ number_of_received_messages }} {% trans 'new messages' %}
+		</a>
+	</div>
+{% endif %}
