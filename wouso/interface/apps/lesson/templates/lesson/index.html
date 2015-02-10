@@ -17,15 +17,6 @@
 		        </a>
 	        </div>
     	</section>
-
-        <!-- {% if c.lessons %}
-        <ol>
-            {% for l in c.active_lessons %}
-            <li><a href="{% url lesson_view l.id %}">{{ l }}</a></li>
-            {% endfor %}
-        </ol>
-        {% endif %} -->
-
 	{% endfor %}
 {% else %}
     {% trans 'No lessons have been added.' %}
