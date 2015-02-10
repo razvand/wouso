@@ -252,7 +252,7 @@ class Player(models.Model):
 
     @cached_method
     def _avatar(self):
-        avatar = "http://www.gravatar.com/avatar/%s.jpg?d=%s" % (md5(self.user.email).hexdigest(), settings.AVATAR_DEFAULT)
+        avatar = "https://www.gravatar.com/avatar/%s.jpg?d=%s" % (md5(self.user.email).hexdigest(), settings.AVATAR_DEFAULT)
         return avatar
 
     # special:
