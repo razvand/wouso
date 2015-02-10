@@ -2,10 +2,15 @@
 
 {% block content %}
 <div class="section">
-    <h2>{% block title %}{% block sectiontitle %}title{% endblock %}{% endblock %}</h2>
-    <div class="section-content">
-        {% block sectioncontent %}
-        {% endblock %}
-    </div>
+	<h2 class="section_title">
+		{% block title %}
+			{% block sectiontitle %}
+			{% endblock %}
+		{% endblock %}
+	</h2>
+	<div class="section-content">
+		{% block sectioncontent %}
+		{% endblock %}
+	</div>
 </div>
 {% endblock %}

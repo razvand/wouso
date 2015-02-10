@@ -3,38 +3,46 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>{{config_title}}</title>
-    <LINK rel="stylesheet" type="text/css" href="{{ basepath }}/static/css/splash.css" />
-    <LINK rel="stylesheet" type="text/css" href="{{ basepath }}/static/themes/{{ config_theme }}/styles.css" />
+	<link rel="stylesheet" href="{{ basepath }}/static/libs/bootstrap/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ basepath }}/static/css/splash.css" />
 </head>
 <body>
-	<div id="floater"></div>
-	<div id="centered">
+	<div id="container">
         <div id="logo"></div>
 
-        <div id="side">
-            <form action="{% url wouso.interface.views.login_view %}" method="post">
-                <label for="username">{% trans 'username' %}:</label>
-                <input size="10" name="username" id="username" class="big" />
-                <label for="password">{% trans 'password' %}:</label>
-                <input size="10" name="password" id="password" class="big" type="password" />
-                <button type="submit">Enter &raquo;</button>
-                {% csrf_token %}
-            </form>
-		<p>
-		Pentru probleme în accesarea platformei deschide un tichet pe <a href="http://support.learningpark.ro">site-ul de suport</a>.
-		</p>
-        </div>
-
-        <div id="content">
+        <div class="title">
             {% include 'messages.html' %}
-            <h2>{{ config_title }}</h2>
-            <p>
-                {% autoescape off %}
-                {{config_intro}}
-                {% endautoescape %}
-			</p>
+            <h3>{{ config_title }}</h3>
 		</div>
 
+		<section class="row login-box">
+			<div class="about col-md-7">
+	            <p>
+	                {% autoescape off %}
+	                	{{config_intro}}
+	                {% endautoescape %}
+				</p>
+			</div>
+			<div id="login" class="col-md-5">
+	            <form action="{% url wouso.interface.views.login_view %}" method="post">
+	            	<div class="form-group">
+		                <label for="username">{% trans 'username' %}</label>
+		                <input type="text" class="form-control" name="username" id="username" placeholder="{% trans 'username' %}"/>
+	            	</div>
+	            	<div class="form-group">
+		                <label for="password">{% trans 'password' %}</label>
+		                <input type="password" class="form-control" name="password" id="password" placeholder="{% trans 'password' %}"/>
+					</div>
+	            	<div class="form-group submit">
+	                	<button type="submit" class="btn btn-success">{% trans 'login' %}</button>
+	                </div>
+	                {% csrf_token %}
+	            </form>
+				<section class="help">
+					Pentru probleme în accesarea platformei deschide un tichet pe <a href="http://support.learningpark.ro">site-ul de suport</a>.
+				</section>
+			</div>
+		</section>
 	</div>
 
 	{% autoescape off %}

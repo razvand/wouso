@@ -1,0 +1,16 @@
+{% load user %}
+{% load ui %}
+{% load artifacts %}
+{% load i18n %}
+
+<div id="search-bar">
+	<form method="post" action="{{ basepath }}/search/">
+		<div class="input-group">
+			<input type="text" class="form-control" id="users-query" name="query" size="10" value="{{ search_query }}"/>
+			<div class="input-group-btn">
+				<button type="submit" class="btn"> {% trans 'Search player' %} </button>
+			</div>
+		</div>
+	</form>
+	<section class="suggestions"> </section>
+</div>

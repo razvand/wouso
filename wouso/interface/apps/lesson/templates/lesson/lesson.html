@@ -3,58 +3,58 @@
 {% load i18n %}
 
 {% block title %}
-    {{ lesson.name }}
+	{{ lesson.category }} : {{ lesson.name }}
 {% endblock %}
 
 {% block scripts %}
-    {{ block.super }}
+	{{ block.super }}
 
-    <script type="text/javascript" src="{{ basepath }}/static/js/timer.js"></script>
+	<script type="text/javascript" src="{{ basepath }}/static/js/timer.js"></script>
 
-    <script id="timer_script" language="javascript">
-        var seconds = {{ lesson.quiz_show_time }} * 60;
-        $(document).ready(function () { update('timer');});
-        setTimeout(function() {
-            $('#quizbutton').prop('disabled', false);
-            $('#quizbutton').removeClass('disabled');
-        }, seconds * 1000);
-    </script>
+	<script id="timer_script" language="javascript">
+		var seconds = {{ lesson.quiz_show_time }} * 60;
+		$(document).ready(function () { update('timer');});
+		setTimeout(function() {
+			$('#quizbutton').prop('disabled', false);
+			$('#quizbutton').removeClass('disabled');
+		}, seconds * 1000);
+	</script>
 
 {% endblock %}
 
 {% block sectioncontent %}
 
-    <h3>{{ lesson.category }}</h3>
+	<p>
+		{{ lesson.content|safe }}
+	</p>
 
-    <hr class="thin" />
+	{% if lesson.youtube_url %}
+		<div class="embed-responsive embed-responsive-16by9">
+			<iframe width="480" height="320" src="{{ embed_url }}?vq=large" frameborder="0" allowfullscreen></iframe>
+		</div>
+	{% endif %}
 
-    <p>
-    {{ lesson.content|safe }}
-    </p>
-
-    {% if lesson.youtube_url %}
-    <iframe width="853" height="480" src="{{ embed_url }}?vq=large" frameborder="0" allowfullscreen></iframe>
-    {% endif %}
-
-    {% if through %}
-        {% if through.is_running %}
-            <div>
-                <p>{% trans 'Quiz is already running' %}</p>
-                <a href="{% url quiz_view lesson.quiz.id %}">
-                    <button type="button">{% trans 'Back to quiz' %}</button>
-                </a>
-            </div>
-        {% elif not through.can_play_again %}
-            <p>{% trans 'You may run this quiz again in' %} {{ through.days_until_can_replay }} {% trans 'days' %}.</p>
-            <a href="{% url quiz_view lesson.quiz.id %}">
-                <button class="disabled" type="button" disabled>{% trans 'Run quiz' %}</button>
-            </a>
-        {% else %}
-           <div>{% trans 'Quiz will be enabled in' %}<p style="display: inline;" id="timer"></p></div>
-            <a href="{% url quiz_view lesson.quiz.id %}">
-                <button id="quizbutton" class="disabled" type="button" disabled>{% trans 'Start quiz' %}</button>
-            </a>
-        {% endif %}
-     {% endif %}
-
+	{% if through %}
+		{% if through.is_running %}
+			<div>
+				<p>{% trans 'Quiz is already running' %}</p>
+				<a href="{% url quiz_view lesson.quiz.id %}">
+					<button type="button">{% trans 'Back to quiz' %}</button>
+				</a>
+			</div>
+		{% elif not through.can_play_again %}
+			<p>{% trans 'You may run this quiz again in' %} {{ through.days_until_can_replay }} {% trans 'days' %}.</p>
+			<a href="{% url quiz_view lesson.quiz.id %}">
+				<button class="disabled" type="button" disabled>{% trans 'Run quiz' %}</button>
+			</a>
+		{% else %}
+			<div>
+				{% trans 'Quiz will be enabled in' %}
+				<p style="display: inline;" id="timer"></p>
+			</div>
+			<a href="{% url quiz_view lesson.quiz.id %}">
+				<button id="quizbutton" class="disabled" type="button" disabled>{% trans 'Start quiz' %}</button>
+			</a>
+		{% endif %}
+	{% endif %}
 {% endblock %}

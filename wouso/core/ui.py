@@ -38,6 +38,7 @@ def register_block(library, name, callback):
     lib.add(name, callback)
 
 def register_sidebar_block(name, callback):
+    return
     return register_block('sidebar', name, callback)
 
 def register_header_link(name, callback):

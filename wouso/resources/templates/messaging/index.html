@@ -1,92 +1,85 @@
-{% extends base_template %}
+{% extends 'interface/section_base.html'%}
+
 {% load i18n %}
-{% block scripts %}
-    <script type="text/javascript" src="{{ basepath }}/static/js/tabs.js"></script>
-    <script type="text/javascript" src="{{ basepath }}/static/js/format.item.js"></script>
-    <link rel="stylesheet" type="text/css" href="{{ basepath }}/static/css/tabs.css" />
-{% endblock %}
 
-{% block title %}{% trans 'Messaging' %}{% endblock %}
+{% block sectiontitle %}
+	{% trans 'Messages' %}
 
-{% block content %}
-<div class="section">
+	<div class="create-message-btn">
+		<a href="{% url create %}">
+			<button type="submit" class="btn btn-success">{% trans 'Compose' %}</button>
+		</a>
+	</div>
 
-<h2>{% trans 'Messages' %}</h2>
+ {% endblock %}
 
-<div class="section-content">
-<div class="actions">
-<a href="{% url create %}">{% trans 'Compose' %}</a>
-</div>
+{% block sectioncontent %}
 
-<ul class="tabs">
-        <li><a href="#rec"  class="no-redir">{% trans 'Received' %}</a></li>
-        <li><a href="#sent" class="no-redir">{% trans 'Sent' %}</a></li>
-        <li><a href="#all"  class="no-redir">{% trans 'All' %}</a></li>
-</ul>
+	<div role="tabpanel">
+		<ul class="nav nav-tabs nav-justified" role="tablist">
+			<li role="presentation" class="active">
+				<a href="#tab-received" role="tab" data-toggle="tab">{% trans 'Received' %}</a>
+			</li>
+			<li role="presentation">
+				<a href="#tab-sent" role="tab" data-toggle="tab">{% trans 'Sent' %}</a>
+			</li>
+			<li role="presentation">
+				<a href="#tab-all" role="tab" data-toggle="tab">{% trans 'All' %}</a>
+			</li>
+		</ul>
+	<div class="tab-content">
+		<div id="tab-received" class="tab-pane active" role="tabpanel">
+			<table id="{% trans 'Messages' %}" class="table table-striped table-hover">
+				<tr>
+					<th>{% trans 'From' %}</td>
+					<th>{% trans 'To' %}</td>
+					<th>{% trans 'Subject' %}</td>
+				{% for msg in messages_rec %}
+					<tr>
+						<td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
+						<td>{{msg.receiver}}</td>
+						<td>{{msg.subject}}</td>
+					</tr>
+				{% empty %} <tr> <td colspan=3>{% trans 'No messages.' %}</td></tr>
+				{% endfor %}
+			</table>
+		</div>
 
-<div class="tab_container">
-    <div id="rec" class="tab_content">
-        <table id="{% trans 'Messages' %}">
-            <tr>
-                <th>{% trans 'From' %}</td>
-                <th>{% trans 'To' %}</td>
-                <th>{% trans 'Subject' %}</td>
-            {% for msg in messages_rec %}
-                <tr>
-                    <td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
-                    <td>{{msg.receiver}}</td>
-                    <td>{{msg.subject}}</td>
-                </tr>
-            {% empty %} <tr> <td colspan=3>{% trans 'No messages.' %}</td></tr>
-            {% endfor %}
-        </table>
-    </div>
+		<div id="tab-sent" class="tab-pane" role="tabpanel">
+			<table id="{% trans 'Messages' %}" class="table table-striped table-hover">
+				<tr>
+					<th>{% trans 'From' %}</td>
+					<th>{% trans 'To' %}</td>
+					<th>{% trans 'Subject' %}</td>
+				</tr>
+				{% for msg in messages_sent %}
+					<tr>
+						<td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
+						<td>{{msg.receiver}}</td>
+						<td>{{msg.subject}}</td>
+					</tr>
+				{% empty %} <tr> <td colspan=3>{% trans 'No messages.' %}</td></tr>
+				{% endfor %}
+			</table>
+		</div>
 
-    <div id="sent" class="tab_content">
-        <table id="{% trans 'Messages' %}">
-            <tr>
-                <th>{% trans 'From' %}</td>
-                <th>{% trans 'To' %}</td>
-                <th>{% trans 'Subject' %}</td>
-            </tr>
-            {% for msg in messages_sent %}
-                <tr>
-                    <td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
-                    <td>{{msg.receiver}}</td>
-                    <td>{{msg.subject}}</td>
-                </tr>
-            {% empty %} <tr> <td colspan=3>{% trans 'No messages.' %}</td></tr>
-            {% endfor %}
-        </table>
-    </div>
+		<div id="tab-all" class="tab-pane" role="tabpanel">
+			<table id="{% trans 'Messages' %}" class="table table-striped table-hover">
+				<tr>
+					<th>{% trans 'From' %}</td>
+					<th>{% trans 'To' %}</td>
+					<th>{% trans 'Subject' %}</td>
+				</tr>
+				{% for msg in messages_all %}
+					<tr>
+						<td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
+						<td>{{msg.receiver}}</td>
+						<td>{{msg.subject}}</td>
+					</tr>
+				{% empty %} <tr> <td colspan=3>{% trans 'No messages.' %}</td></tr>
+				{% endfor %}
+			</table>
+		</div>
+	</div>
 
-    <div id="all" class="tab_content">
-        <table id="{% trans 'Messages' %}">
-            <tr>
-                <th>{% trans 'From' %}</td>
-                <th>{% trans 'To' %}</td>
-                <th>{% trans 'Subject' %}</td>
-            </tr>
-            {% for msg in messages_all %}
-                <tr>
-                    <td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
-                    <td>{{msg.receiver}}</td>
-                    <td>{{msg.subject}}</td>
-                </tr>
-            {% empty %} <tr> <td colspan=3>{% trans 'No messages.' %}</td></tr>
-            {% endfor %}
-        </table>
-    </div>
-
-    <div id="message"></div>
-
-    <script language="javascript" type="text/javascript">
-        tabToURL("rec", "{% url quiet_home box="rec" quiet='q' %}")
-        tabToURL("sent", "{% url quiet_home box="sent" quiet='q' %}")
-        tabToURL("all", "{% url quiet_home box="all" quiet='q' %}")
-        $('#rec').trigger('custom')
-    </script>
-</div>
-</div>
-</div>
 {% endblock %}

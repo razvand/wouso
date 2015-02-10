@@ -1,7 +1,9 @@
 <div id="ajax-message">
     {% if messages %}
         {% for message in messages %}
-            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        	<div class="bg-message">
+            	<p {% if message.tags %} class="{{ message.tags }} bg-warning" {% endif %} > {{ message }} </p>
+            </div>
         {% endfor %}
     {% endif %}
 </div>

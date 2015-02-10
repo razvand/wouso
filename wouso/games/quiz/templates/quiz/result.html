@@ -2,13 +2,23 @@
 {% load i18n %}
 
 {% block title %}
-    {% trans 'Results - ' %} {{ quiz.qtype }} {% trans 'Quiz ' %} {{ quiz }}
+	{% trans 'Results' %} :
+	{{ quiz }}
+	<small>[{{ quiz.qtype }} {% trans 'Quiz ' %}]</small>
 {% endblock %}
+
 
 {% block sectioncontent %}
 
-<p>{% trans 'You scored:' %} {{ points }} out of {{ quiz.points_reward }}!</p>
+<div class="quiz-answer">
+	<h4 class="result-message">
+		{% trans 'You scored:' %} {{ points }} {% trans 'out of' %} {{ quiz.points_reward }}!
+	</h4>
 
-<a href="{% url quiz_index_view %}">{% trans 'Back to quizzes' %}</a>
-
+	<div class="center-action-button">
+		<a href="{% url quiz_index_view %}">
+			<button type="submit" class="btn btn-success">{% trans 'Back to quizzes' %}</button>
+		</a>
+	</div>
+</div>
 {% endblock %}
