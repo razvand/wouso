@@ -2,75 +2,208 @@
 
 {% load i18n %}
 
-{% block title %}{% trans 'Quizzes' %}{% endblock %}
-{% block sectiontitle %}{% trans 'Quizzes' %}{% endblock %}
+{% block sectiontitle %}
+	{% trans 'Quizzes' %}
+{% endblock %}
 
 {% block sectioncontent %}
 
-{% if request.user.is_staff %}
-    <p><i>{% trans 'Note: Inactive quizzes are only visible by staff members' %}</i></p>
-    <h3>{% trans 'Inactive quizzes' %}</h3>
-    <ul>
-        {% for t in inactive_quizzes %}
-            <li>
-                <a href="{% url quiz_view t.quiz.id %}" onclick="return confirm('Are you sure you want to take this quiz?')">
-                    {{ t.quiz.name }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-{% endif %}
 
-{% if active_quizzes or expired_quizzes %}
-    <h3>{% trans 'Active quizzes' %}</h3>
-    <ul>
-        {% for t in active_quizzes %}
-            <li>
-                <a href="{% url quiz_view t.quiz.id %}" onclick="return confirm('Are you sure you want to take this quiz?')">
-                    {{ t.quiz.name }}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
 
-    <h3>{% trans 'Expired quizzes' %}</h3>
-    <ul>
-        {% for t in expired_quizzes %}
-            <li>{{ t.quiz.name }}</li>
-        {% endfor %}
-    </ul>
-{% else %}
-    <p>{% trans 'No quizzes have been published. Come back later.' %}</p>
-{% endif %}
+<section id="quiz-list">
+	{% if active_quizzes or expired_quizzes %}
 
-<h3>{% trans 'Your results' %}</h3>
-{% if played_quizzes %}
-    <table>
-        <tr>
-            <th rowspan="2">#</th>
-            <th rowspan="2">{% trans 'Quiz' %}</th>
-            <th colspan="2">{% trans 'Best Score' %}</th>
-            <th colspan="2">{% trans 'Last Score' %}</th>
-        </tr>
-        <tr>
-            <th>{% trans 'Date' %}</th>
-            <th>{% trans 'Score' %}</th>
-            <th>{% trans 'Date' %}</th>
-            <th>{% trans 'Result' %}</th>
-        </tr>
-        {% for t in played_quizzes %}
-            <tr style="text-align: center">
-                <td>{{ forloop.counter }}</td>
-                <td>{{ t.quiz.name }}</td>
-                <td>{{ t.best_attempt.date }}</td>
-                <td>{{ t.best_attempt.points }}</td>
-                <td>{{ t.last_attempt.date }}</td>
-                <td>{{ t.last_attempt.points }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-{% else %}
-    <p> {% trans "You haven't run any quiz yet." %} </p>
-{% endif %}
+		{% if request.user.is_staff %}
+			<p>
+				<i>{% trans 'Note: Inactive quizzes are only visible by staff members' %}</i>
+			</p>
+
+			<!---------------------->
+			<!-- Inactive quizzes -->
+
+			<h3 class="type">{% trans 'Inactive quizzes' %}</h3>
+
+			{% for t in inactive_quizzes %}
+			<div class="quiz">
+				<div class="quiz-box">
+					<h4 class="title" data-toggle="true">
+						<small>
+							{% if t.best_attempt.points %}
+								{{ t.best_attempt.points }} / 100 &nbsp;
+							{% else %}
+								-- / 100 &nbsp;
+							{% endif %}
+								<span class="glyphicon glyphicon-education"></span>
+						</small>
+						{{ t.quiz.name }}
+						<a class="start-quiz" href="{% url quiz_view t.quiz.id %}"
+							onclick="return confirm('Are you sure you want to take this quiz?')">
+							<span class="glyphicon glyphicon-flash"></span>
+							{% trans 'Start Quiz' %}
+						</a>
+					</h4>
+					<div class="score">
+						{% if t.best_attempt.points %}
+							<div class="score-box best">
+								<div class="points">
+									<span class="glyphicon glyphicon-education"></span>
+									<b>{% trans 'Best Score' %} : </b>
+									{{ t.best_attempt.points }}
+									{% trans 'points' %}
+								</div>
+								<div class="date">
+									<span class="glyphicon glyphicon-time"></span>
+									{{ t.best_attempt.date }}
+								</div>
+							</div>
+							<div class="score-box last">
+								<div class="points">
+									<span class="glyphicon glyphicon-education"></span>
+									<b>{% trans 'Last Score' %} : </b>
+									{{ t.last_attempt.points }}
+									{% trans 'points' %}
+								</div>
+								<div class="date">
+									<span class="glyphicon glyphicon-time"></span>
+									{{ t.last_attempt.date }}
+								</div>
+							</div>
+						{% else %}
+							<div class="score-box small text-danger">
+								{% trans 'No run history' %}
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+			{% endfor %}
+		{% endif %}
+
+		<!-------------------->
+		<!-- Active quizzes -->
+
+		<h3 class="type"> {% trans 'Active quizzes' %} </h3>
+		{% for t in active_quizzes %}
+			<div class="quiz">
+				<div class="quiz-box">
+					<h4 class="title" data-toggle="true">
+						<small>
+							{% if t.best_attempt.points %}
+								{{ t.best_attempt.points }} / 100 &nbsp;
+							{% else %}
+								-- / 100 &nbsp;
+							{% endif %}
+								<span class="glyphicon glyphicon-education"></span>
+						</small>
+						{{ t.quiz.name }}
+						<a class="start-quiz" href="{% url quiz_view t.quiz.id %}"
+							onclick="return confirm('Are you sure you want to take this quiz?')">
+							<span class="glyphicon glyphicon-flash"></span>
+							{% trans 'Start Quiz' %}
+						</a>
+					</h4>
+					<div class="score">
+						{% if t.best_attempt.points %}
+							<div class="score-box best">
+								<div class="points">
+									<span class="glyphicon glyphicon-education"></span>
+									<b>{% trans 'Best Score' %} : </b>
+									{{ t.best_attempt.points }}
+									{% trans 'points' %}
+								</div>
+								<div class="date">
+									<span class="glyphicon glyphicon-time"></span>
+									{{ t.best_attempt.date }}
+								</div>
+							</div>
+							<div class="score-box last">
+								<div class="points">
+									<span class="glyphicon glyphicon-education"></span>
+									<b>{% trans 'Last Score' %} : </b>
+									{{ t.last_attempt.points }}
+									{% trans 'points' %}
+								</div>
+								<div class="date">
+									<span class="glyphicon glyphicon-time"></span>
+									{{ t.last_attempt.date }}
+								</div>
+							</div>
+						{% else %}
+							<div class="score-box small text-danger">
+								{% trans 'No run history' %}
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+
+		<!--------------------->
+		<!-- Expired quizzes -->
+
+		<h3 class="type">{% trans 'Expired quizzes' %}</h3>
+
+		{% for t in expired_quizzes %}
+			<div class="quiz">
+				<div class="quiz-box">
+					<h4 class="title" data-toggle="true">
+						<small>
+							{% if t.best_attempt.points %}
+								{{ t.best_attempt.points }} / 100 &nbsp;
+							{% else %}
+								-- / 100 &nbsp;
+							{% endif %}
+								<span class="glyphicon glyphicon-education"></span>
+						</small>
+						{{ t.quiz.name }}
+					</h4>
+					<div class="score">
+						{% if t.best_attempt.points %}
+							<div class="score-box best">
+								<div class="points">
+									<span class="glyphicon glyphicon-education"></span>
+									<b>{% trans 'Best Score' %} : </b>
+									{{ t.best_attempt.points }}
+									{% trans 'points' %}
+								</div>
+								<div class="date">
+									<span class="glyphicon glyphicon-time"></span>
+									{{ t.best_attempt.date }}
+								</div>
+							</div>
+							<div class="score-box last">
+								<div class="points">
+									<span class="glyphicon glyphicon-education"></span>
+									<b>{% trans 'Last Score' %} : </b>
+									{{ t.last_attempt.points }}
+									{% trans 'points' %}
+								</div>
+								<div class="date">
+									<span class="glyphicon glyphicon-time"></span>
+									{{ t.last_attempt.date }}
+								</div>
+							</div>
+						{% else %}
+							<div class="score-box small text-danger">
+								{% trans 'No run history' %}
+							</div>
+						{% endif %}
+					</div>
+				</div>
+			</div>
+		{% endfor %}
+
+	{% else %}
+		<p>{% trans 'No quizzes have been published. Come back later.' %}</p>
+	{% endif %}
+</section>
 
 {% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript" src="{{ basepath }}/static/js/quiz.js"></script>
+{% endblock %}
+
+
+
+
