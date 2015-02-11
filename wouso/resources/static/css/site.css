@@ -161,11 +161,11 @@ h1,h2,h3,h4,h5,h6 {
 	overflow: hidden;
 
 
-	  -webkit-user-select: none;  /* Chrome all / Safari all */
-	  -moz-user-select: none;     /* Firefox all */
-	  -ms-user-select: none;      /* IE 10+ */
-	  -o-user-select: none;
-	  user-select: none;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+	-moz-user-select: none;     /* Firefox all */
+	-ms-user-select: none;      /* IE 10+ */
+	-o-user-select: none;
+	user-select: none;
 }
 
 #quiz-list .quiz .title:hover {

@@ -43,3 +43,17 @@
 .course .course-img {
 	width: 100%;
 }
+
+.circle {
+	width: 68px;
+	height: 68px;
+	margin: 0 auto 10px;
+	padding: 16px;
+	text-align: center;
+	border-radius: 50%;
+	display: block;
+}
+
+.center-text {
+	text-align: center;
+}
