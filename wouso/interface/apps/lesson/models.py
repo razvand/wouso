@@ -21,7 +21,7 @@ class LessonCategory(models.Model):
             first = [ls[i] for i in order]
             full_ls = []
             full_ls.extend(first)
-            for l in self.lesson_set.all():
+            for l in self.get_unordered_lessons():
                 if l not in first:
                     full_ls.append(l)
             return full_ls
