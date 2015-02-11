@@ -2,6 +2,7 @@
 */
 function seconds2time( seconds )
 {
+	hours = parseInt(seconds / 3600);
 	seconds = seconds % 3600;
 	minute = Math.floor(seconds / 60);
 	secunde = seconds % 60;
@@ -9,6 +10,9 @@ function seconds2time( seconds )
 		minute ='0' + minute;
 	if (secunde < 10)
 		secunde = '0' + secunde;
+
+	if (hours)
+		return hours + ':' + minute + ':' + secunde;
 
 	return minute + ':' + secunde;
 }
