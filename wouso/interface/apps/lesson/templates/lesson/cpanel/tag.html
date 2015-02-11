@@ -1,29 +1,28 @@
-{% extends 'lesson/cpanel/manage_categories.html' %}
+{% extends 'lesson/cpanel/manage_tags.html' %}
 
 {% load i18n %}
 {% load django_bootstrap_breadcrumbs %}
 {% load bootstrap %}
 
 {% block sectiontitle %}
-    Category
+    Tag
     <div class="pull-right">
-        <a class="btn btn-primary" href="{% url add_lesson_category %}">
-            <span class="glyphicon glyphicon-plus"></span>{% trans 'Add category' %}
+        <a class="btn btn-primary" href="{% url add_lesson_tag %}">
+            <span class="glyphicon glyphicon-plus"></span>{% trans 'Add tag' %}
         </a>
     </div>
 {% endblock %}
 
 {% block breadcrumbs %}
     {{ block.super }}
-    {% breadcrumb "Category" "category" %}
+    {% breadcrumb "Tag" "tag" %}
 {% endblock %}
 
 {% block sectioncontent %}
-
     <div class="col-md-8">
         {% if form.errors %}
             <p style="color: red;">
-                Please correct the error{{ form.errors|pluralize }} below.
+                Please correct the error {{ form.errors|pluralize }} below.
             </p>
         {% endif %}
 
@@ -35,5 +34,4 @@
             {% csrf_token %}
         </form>
     </div>
-
 {% endblock %}

@@ -18,7 +18,7 @@ from wouso.core.qpool.models import Question, Tag
 
 class QuizCategory(models.Model):
     name = models.CharField(max_length=100)
-    logo = models.ImageField(upload_to=settings.MEDIA_QUIZCATEGORY_LOGO_DIR, null=True, blank=True)
+    logo = models.ImageField(upload_to=settings.MEDIA_ARTIFACTS_DIR, null=True, blank=True)
 
     @property
     def quizzes(self):
@@ -26,7 +26,7 @@ class QuizCategory(models.Model):
 
     @property
     def logo_url(self):
-        return os.path.join(settings.MEDIA_QUIZCATEGORY_LOGO_URL, os.path.basename(str(self.logo))) if self.logo else ""
+        return os.path.join(settings.MEDIA_ARTIFACTS_URL, os.path.basename(str(self.logo))) if self.logo else ""
 
     def __unicode__(self):
         return self.name
@@ -88,6 +88,14 @@ class Quiz(models.Model):
 
     def is_public(self):
         return self.type == 'P'
+
+    def update_status(self):
+        now = datetime.now()
+        if self.start <= now <= self.end:
+            self.status = 'A'
+        elif self.end < now:
+            self.status = 'E'
+        self.save()
 
     @property
     def qtype(self):

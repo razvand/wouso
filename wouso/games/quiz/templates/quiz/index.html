@@ -2,12 +2,16 @@
 
 {% load i18n %}
 
-{% block sectiontitle %}
-	{% trans 'Quizzes' %}
-{% endblock %}
+{% block title %}{% trans 'Categories' %}{% endblock %}
+{% block sectiontitle %}{% trans 'Categories' %}{% endblock %}
 
 {% block sectioncontent %}
 
+    {% for c in categories %}
+        <h3><a href="{% url quiz_category_view c.id %}">{{ c }}</a>
+    {% empty %}
+        {% trans 'No categories have been added yet' %}
+    {% endfor %}
 
 
 <section id="quiz-list">

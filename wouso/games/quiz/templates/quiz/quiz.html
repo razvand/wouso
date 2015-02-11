@@ -7,6 +7,26 @@
 	<small>[{{ quiz.qtype }} {% trans 'Quiz ' %}]</small>
 {% endblock %}
 
+{% block scripts %}
+    {{ block.super }}
+    <!--
+    <script type="text/javascript">
+        // To use in case you need to dinamically load MathJax after the page has loaded.
+        // See examples here: http://cdn.mathjax.org/mathjax/latest/test/examples.html
+        window.onload = function () {
+            var script = document.createElement("script");
+            script.type = "text/javascript";
+            script.src = "https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML";
+            document.getElementsByTagName("head")[0].appendChild(script);
+        }
+        // The next line may be used instead of the above function. Uncomment it if you want to use it.
+        //MathJax.Hub.Queue(["Typeset",MathJax.Hub]);
+    </script>
+    -->
+
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS_HTML"></script>
+{% endblock %}
+
 {% block sectioncontent %}
 
 <div id="timer" class="timer">

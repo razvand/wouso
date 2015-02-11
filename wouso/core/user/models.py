@@ -26,7 +26,7 @@ class Race(models.Model):
 
     can_play = models.BooleanField(default=True, blank=True)
 
-    logo = models.ImageField(upload_to=settings.MEDIA_RACE_LOGO_DIR, null=True, blank=True)
+    logo = models.ImageField(upload_to=settings.MEDIA_ARTIFACTS_DIR, null=True, blank=True)
 
     @property
     def points(self):
@@ -252,7 +252,7 @@ class Player(models.Model):
 
     @cached_method
     def _avatar(self):
-        avatar = "http://www.gravatar.com/avatar/%s.jpg?d=%s" % (md5(self.user.email).hexdigest(), settings.AVATAR_DEFAULT)
+        avatar = "https://www.gravatar.com/avatar/%s.jpg?d=%s" % (md5(self.user.email).hexdigest(), settings.AVATAR_DEFAULT)
         return avatar
 
     # special:
