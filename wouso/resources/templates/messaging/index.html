@@ -31,13 +31,18 @@
 					<th>{% trans 'From' %}</td>
 					<th>{% trans 'To' %}</td>
 					<th>{% trans 'Subject' %}</td>
+				</tr>
+
 				{% for msg in messages_rec %}
 					<tr>
 						<td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
 						<td>{{msg.receiver}}</td>
 						<td>{{msg.subject}}</td>
 					</tr>
-				{% empty %} <tr> <td colspan=3>{% trans 'No messages.' %}</td></tr>
+				{% empty %}
+					<tr>
+						<td colspan=3>{% trans 'No messages.' %}</td>
+					</tr>
 				{% endfor %}
 			</table>
 		</div>
@@ -49,14 +54,23 @@
 					<th>{% trans 'To' %}</td>
 					<th>{% trans 'Subject' %}</td>
 				</tr>
-				{% for msg in messages_sent %}
-					<tr>
-						<td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
-						<td>{{msg.receiver}}</td>
-						<td>{{msg.subject}}</td>
-					</tr>
-				{% empty %} <tr> <td colspan=3>{% trans 'No messages.' %}</td></tr>
-				{% endfor %}
+					{% for msg in messages_sent %}
+						<tr>
+							<td>
+								{% if msg.sender %}
+									{{msg.sender}}
+								{% else %}
+									{% trans 'System' %}
+								{% endif %}
+							</td>
+							<td>{{msg.receiver}}</td>
+							<td>{{msg.subject}}</td>
+						</tr>
+					{% empty %}
+						<tr>
+							<td colspan=3>{% trans 'No messages.' %}</td>
+						</tr>
+					{% endfor %}
 			</table>
 		</div>
 	</div>
