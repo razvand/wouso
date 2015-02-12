@@ -20,12 +20,25 @@ body {
 }
 
 #logo {
-	background: url('../img/csapcslogo512.png');
+	height: 220px;
+	background: url('../img/csapcslogo512.png') no-repeat left;
+	background-size: contain;
+	position: relative;
+}
+
+#logo:after {
+	content: " ";
+	width: 200px;
+	height: 200px;
+	margin: 10px;
+	background: url('../img/upb-logo.png');
 	background-size: contain;
 	background-repeat: no-repeat;
-	background-position: center;
-	height: 220px;
+	position: absolute;
+	right: 0;
+	z-index: -1;
 }
+
 
 .title {
 	padding: 20px;
@@ -38,14 +51,16 @@ body {
 	background: rgba(255, 255, 255, 0.4);
 }
 
-.about {
+.login-box .about {
+	max-width: 80%;
 	padding: 20px;
-	height: 100%;
+	margin: 0 auto;
 	color: #666E73;
-	float: left;
 }
 
 #login {
+	max-width: 284px;
+	margin: 0 auto;
 	background: #FFF;
 	padding: 20px 20px;
 	border: 5px solid #6FCBF5;
