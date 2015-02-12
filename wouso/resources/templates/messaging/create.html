@@ -11,81 +11,74 @@
 
 	<div id="compose-message" class="row">
 		<div class="col-md-1"></div>
+
 		<div class="col-md-9">
-			<form id="send-message" class="form-horizontal" onsubmit="messagingSubmit();" method="post" action="{% url create %}" data-ajax="false">
+			<form id="msg" class="form-horizontal" onsubmit="messagingSubmit();" method="post" action="/m/create" data-ajax="false">
+
 				<div class="form-group">
-					<label for="form-input-user" class="col-md-2 control-label">{% trans 'To' %}</label>
+					<label for="to_input" class="col-md-2 control-label">{% trans 'To' %}</label>
 					<div class="col-md-10">
-						<input type="text" class="form-control" id="form-input-user" placeholder="{% trans 'User' %}">
+						<input type="text" name="receiver" class="form-control" id="to_input" placeholder="{% trans 'User' %}" autocomplete="off">
+						<div id="to_container"></div>
 					</div>
 				</div>
+
 				<div class="form-group">
-					<label for="form-input-subject" class="col-md-2 control-label">{% trans 'Subject' %}</label>
+					<label for="subject" class="col-md-2 control-label">{% trans 'Subject' %}</label>
 					<div class="col-md-10">
-						<input type="text" class="form-control" id="form-input-subject" placeholder="{% trans 'Subject' %}">
+						<input type="text" id="subject" name="subject" class="form-control" placeholder="{% trans 'Subject' %}">
 					</div>
 				</div>
+
 				<div class="form-group">
-					<label for="form-input-message" class="col-md-2 control-label">{% trans 'Text' %}</label>
+					<label for="text" class="col-md-2 control-label">{% trans 'Text' %}</label>
 					<div class="col-md-10">
-						<textarea id="form-input-message" class="form-control" rows="3"></textarea>
+						<textarea id="text" name="text" class="form-control" rows="3"></textarea>
 					</div>
 				</div>
 
 				<div class="actions">
-					<button type="submit" class="btn btn-success">{% trans 'Send' %}</button>
 					<a href="{% url messaging %}">
 						<button type="button" class="btn btn-danger">{% trans 'Cancel' %}</button>
 					</a>
+					<button class="btn btn-success default" type="submit">{% trans 'Send' %}</a>
 				</div>
+
+				<input name="reply_to" value="" type="hidden">
+
+				{% csrf_token %}
+
 			</form>
 		</div>
 		<div class="col-md-2"></div>
 	</div>
 
-	<hr>
-
-	<!-- TODO: @Gabriel Ivanica  -->
-	<!-- TODO: delete this !!! -->
-	<!-- TODO: what's with that variable INPUT ??!!! (the first one) -->
-
-	<form id="msg" onsubmit="messagingSubmit();" method="post" action="{% url create %}" data-ajax="false">
-		  <table>
-			<tr><td>{% trans 'To' %}:</td><td valign="top">
-				{% if to %}
-					<input type="text" id="to_input" class="hidden">
-					<input type="hidden" id="to" name="to" value="{{ to.id }}" />
-					<span class="to_user">{% player_simple to %}</span>
-				{% else %}
-					<input type="text" id="to_input" class="big" /> <div id="to_container"></div>
-				{% endif %}
-		</td></tr>
-		<tr><td>{% trans 'Subject' %}: </td><td valign="top">
-				<input type="text" id="subject" name="subject" class="big" size="50" value="{{ subject }}"/>
-		</td></tr>
-		<tr><td valign="top">{% trans 'Text' %}:</td>
-		<td>
-			<textarea id="text" name="text" class="big" cols="50" rows="5"></textarea>
-		</td>
-		</tr>
-		</table>
-		<div class="actions">
-			<a href="{% url messaging %}">{% trans 'Cancel' %}</a>
-			<button type="submit" class="default">{% trans 'Send' %}</button>
-		</div>
-		{% csrf_token %}
-		<input type="hidden" name="reply_to" value="{{ reply_to.id }}" />
-	</form>
-
 	<!-- TODO: @Gabriel Ivanica  -->
 	<!-- TODO: replace with jquery.autocomplete -->
 
 	<script type="text/javascript">
-		$(document).ready(function() {
-		$("#to_input").autocomplete("{{ basepath }}/instantsearch/", { minChars:3, matchSubset:1, matchContains:1, cacheLength:10, formatItem:formatItem, onItemSelect:selectItemMessaging, selectOnly:1 });
+		window.addEventListener('load', function() {
+
+				var options = {
+					minChars: 3,
+					matchSubset: 1,
+					matchContains: 1,
+					cacheLength: 10,
+					formatItem: formatItem,
+					onItemSelect: selectItemMessaging,
+					selectOnly:1
+				};
+
+				$("#to_input").autocomplete("{{ basepath }}/instantsearch/", options);
+				$("#to_input").bind('focusout', messagingOut);
+
 		});
-		$("#to_input").bind('focusout', messagingOut);
-		$("#to_input").bind('focusin', function(){ $("#to_input").css('color', 'black') } )
 	</script>
 
+{% endblock %}
+
+{% block scripts %}
+	<script type="text/javascript" src="{{ basepath }}/static/js/jquery-1.6.2.min.js"></script>
+	<script type="text/javascript" src="{{ basepath }}/static/js/jquery.autocomplete.js"></script>
+	<script type="text/javascript" src="{{ basepath }}/static/js/format.item.js"></script>
 {% endblock %}
