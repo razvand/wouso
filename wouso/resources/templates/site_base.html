@@ -54,12 +54,14 @@
 				{% block sidebar %}
 				{% endblock %}
 			</aside>
+
+			<footer id="footer" class="col-md-12">
+				{% include 'interface/footer.html' %}
+				{% block footer %}
+				{% endblock %}
+			</footer>
 		</div>
 	</section>
-	<footer id="footer">
-		{% block footer %}
-		{% endblock %}
-	</footer>
 
 	<!-- <div id="PrivatebarUsers"></div> -->
 

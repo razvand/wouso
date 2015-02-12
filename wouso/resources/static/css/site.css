@@ -116,6 +116,35 @@ h1,h2,h3,h4,h5,h6 {
 	border: 1px solid #DDD;
 }
 
+
+/*
+ * Footer
+ */
+
+#footer {
+	height: 120px;
+	min-height: 120px;
+	padding: 30px 0 0 0;
+	background: #EEE;
+	text-align: center;
+	border-top: 1px solid #DDD;
+}
+
+#footer .logo-upb {
+	width: 100px;
+	position: absolute;
+	top: 10px;
+	left: 70%;
+}
+
+#footer .logo-upb img {
+	width: 100%;
+}
+#footer .copyright {
+	margin: 10px 0 0 0;
+	text-align: center;
+}
+
 /*
  * QUIZZES
  */
