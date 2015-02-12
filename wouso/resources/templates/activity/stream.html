@@ -4,15 +4,12 @@
 <ul class="activity-stream">
     {% for ac in activity %}
         <li class="activity-line">
+
+            <div class="activity-timestamp">{{ ac.timestamp }}</div>
+
             <div class="activity-source">
                 <a href="{{ ac.get_game_absolute_url }}" title="{% trans ac.game_name %}">{% trans ac.game_name %}</a>
             </div>
-
-            <a class="player-avatar" href="{% url player_profile ac.player_from.id %}">
-                <img class="avatar medium player-avatar-image" src="{% player_avatar ac.player_from %}" />
-
-                <div class="player-avatar-race player-avatar-race-{{ ac.player_from.race_name|lower}}"></div>
-            </a>
 
             <div class="activity-message">
                 {% if ac.player_from %}
@@ -28,15 +25,12 @@
                 <div class="activity-second">
                     <a class="player-avatar-small" href="{% url player_profile ac.player_from.id %}">
                         <img class="avatar small player-avatar-image" src="{%  player_avatar ac.player_to %}" />
-
                         <div class="player-avatar-race player-avatar-race-{{ ac.player_to.race_name|lower }}"></div>
                     </a>
 
                     <div><strong>{% player_simple ac.player_to %}</strong></div>
                 </div>
             {% endif %}
-
-            <div class="activity-timestamp">{{ ac.timestamp }}</div>
         </li>
     {% empty %}
         <li class="activity-line empty">{% trans 'At the moment, there are no activies to report.' %}</li>

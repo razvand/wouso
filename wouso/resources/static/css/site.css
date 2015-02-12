@@ -314,3 +314,27 @@ h1,h2,h3,h4,h5,h6 {
 	float: right;
 	margin: 0 0 0 10px;
 }
+
+#profile-page .profile {
+
+}
+
+#profile-page .avatar {
+	margin: 0 20px 0 0;
+	padding: 10px;
+	border: 1px solid #EEE;
+}
+
+#profile-page .activity-stream {
+	margin: 0;
+	padding: 0;
+}
+
+#profile-page .activity-line {
+	list-style: none;
+	margin: 10px 0;
+}
+
+#profile-page .activity-timestamp {
+	color: #777;
+}
