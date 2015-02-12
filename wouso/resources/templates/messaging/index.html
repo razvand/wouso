@@ -35,7 +35,11 @@
 
 				{% for msg in messages_rec %}
 					<tr>
-						<td>{% if msg.sender %}{{msg.sender}}{% else %}{% trans 'System' %}{% endif %}</td>
+						<td>{% if msg.sender %}
+								{{msg.sender}}
+							{% else %}
+								{% trans 'System' %}
+							{% endif %}</td>
 						<td>{{msg.receiver}}</td>
 						<td>{{msg.subject}}</td>
 					</tr>
