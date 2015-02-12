@@ -132,6 +132,12 @@ def homepage(request, page=u'1'):
         more = True
     news = news[:10]
 
+    top_races = list(Race.objects.exclude(can_play=False))
+    top_races.sort(key=lambda a: a.points, reverse=True)
+    top_races = top_races[:10]
+
+    top_players = Player.objects.order_by('-points')[:10]
+
     return render_to_response(template,
                               {'activity': activity,
                               'is_homepage': True,
@@ -140,6 +146,8 @@ def homepage(request, page=u'1'):
                               'games': get_games(),
                               'news': news,
                               'more': more,
+                              'top_races': top_races,
+                              'top_players': top_players
                               },
                               context_instance=RequestContext(request))
 
@@ -196,7 +204,7 @@ def instantsearch(request):
             user_ids = [u.id for u in users]
             searchresults = Player.objects.filter(Q(user__in=user_ids) | Q(full_name__icontains=query) | Q(nickname__icontains=query))
         else:
-            searchresults = Player.objects.filter(Q(nickname__icontains=query))
+            searchresults = Player.objectas.filter(Q(nickname__icontains=query))
         return render_to_response('interface/instant_search_results.txt',
                                   {'searchresults': searchresults},
                                   context_instance=RequestContext(request))
