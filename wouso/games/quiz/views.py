@@ -23,13 +23,14 @@ index = login_required(QuizIndexView.as_view())
 
 
 class QuizCategoryView(ListView):
-    model = Quiz
+    model = QuizCategory
     template_name = 'quiz/category.html'
 
     def get_context_data(self, **kwargs):
         context = super(QuizCategoryView, self).get_context_data(**kwargs)
         profile = self.request.user.get_profile()
         quiz_user = profile.get_extension(QuizUser)
+        category = QuizCategory.objects.get(id=self.kwargs['id'])
 
         for q in Quiz.objects.all():
             if not q.is_expired():
@@ -44,6 +45,7 @@ class QuizCategoryView(ListView):
         context['inactive_quizzes'] = quiz_user.inactive_quizzes
         context['expired_quizzes'] = quiz_user.expired_quizzes
         context['played_quizzes'] = quiz_user.played_quizzes
+        context['category'] = category
 
         return context
 

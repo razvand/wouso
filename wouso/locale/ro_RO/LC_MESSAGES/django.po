@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wouso VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-02 12:55+0200\n"
+"POT-Creation-Date: 2015-02-15 21:59+0200\n"
 "PO-Revision-Date: 2012-10-30 23:28+0200\n"
 "Last-Translator: Matei Oprea <matei.oprea@rosedu.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,7 +31,8 @@ msgstr "a făcut o vrajă pe "
 #: core/magic/models.py:79 games/quest/templates/quest/history.html:37
 #: resources/templates/division.html:19
 #: resources/templates/interface/forum_header.html:36
-#: resources/templates/interface/header.html:36
+#: resources/templates/interface/sidebar/progress.html:23
+#: resources/templates/profile/profile.html:25
 msgid "Level"
 msgstr "Nivel"
 
@@ -70,7 +71,7 @@ msgstr "a promovat la nivelul {level} și a primit {amount} aur"
 msgid "joined the game."
 msgstr "a intrat în joc."
 
-#: core/user/templatetags/user.py:49
+#: core/user/templatetags/user.py:51
 msgid "You"
 msgstr "Tu"
 
@@ -140,11 +141,11 @@ msgstr "Ai răspuns deja la acest duel"
 
 #: games/challenge/tests.py:509 games/challenge/tests.py:518
 #: games/challenge/templates/challenge/index.html:26
-#: resources/templates/profile/profile.html:67
+#: resources/templates/profile/profile.html:128
 msgid "Challenge!"
 msgstr "Duelează!"
 
-#: games/challenge/tests.py:513 resources/templates/profile/profile.html:65
+#: games/challenge/tests.py:513 resources/templates/profile/profile.html:126
 msgid "Challenged"
 msgstr "Duelat"
 
@@ -154,7 +155,7 @@ msgstr "Duelat"
 #: games/challenge/templates/challenge/index.html:6
 #: games/challenge/templates/challenge/sidebar.html:5
 #: games/challenge/templates/challenge/statistics.html:4
-#: resources/templates/profile/profile.html:109
+#: resources/templates/profile/profile.html:70
 msgid "Challenges"
 msgstr "Dueluri"
 
@@ -267,9 +268,10 @@ msgstr ""
 "Ai lansat un duel cu %(c_to)s la %(date)s."
 
 #: games/challenge/templates/challenge/challenge.html:70
-#: games/quiz/templates/quiz/quiz.html:48
-#: games/quiz/templates/quiz/cpanel/add_quiz.html:19
-#: games/quiz/templates/quiz/cpanel/edit_quiz.html:19
+#: games/quiz/templates/quiz/quiz.html:45
+#: games/quiz/templates/quiz/cpanel/add_quiz.html:36
+#: games/quiz/templates/quiz/cpanel/category.html:24
+#: games/quiz/templates/quiz/cpanel/edit_quiz.html:36
 #: games/specialchallenge/templates/specialchallenge/challenge_add_question.html:13
 #: games/specialchallenge/templates/specialchallenge/challenge_edit_question.html:13
 #: games/specialchallenge/templates/specialchallenge/configure.html:14
@@ -278,8 +280,10 @@ msgstr ""
 #: games/workshop/templates/workshop/cpanel/editgroup.html:19
 #: games/workshop/templates/workshop/cpanel/schedule_change.html:21
 #: interface/apps/files/templates/files/cpanel/edit_file.html:19
-#: interface/apps/lesson/templates/lesson/cpanel/category.html:25
-#: interface/apps/lesson/templates/lesson/cpanel/edit_lesson.html:19
+#: interface/apps/lesson/templates/lesson/cpanel/add_lesson.html:66
+#: interface/apps/lesson/templates/lesson/cpanel/category.html:34
+#: interface/apps/lesson/templates/lesson/cpanel/edit_lesson.html:76
+#: interface/apps/lesson/templates/lesson/cpanel/tag.html:33
 #: interface/forum/templates/forum/topic_create.html:25
 #: interface/forum/templates/forum/cpanel/add_category.html:28
 #: interface/forum/templates/forum/cpanel/add_forum.html:28
@@ -344,11 +348,12 @@ msgstr "Jucate"
 
 #: games/challenge/templates/challenge/result.html:5
 #: games/quest/templates/quest/cpanel_home.html:67
+#: games/quiz/templates/quiz/result.html:5
 msgid "Results"
 msgstr "Rezultate"
 
 #: games/challenge/templates/challenge/result.html:12
-#: games/quiz/templates/quiz/result.html:10
+#: games/quiz/templates/quiz/result.html:15
 msgid "You scored:"
 msgstr "Ai obținut:"
 
@@ -413,14 +418,11 @@ msgid "Challenges against "
 msgstr "Dueluri cu "
 
 #: games/challenge/templates/challenge/statistics_detail.html:11
-#: games/quiz/templates/quiz/index.html:38
-#: games/quiz/templates/quiz/index.html:40
 #: resources/templates/messaging/message.html:16
 msgid "Date"
 msgstr "Data"
 
 #: games/challenge/templates/challenge/statistics_detail.html:12
-#: games/quiz/templates/quiz/index.html:41
 msgid "Result"
 msgstr "Rezultat"
 
@@ -509,7 +511,7 @@ msgstr "Trebuie să dai un răspuns"
 
 #: games/qotd/templates/qotd/index.html:34
 #: games/qotd/templates/qotd/sidebar.html:23
-#: resources/templates/profile/profile.html:193
+#: resources/templates/profile/profile.html:218
 msgid "History"
 msgstr "Istoric"
 
@@ -554,7 +556,8 @@ msgid "Add final quest"
 msgstr "Adăugă aventură finală"
 
 #: games/quest/templates/quest/cpanel_home.html:49
-#: games/quiz/templates/quiz/cpanel/list_quizzes.html:53
+#: games/quiz/templates/quiz/cpanel/list_quizzes.html:70
+#: games/quiz/templates/quiz/cpanel/manage_categories.html:30
 #: games/specialquest/templates/specialquest/cpanel_groups.html:47
 #: games/specialquest/templates/specialquest/cpanel_home.html:42
 #: games/workshop/templates/workshop/cpanel/editspot.html:26
@@ -562,16 +565,17 @@ msgstr "Adăugă aventură finală"
 #: games/workshop/templates/workshop/cpanel/semigroups.html:47
 #: games/workshop/templates/workshop/cpanel/workshop_status.html:17
 #: games/workshop/templates/workshop/cpanel/workshops.html:54
-#: interface/apps/files/templates/files/cpanel/list_files.html:40
+#: interface/apps/files/templates/files/cpanel/list_files.html:54
 #: interface/apps/files/templates/files/cpanel/manage_categories.html:28
-#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:130
-#: interface/apps/lesson/templates/lesson/cpanel/manage_categories.html:31
+#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:148
+#: interface/apps/lesson/templates/lesson/cpanel/manage_categories.html:35
+#: interface/apps/lesson/templates/lesson/cpanel/manage_tags.html:39
 #: interface/forum/templates/forum/cpanel/index.html:124
 #: interface/forum/templates/forum/cpanel/manage_categories.html:29
 #: resources/templates/cpanel/artifact_home.html:41
 #: resources/templates/cpanel/artifactset.html:53
 #: resources/templates/cpanel/news.html:32
-#: resources/templates/cpanel/qpool_home.html:175
+#: resources/templates/cpanel/qpool_home.html:169
 #: resources/templates/cpanel/qpool_managetags.html:36
 #: resources/templates/cpanel/reports.html:42
 #: resources/templates/cpanel/roles.html:36
@@ -598,7 +602,7 @@ msgstr "Bonifică pe primii 10"
 
 #: games/quest/templates/quest/history.html:5
 #: games/quest/templates/quest/history.html:6
-#: resources/templates/top/sidebar.html:36
+#: resources/templates/top/sidebar.html:37
 msgid "Quest History"
 msgstr "Istoric de aventuri"
 
@@ -608,6 +612,7 @@ msgstr "Eroii jocului"
 
 #: games/quest/templates/quest/history.html:36
 #: resources/templates/division.html:18
+#: resources/templates/interface/sidebar/leaderboard.html:16
 #: resources/templates/top/challenge_top.html:23
 #: resources/templates/top/coin_top.html:15
 #: resources/templates/top/maintop.html:22
@@ -616,11 +621,12 @@ msgstr "Jucător"
 
 #: games/quest/templates/quest/history.html:38
 #: resources/templates/division.html:20
-#: resources/templates/leaderboard.html:20
-#: resources/templates/leaderboard.html:38
+#: resources/templates/leaderboard.html:17
+#: resources/templates/leaderboard.html:35
+#: resources/templates/interface/sidebar/leaderboard.html:13
 #: resources/templates/profile/group.html:23
-#: resources/templates/profile/profile.html:23
-#: resources/templates/profile/profile.html:24
+#: resources/templates/profile/profile.html:32
+#: resources/templates/profile/profile.html:35
 #: resources/templates/top/classes.html:21
 msgid "Group"
 msgstr "Grup"
@@ -715,7 +721,7 @@ msgstr "Joacă aventura!"
 msgid "No quest active."
 msgstr "Nu există aventuri active."
 
-#: games/quiz/models.py:198
+#: games/quiz/models.py:241
 msgid ""
 "received {points} points and {gold} gold bonus for beating his/her highscore "
 "at quiz {quiz_name}"
@@ -723,7 +729,7 @@ msgstr ""
 "a primit {points} puncte și {gold} aur bonus pentru că și-a depăsșit cel mai "
 "bun scor la testul {quiz_name}"
 
-#: games/quiz/models.py:204
+#: games/quiz/models.py:247
 msgid ""
 "received {points} points and {gold} gold bonus for submitting quiz "
 "{quiz_name}"
@@ -731,62 +737,88 @@ msgstr ""
 "a primit {points} puncte și {gold} aur bonus pentru ca a submis testul "
 "{quiz_name}"
 
-#: games/quiz/views.py:48
+#: games/quiz/views.py:69
 msgid "You can replay this quiz in {days} day(s)!"
 msgstr "Poți rula din nou acest test în {days} zile."
 
+#: games/quiz/templates/quiz/category.html:6
 #: games/quiz/templates/quiz/index.html:5
-#: games/quiz/templates/quiz/index.html:6
 #: games/quiz/templates/quiz/sidebar.html:4
+#: resources/templates/interface/header.html:23
 msgid "Quizzes"
 msgstr "Teste"
 
-#: games/quiz/templates/quiz/index.html:11
-msgid "Active Quizzes"
-msgstr "Teste active"
+#: games/quiz/templates/quiz/category.html:17
+msgid "Note: Inactive quizzes are only visible by staff members"
+msgstr "Notă: Testele inactive sunt vizibile doar personalului administrativ"
 
-#: games/quiz/templates/quiz/index.html:18
-msgid "Expired Quizzes"
-msgstr "Teste care au expirat"
+#: games/quiz/templates/quiz/category.html:23
+msgid "Inactive quizzes"
+msgstr "Teste inactive"
 
-#: games/quiz/templates/quiz/index.html:25
-msgid "No quizzes have been published. Come back later."
-msgstr "Nu au fost publicate teste. Te rugăm să revii."
+#: games/quiz/templates/quiz/category.html:42
+#: games/quiz/templates/quiz/category.html:104
+msgid "Start Quiz"
+msgstr "Rulează test"
 
-#: games/quiz/templates/quiz/index.html:28
-msgid "Your results"
-msgstr "Rezultatele tale"
-
-#: games/quiz/templates/quiz/index.html:33
-msgid "Quiz"
-msgstr "Test"
-
-#: games/quiz/templates/quiz/index.html:34
+#: games/quiz/templates/quiz/category.html:50
+#: games/quiz/templates/quiz/category.html:112
+#: games/quiz/templates/quiz/category.html:169
 msgid "Best Score"
 msgstr "Cel mai bun rezultat"
 
-#: games/quiz/templates/quiz/index.html:35
+#: games/quiz/templates/quiz/category.html:52
+#: games/quiz/templates/quiz/category.html:64
+#: games/quiz/templates/quiz/category.html:114
+#: games/quiz/templates/quiz/category.html:126
+#: games/quiz/templates/quiz/category.html:171
+#: games/quiz/templates/quiz/category.html:183
+msgid "points"
+msgstr "Puncte"
+
+#: games/quiz/templates/quiz/category.html:62
+#: games/quiz/templates/quiz/category.html:124
+#: games/quiz/templates/quiz/category.html:181
 msgid "Last Score"
 msgstr "Cel mai recent rezultat"
 
-#: games/quiz/templates/quiz/index.html:39
-msgid "Score"
-msgstr "Rezultat"
+#: games/quiz/templates/quiz/category.html:73
+#: games/quiz/templates/quiz/category.html:135
+#: games/quiz/templates/quiz/category.html:192
+msgid "No run history"
+msgstr "Nu ai rulat testul"
 
-#: games/quiz/templates/quiz/index.html:55
-msgid "You haven't run any quiz yet."
-msgstr "Nu ai rulat încă nici un test."
+#: games/quiz/templates/quiz/category.html:86
+msgid "Active quizzes"
+msgstr "Teste active"
 
-#: games/quiz/templates/quiz/quiz.html:6
-#: games/quiz/templates/quiz/result.html:5
+#: games/quiz/templates/quiz/category.html:147
+msgid "Expired quizzes"
+msgstr "Teste care au expirat"
+
+#: games/quiz/templates/quiz/category.html:202
+msgid "No quizzes have been published. Come back later."
+msgstr "Nu au fost publicate teste. Te rugăm să revii."
+
+#: games/quiz/templates/quiz/index.html:20
+#: resources/templates/site_index.html:58
+msgid "No categories have been added yet"
+msgstr "Nu au fost adăugate categorii"
+
+#: games/quiz/templates/quiz/quiz.html:7
+#: games/quiz/templates/quiz/result.html:7
 msgid "Quiz "
 msgstr "Test "
 
-#: games/quiz/templates/quiz/result.html:5
-msgid "Results - "
-msgstr "Rezultate - "
+#: games/quiz/templates/quiz/result.html:15
+msgid "Your grade is"
+msgstr "Nota ta finală este"
 
-#: games/quiz/templates/quiz/result.html:12
+#: games/quiz/templates/quiz/result.html:15
+msgid "(out of"
+msgstr "(nu mai sunt"
+
+#: games/quiz/templates/quiz/result.html:20
 msgid "Back to quizzes"
 msgstr "Înapoi la teste"
 
@@ -801,13 +833,18 @@ msgstr "Nu există teste active."
 #: games/quiz/templates/quiz/sidebar.html:14
 #: interface/apps/files/templates/files/sidebar.html:14
 #: interface/apps/lesson/templates/lesson/sidebar.html:14
-#: resources/templates/profile/group.html:64
-#: resources/templates/profile/race.html:53
+#: resources/templates/profile/group.html:65
+#: resources/templates/profile/race.html:100
 msgid "View all"
 msgstr "Arată tot"
 
-#: games/quiz/templates/quiz/cpanel/add_quiz.html:18
-#: games/quiz/templates/quiz/cpanel/edit_quiz.html:18
+#: games/quiz/templates/quiz/cpanel/add_quiz.html:26
+#: games/quiz/templates/quiz/cpanel/edit_quiz.html:26
+msgid "Tags"
+msgstr "Etichete"
+
+#: games/quiz/templates/quiz/cpanel/add_quiz.html:35
+#: games/quiz/templates/quiz/cpanel/edit_quiz.html:35
 #: games/specialchallenge/templates/specialchallenge/challenge_add_question.html:15
 #: games/specialchallenge/templates/specialchallenge/challenge_del_question.html:19
 #: games/specialchallenge/templates/specialchallenge/challenge_edit_question.html:15
@@ -815,35 +852,90 @@ msgstr "Arată tot"
 #: games/specialchallenge/templates/specialchallenge/configure.html:16
 #: games/specialchallenge/templates/specialchallenge/create.html:17
 #: interface/apps/files/templates/files/cpanel/edit_file.html:18
-#: interface/apps/lesson/templates/lesson/cpanel/edit_lesson.html:18
 #: resources/templates/cpanel/qpool_setactivetags.html:34
 msgid "Back"
 msgstr "Înapoi"
+
+#: games/quiz/templates/quiz/cpanel/category.html:22
+#: games/specialquest/templates/specialquest/cpanel_edit.html:27
+#: interface/apps/lesson/templates/lesson/cpanel/add_lesson.html:64
+#: interface/apps/lesson/templates/lesson/cpanel/category.html:32
+#: interface/apps/lesson/templates/lesson/cpanel/edit_lesson.html:74
+#: interface/apps/lesson/templates/lesson/cpanel/sort_lessons.html:49
+#: interface/apps/lesson/templates/lesson/cpanel/sort_tags.html:49
+#: interface/apps/lesson/templates/lesson/cpanel/tag.html:31
+#: interface/forum/templates/forum/cpanel/add_category.html:26
+#: interface/forum/templates/forum/cpanel/add_forum.html:26
+#: interface/forum/templates/forum/cpanel/edit_category.html:26
+#: interface/forum/templates/forum/cpanel/edit_forum.html:26
+#: resources/templates/cpanel/add_question.html:134
+#: resources/templates/cpanel/edit_formula.html:27
+#: resources/templates/cpanel/edit_question.html:138
+#: resources/templates/cpanel/karma_group.html:22
+#: resources/templates/messaging/create.html:42
+msgid "Cancel"
+msgstr "Renunță"
+
+#: games/quiz/templates/quiz/cpanel/category.html:23
+#: games/specialquest/templates/specialquest/cpanel_edit.html:28
+#: interface/apps/lesson/templates/lesson/cpanel/add_lesson.html:65
+#: interface/apps/lesson/templates/lesson/cpanel/category.html:33
+#: interface/apps/lesson/templates/lesson/cpanel/edit_lesson.html:75
+#: interface/apps/lesson/templates/lesson/cpanel/sort_lessons.html:50
+#: interface/apps/lesson/templates/lesson/cpanel/sort_tags.html:50
+#: interface/apps/lesson/templates/lesson/cpanel/tag.html:32
+#: interface/forum/templates/forum/cpanel/add_category.html:27
+#: interface/forum/templates/forum/cpanel/add_forum.html:27
+#: interface/forum/templates/forum/cpanel/edit_category.html:27
+#: interface/forum/templates/forum/cpanel/edit_forum.html:27
+#: resources/templates/cpanel/add_question.html:135
+#: resources/templates/cpanel/edit_formula.html:28
+#: resources/templates/cpanel/edit_question.html:139
+msgid "Reset"
+msgstr "Resetează"
 
 #: games/quiz/templates/quiz/cpanel/list_quizzes.html:10
 msgid "Add quiz"
 msgstr "Adaugă test"
 
-#: games/quiz/templates/quiz/cpanel/list_quizzes.html:56
+#: games/quiz/templates/quiz/cpanel/list_quizzes.html:13
+#: interface/apps/files/templates/files/cpanel/list_files.html:13
+#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:16
+#: interface/forum/templates/forum/cpanel/index.html:13
+msgid "Manage categories"
+msgstr "Administrează categorii"
+
+#: games/quiz/templates/quiz/cpanel/list_quizzes.html:73
+#: games/quiz/templates/quiz/cpanel/manage_categories.html:33
 #: games/specialchallenge/templates/specialchallenge/challenge_del_question.html:17
 #: games/specialquest/templates/specialquest/cpanel_groups.html:51
 #: games/specialquest/templates/specialquest/cpanel_home.html:46
-#: interface/apps/files/templates/files/cpanel/list_files.html:43
+#: interface/apps/files/templates/files/cpanel/list_files.html:57
 #: interface/apps/files/templates/files/cpanel/manage_categories.html:31
-#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:133
-#: interface/apps/lesson/templates/lesson/cpanel/manage_categories.html:34
+#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:151
+#: interface/apps/lesson/templates/lesson/cpanel/manage_categories.html:38
+#: interface/apps/lesson/templates/lesson/cpanel/manage_tags.html:42
 #: interface/forum/templates/forum/cpanel/index.html:127
 #: interface/forum/templates/forum/cpanel/manage_categories.html:32
 #: resources/templates/cpanel/artifact_home.html:44
 #: resources/templates/cpanel/formulas_home.html:39
 #: resources/templates/cpanel/news.html:35
-#: resources/templates/cpanel/qpool_home.html:178
+#: resources/templates/cpanel/qpool_home.html:172
 #: resources/templates/cpanel/qpool_managetags.html:39
 #: resources/templates/cpanel/spells_home.html:46
 #: resources/templates/cpanel/static_pages.html:35
 #: resources/templates/messaging/message.html:6
 msgid "Delete"
 msgstr "Șterge"
+
+#: games/quiz/templates/quiz/cpanel/manage_categories.html:8
+#: interface/apps/files/templates/files/cpanel/manage_categories.html:8
+#: interface/apps/lesson/templates/lesson/cpanel/category.html:11
+#: interface/apps/lesson/templates/lesson/cpanel/manage_categories.html:9
+#: interface/apps/lesson/templates/lesson/cpanel/sort_tags.html:26
+#: interface/forum/templates/forum/cpanel/manage_categories.html:9
+msgid "Add category"
+msgstr "Adaugă categorie"
 
 #: games/specialchallenge/models.py:21
 msgid "New, editing"
@@ -936,7 +1028,7 @@ msgid "del"
 msgstr "șterge"
 
 #: games/specialchallenge/templates/specialchallenge/challenge_view.html:33
-#: resources/templates/cpanel/qpool_home.html:18
+#: resources/templates/cpanel/qpool_home.html:15
 msgid "Add question"
 msgstr "Adaugă întrebare"
 
@@ -1061,45 +1153,12 @@ msgstr "Invitație trimisă"
 msgid "Special"
 msgstr "Special"
 
-#: games/specialquest/templates/specialquest/cpanel_edit.html:27
-#: interface/apps/lesson/templates/lesson/cpanel/category.html:23
-#: interface/apps/lesson/templates/lesson/cpanel/sort_lessons.html:45
-#: interface/forum/templates/forum/cpanel/add_category.html:26
-#: interface/forum/templates/forum/cpanel/add_forum.html:26
-#: interface/forum/templates/forum/cpanel/edit_category.html:26
-#: interface/forum/templates/forum/cpanel/edit_forum.html:26
-#: resources/templates/cpanel/add_question.html:132
-#: resources/templates/cpanel/edit_formula.html:27
-#: resources/templates/cpanel/edit_question.html:131
-#: resources/templates/cpanel/karma_group.html:22
-#: resources/templates/cpanel/qpool_edit.html:97
-#: resources/templates/cpanel/qpool_new.html:77
-#: resources/templates/messaging/create.html:32
-msgid "Cancel"
-msgstr "Renunță"
-
-#: games/specialquest/templates/specialquest/cpanel_edit.html:28
-#: interface/apps/lesson/templates/lesson/cpanel/category.html:24
-#: interface/apps/lesson/templates/lesson/cpanel/sort_lessons.html:46
-#: interface/forum/templates/forum/cpanel/add_category.html:27
-#: interface/forum/templates/forum/cpanel/add_forum.html:27
-#: interface/forum/templates/forum/cpanel/edit_category.html:27
-#: interface/forum/templates/forum/cpanel/edit_forum.html:27
-#: resources/templates/cpanel/add_question.html:133
-#: resources/templates/cpanel/edit_formula.html:28
-#: resources/templates/cpanel/edit_question.html:132
-#: resources/templates/cpanel/qpool_edit.html:98
-#: resources/templates/cpanel/qpool_new.html:78
-msgid "Reset"
-msgstr "Resetează"
-
 #: games/specialquest/templates/specialquest/cpanel_edit.html:29
 #: games/workshop/templates/workshop/review_change.html:13
-#: interface/apps/lesson/templates/lesson/cpanel/sort_lessons.html:47
-#: resources/templates/cpanel/add_question.html:134
-#: resources/templates/cpanel/edit_question.html:133
-#: resources/templates/cpanel/qpool_edit.html:99
-#: resources/templates/cpanel/qpool_new.html:79
+#: interface/apps/lesson/templates/lesson/cpanel/sort_lessons.html:51
+#: interface/apps/lesson/templates/lesson/cpanel/sort_tags.html:51
+#: resources/templates/cpanel/add_question.html:136
+#: resources/templates/cpanel/edit_question.html:140
 #: resources/templates/profile/set_profile.html:15
 msgid "Save"
 msgstr "Salvează"
@@ -1250,7 +1309,7 @@ msgid "Invite %(to)s to %(group)s"
 msgstr "Invită %(to)s la %(group)s"
 
 #: games/specialquest/templates/specialquest/invite.html:12
-#: resources/templates/profile/profile.html:81
+#: resources/templates/profile/profile.html:142
 msgid "Invite"
 msgstr "Invită"
 
@@ -1396,7 +1455,7 @@ msgstr "Ești sigur că vrei să trimiți?"
 
 #: games/workshop/templates/workshop/play.html:48
 #: resources/templates/cpanel/system_message_group.html:35
-#: resources/templates/messaging/create.html:33
+#: resources/templates/messaging/create.html:44
 msgid "Send"
 msgstr "Trimite"
 
@@ -1446,7 +1505,6 @@ msgstr "Asistent"
 #: games/workshop/templates/workshop/review.html:10
 #: games/workshop/templates/workshop/review.html:60
 #: resources/templates/interface/forum_header.html:24
-#: resources/templates/interface/header.html:24
 msgid "Anonymous"
 msgstr "Anonim"
 
@@ -1482,8 +1540,7 @@ msgstr "notă pe recenzie:"
 
 #: games/workshop/templates/workshop/review.html:100
 msgid "There are no assessments to review. Maybe the review did not start yet."
-msgstr ""
-"Nu există evaluări de recenzat. Probabil nu a început etapa de recenzare."
+msgstr "Nu există evaluări de recenzat. Probabil nu a început etapa de recenzare."
 
 #: games/workshop/templates/workshop/review.html:105
 msgid "Review!"
@@ -1562,10 +1619,10 @@ msgid "Go to Questions"
 msgstr "Mergi la întrebări"
 
 #: games/workshop/templates/workshop/cpanel/schedule.html:43
-#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:122
+#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:140
 #: interface/forum/templates/forum/cpanel/index.html:117
-#: resources/templates/cpanel/qpool_home.html:151
-#: resources/templates/cpanel/qpool_home.html:160
+#: resources/templates/cpanel/qpool_home.html:148
+#: resources/templates/cpanel/qpool_home.html:157
 msgid "Yes"
 msgstr "Da"
 
@@ -1615,17 +1672,34 @@ msgstr "Editează poziție"
 msgid "Integrity Check"
 msgstr "Verificare de integritate"
 
-#: interface/activity/achievements.py:259
+#: interface/activity/achievements.py:257
 msgid "earned {artifact}"
 msgstr "a dobândit {artifact}"
 
 #: interface/apps/files/templates/files/index.html:5
 #: interface/apps/files/templates/files/index.html:6
 #: interface/apps/files/templates/files/sidebar.html:4
+#: resources/templates/interface/header.html:24
 msgid "Files"
 msgstr "Fișiere"
 
-#: interface/apps/files/templates/files/index.html:21
+#: interface/apps/files/templates/files/index.html:17
+msgid "Format"
+msgstr "Format"
+
+#: interface/apps/files/templates/files/index.html:18
+#: resources/templates/profile/groups.html:18
+#: resources/templates/profile/race.html:49
+#: resources/templates/profile/race.html:90
+#: resources/templates/profile/race.html:107
+msgid "Name"
+msgstr "Nume"
+
+#: interface/apps/files/templates/files/index.html:19
+msgid "Size"
+msgstr "Dimensiune"
+
+#: interface/apps/files/templates/files/index.html:33
 msgid "No files have been added."
 msgstr "Nu au fost adăugate fișiere."
 
@@ -1641,57 +1715,24 @@ msgstr "Nu există fișiere accesibile."
 msgid "Upload file"
 msgstr "Încarcă un fișier"
 
-#: interface/apps/files/templates/files/cpanel/list_files.html:13
-#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:13
-#: interface/forum/templates/forum/cpanel/index.html:13
-msgid "Manage categories"
-msgstr "Administrează categorii"
+#: interface/apps/lesson/templates/lesson/category.html:5
+msgid "Category"
+msgstr "Categorie"
 
-#: interface/apps/files/templates/files/cpanel/manage_categories.html:8
-#: interface/apps/lesson/templates/lesson/cpanel/manage_categories.html:8
-#: interface/forum/templates/forum/cpanel/manage_categories.html:9
-msgid "Add category"
-msgstr "Adaugă categorie"
+#: interface/apps/lesson/templates/lesson/category.html:29
+msgid "No tags have been added."
+msgstr "Nu au fost adăugate etichete."
 
-#: interface/apps/lesson/templates/lesson/index.html:5
 #: interface/apps/lesson/templates/lesson/index.html:6
 #: interface/apps/lesson/templates/lesson/sidebar.html:4
+#: resources/templates/interface/header.html:22
 msgid "Lessons"
 msgstr "Lecții"
 
-#: interface/apps/lesson/templates/lesson/index.html:22
+#: interface/apps/lesson/templates/lesson/index.html:24
+#: interface/apps/lesson/templates/lesson/tag.html:15
 msgid "No lessons have been added."
 msgstr "Nu au fost adăugate lecții."
-
-#: interface/apps/lesson/templates/lesson/lesson.html:42
-msgid "Quiz is already running"
-msgstr "Testul deja rulează"
-
-#: interface/apps/lesson/templates/lesson/lesson.html:44
-msgid "Back to quiz"
-msgstr "Înapoi la test"
-
-#: interface/apps/lesson/templates/lesson/lesson.html:48
-msgid "You may run this quiz again in"
-msgstr "Poți rezolva acest test din nou în"
-
-#: interface/apps/lesson/templates/lesson/lesson.html:48
-#: resources/templates/magic/bazaar.html:42
-#: resources/templates/profile/cast.html:46
-msgid "days"
-msgstr "zile"
-
-#: interface/apps/lesson/templates/lesson/lesson.html:50
-msgid "Run quiz"
-msgstr "Rezolvă test"
-
-#: interface/apps/lesson/templates/lesson/lesson.html:53
-msgid "Quiz will be enabled in"
-msgstr "Testul va fi activat în"
-
-#: interface/apps/lesson/templates/lesson/lesson.html:55
-msgid "Start quiz"
-msgstr "Începe test"
 
 #: interface/apps/lesson/templates/lesson/sidebar.html:9
 msgid "lessons are active."
@@ -1701,33 +1742,60 @@ msgstr "lecții sunt active."
 msgid "No lessons are active."
 msgstr "Nu există lecții active."
 
+#: interface/apps/lesson/templates/lesson/tag.html:5
+#: interface/apps/lesson/templates/lesson/tag.html:6
+msgid "Lesson"
+msgstr "Lecții"
+
 #: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:10
 msgid "Add lesson"
 msgstr "Adaugă lecție"
 
-#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:78
+#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:13
+#: resources/templates/cpanel/qpool_home.html:21
+msgid "Manage tags"
+msgstr "Administrează taguri"
+
+#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:81
 #: interface/forum/templates/forum/cpanel/index.html:75
-#: resources/templates/cpanel/qpool_home.html:86
-#: resources/templates/messaging/index.html:24
+#: resources/templates/cpanel/qpool_home.html:83
 msgid "All"
 msgstr "Toate"
 
-#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:79
+#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:82
 #: interface/forum/templates/forum/cpanel/index.html:76
-#: resources/templates/cpanel/qpool_home.html:87
+#: resources/templates/cpanel/qpool_home.html:84
 msgid "None"
 msgstr "Niciunul"
 
-#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:124
+#: interface/apps/lesson/templates/lesson/cpanel/list_lessons.html:142
 #: interface/forum/templates/forum/cpanel/index.html:119
-#: resources/templates/cpanel/qpool_home.html:153
-#: resources/templates/cpanel/qpool_home.html:162
+#: resources/templates/cpanel/qpool_home.html:150
+#: resources/templates/cpanel/qpool_home.html:159
 msgid "No"
 msgstr "NU"
 
-#: interface/apps/lesson/templates/lesson/cpanel/manage_categories.html:28
+#: interface/apps/lesson/templates/lesson/cpanel/manage_categories.html:32
+msgid "Sort Tags"
+msgstr "Sortează etichete"
+
+#: interface/apps/lesson/templates/lesson/cpanel/manage_tags.html:9
+#: interface/apps/lesson/templates/lesson/cpanel/sort_lessons.html:26
+#: interface/apps/lesson/templates/lesson/cpanel/tag.html:11
+msgid "Add tag"
+msgstr "Adaugă etichetă"
+
+#: interface/apps/lesson/templates/lesson/cpanel/manage_tags.html:36
 msgid "Sort Lessons"
 msgstr "Sortează lecțiile"
+
+#: interface/apps/lesson/templates/lesson/cpanel/sort_lessons.html:37
+msgid "Sort lessons in"
+msgstr "Sortează lecțiile"
+
+#: interface/apps/lesson/templates/lesson/cpanel/sort_tags.html:37
+msgid "Sort tags in"
+msgstr "Sortează etichetele"
 
 #: interface/apps/magic/views.py:42
 msgid "Rate: 1 gold = {rate} points, {rate2} points = 1 gold"
@@ -1778,9 +1846,8 @@ msgid "Cast failed:"
 msgstr "Vrajă eșuată:"
 
 #: interface/apps/messaging/models.py:53
-#: resources/templates/messaging/index.html:36
-#: resources/templates/messaging/index.html:54
-#: resources/templates/messaging/index.html:72
+#: resources/templates/messaging/index.html:41
+#: resources/templates/messaging/index.html:67
 #: resources/templates/messaging/message.html:22
 #: resources/templates/messaging/message_one.html:6
 msgid "System"
@@ -1795,10 +1862,10 @@ msgid "Cannot send message."
 msgstr "Nu se poate trimite mesajul."
 
 #: interface/apps/messaging/views.py:126 interface/apps/messaging/views.py:134
-#: resources/templates/messaging/index.html:14
+#: resources/templates/interface/header.html:25
+#: resources/templates/messaging/index.html:6
 #: resources/templates/messaging/index.html:29
-#: resources/templates/messaging/index.html:46
-#: resources/templates/messaging/index.html:64
+#: resources/templates/messaging/index.html:55
 msgid "Messages"
 msgstr "Mesaje"
 
@@ -1810,11 +1877,11 @@ msgstr "Propune întrebare"
 msgid "Live stats"
 msgstr "Statistici live"
 
-#: interface/cpanel/views.py:1343
+#: interface/cpanel/views.py:1289
 msgid "received {amount} {coin} bonus for {reason}"
 msgstr "a primit {amount} {coin} bonus pentru {reason}"
 
-#: interface/cpanel/views.py:1405
+#: interface/cpanel/views.py:1351
 msgid "received {amount} {coin} bonus for {karma_points} Karma Points"
 msgstr "a primit {amount} {coin} bonus pentru {karma_points} puncte de karma"
 
@@ -1857,9 +1924,7 @@ msgstr "Răspunsuri"
 
 #: interface/forum/templates/forum/forum.html:48
 msgid "No topics in this forum, only admins can create and post here."
-msgstr ""
-"Nu există subiecte pe acest forum. Doar administratorii pot scrie mesaje "
-"aici."
+msgstr "Nu există subiecte pe acest forum. Doar administratorii pot scrie mesaje aici."
 
 #: interface/forum/templates/forum/forum.html:52
 msgid "No topics in this forum, create one :)"
@@ -1887,7 +1952,7 @@ msgid "Add forum"
 msgstr "Adăugă forum"
 
 #: resources/templates/division.html:6 resources/templates/division.html:7
-#: resources/templates/top/sidebar.html:30
+#: resources/templates/top/sidebar.html:31
 msgid "My Division"
 msgstr "Divizia mea"
 
@@ -1906,14 +1971,14 @@ msgid "Staff users are not members of any division"
 msgstr "Personalul nu este membru al vreunei divizii"
 
 #: resources/templates/division.html:21
-#: resources/templates/leaderboard.html:39
+#: resources/templates/leaderboard.html:36
 #: resources/templates/top/classes.html:22
 #: resources/templates/top/races.html:21
 msgid "Race"
 msgstr "Rasă"
 
 #: resources/templates/division.html:22
-#: resources/templates/profile/profile.html:90
+#: resources/templates/profile/profile.html:51
 #: resources/templates/top/challenge_top.html:27
 #: resources/templates/top/maintop.html:25
 msgid "Last seen"
@@ -1921,8 +1986,10 @@ msgstr "Văzut ultima oară"
 
 #: resources/templates/leaderboard.html:6
 #: resources/templates/leaderboard.html:7
-#: resources/templates/top/sidebar.html:5
-#: resources/templates/top/sidebar.html:26
+#: resources/templates/interface/header.html:26
+#: resources/templates/interface/sidebar/leaderboard.html:7
+#: resources/templates/top/sidebar.html:6
+#: resources/templates/top/sidebar.html:27
 msgid "Leaderboard"
 msgstr "Clasament"
 
@@ -1930,103 +1997,62 @@ msgstr "Clasament"
 msgid "Leaderboard has been disabled."
 msgstr "Clasamentul a fost dezactivat."
 
-#: resources/templates/leaderboard.html:19
-#: resources/templates/leaderboard.html:37
-#: resources/templates/top/classes.html:20
-#: resources/templates/top/races.html:20
-msgid "#"
-msgstr "#"
+#: resources/templates/leaderboard.html:16
+#: resources/templates/profile/race.html:89
+msgid "ID"
+msgstr "Identificator"
 
-#: resources/templates/leaderboard.html:21
-#: resources/templates/leaderboard.html:40
+#: resources/templates/leaderboard.html:18
+#: resources/templates/leaderboard.html:37
 #: resources/templates/magic/bazaar.html:73
 #: resources/templates/profile/groups.html:21
-#: resources/templates/profile/profile.html:119
 #: resources/templates/top/classes.html:23
 #: resources/templates/top/maintop.html:23
 #: resources/templates/top/races.html:22
 msgid "Points"
 msgstr "Puncte"
 
-#: resources/templates/leaderboard.html:51
+#: resources/templates/leaderboard.html:34
+#: resources/templates/profile/race.html:51
+#: resources/templates/profile/race.html:109
+#: resources/templates/top/classes.html:20
+#: resources/templates/top/races.html:20
+msgid "#"
+msgstr "#"
+
+#: resources/templates/leaderboard.html:48
 #: resources/templates/top/sidebar_groups.html:12
 msgid "Full list.."
 msgstr "Listă completă.."
 
-#: resources/templates/mobile_base.html:31
-#: resources/templates/cpanel/index.html:96
-#: resources/templates/interface/forum_header.html:22
-#: resources/templates/interface/header.html:22
-msgid "Logout"
-msgstr "Deconectare"
+#: resources/templates/site_index.html:12
+msgid "Activities"
+msgstr "Activități"
 
-#: resources/templates/mobile_base.html:33
-msgid "Anonimous"
-msgstr "Anonim"
+#: resources/templates/splash.html:29 resources/templates/splash.html.py:30
+#: resources/templates/registration/login.html:30
+#: resources/templates/registration/login.html:31
+msgid "username"
+msgstr "nume utilizator"
 
-#: resources/templates/mobile_base.html:33
-#: resources/templates/interface/forum_header.html:24
-#: resources/templates/interface/header.html:24
-msgid "Login"
-msgstr "Autentificare"
+#: resources/templates/splash.html:33 resources/templates/splash.html.py:34
+#: resources/templates/registration/login.html:34
+#: resources/templates/registration/login.html:35
+msgid "password"
+msgstr "parola"
 
-#: resources/templates/mobile_index.html:5
+#: resources/templates/splash.html:37
+#: resources/templates/registration/login.html:38
+msgid "login"
+msgstr "autentificare"
+
 #: resources/templates/activity/all.html:4
 #: resources/templates/activity/all.html:5
 #: resources/templates/magic/bazaar.html:22
 #: resources/templates/profile/group.html:43
-#: resources/templates/profile/profile.html:117
-#: resources/templates/profile/race.html:40
+#: resources/templates/profile/race.html:76
 msgid "Activity"
 msgstr "Activitate"
-
-#: resources/templates/mobile_index.html:9
-msgid "Bookmarks"
-msgstr "Scurtături"
-
-#: resources/templates/mobile_index.html:15
-#: resources/templates/magic/bazaar.html:17
-#: resources/templates/magic/bazaar_buy.html:4
-#: resources/templates/magic/bazaar_buy.html:7
-#: resources/templates/profile/cast.html:12
-msgid "Bazaar"
-msgstr "Bazar"
-
-#: resources/templates/site_base.html:50
-msgid "Search player"
-msgstr "Caută jucător"
-
-#: resources/templates/site_index.html:13
-msgid "Activities"
-msgstr "Activități"
-
-#: resources/templates/site_index.html:27
-msgid "All activities"
-msgstr "Toate activitățile"
-
-#: resources/templates/site_index.html:35
-#: resources/templates/pages/news_index.html:4
-#: resources/templates/pages/news_index.html:5
-#: resources/templates/pages/news_item.html:4
-#: resources/templates/pages/news_item.html:5
-msgid "News"
-msgstr "Știri"
-
-#: resources/templates/site_index.html:39
-msgid "No news."
-msgstr "Nici o știre"
-
-#: resources/templates/site_index.html:42
-msgid "All news"
-msgstr "Toate știrile"
-
-#: resources/templates/splash.html:16
-msgid "username"
-msgstr "nume utilizator"
-
-#: resources/templates/splash.html:18
-msgid "password"
-msgstr "parola"
 
 #: resources/templates/activity/seen24h.html:5
 msgid "Seen players"
@@ -2040,7 +2066,7 @@ msgstr "Văzut în ultimele 24 de ore"
 msgid "Total:"
 msgstr "Total:"
 
-#: resources/templates/activity/stream.html:42
+#: resources/templates/activity/stream.html:36
 msgid "At the moment, there are no activies to report."
 msgstr "Pe moment nu există activități."
 
@@ -2077,7 +2103,13 @@ msgstr "Editează"
 msgid "Import"
 msgstr "Importă fișier"
 
-#: resources/templates/cpanel/index.html:189
+#: resources/templates/cpanel/index.html:97
+#: resources/templates/interface/forum_header.html:22
+#: resources/templates/interface/header.html:35
+msgid "Logout"
+msgstr "Deconectare"
+
+#: resources/templates/cpanel/index.html:190
 #: resources/templates/cpanel/players.html:8
 msgid "Add player"
 msgstr "Adaugă jucător"
@@ -2111,7 +2143,7 @@ msgid "Add news item"
 msgstr "Adaugă o știre"
 
 #: resources/templates/cpanel/players.html:21
-#: resources/templates/cpanel/qpool_home.html:38
+#: resources/templates/cpanel/qpool_home.html:35
 msgid "Search"
 msgstr "Caută"
 
@@ -2123,40 +2155,28 @@ msgstr "Administrează"
 msgid "Recheck Infractions"
 msgstr "Reverifică infracțiunile"
 
-#: resources/templates/cpanel/qpool_home.html:15
-msgid "Add question #2"
-msgstr "Adaugă întrebare #2"
-
-#: resources/templates/cpanel/qpool_home.html:21
+#: resources/templates/cpanel/qpool_home.html:18
 msgid "Import file"
 msgstr "Importă fișier"
 
-#: resources/templates/cpanel/qpool_home.html:24
-msgid "Manage tags"
-msgstr "Administrează taguri"
-
-#: resources/templates/cpanel/qpool_home.html:67
+#: resources/templates/cpanel/qpool_home.html:64
 msgid "Automatic schedule"
 msgstr "Planificare automată"
 
-#: resources/templates/cpanel/qpool_home.html:72
+#: resources/templates/cpanel/qpool_home.html:69
 msgid "Set active tags"
 msgstr "Configurează etichetele active"
 
-#: resources/templates/cpanel/qpool_home.html:76
+#: resources/templates/cpanel/qpool_home.html:73
 msgid "Export all"
 msgstr "Exportă tot"
 
-#: resources/templates/cpanel/qpool_home.html:80
+#: resources/templates/cpanel/qpool_home.html:77
 msgid "Delete all"
 msgstr "Șterge tot"
 
-#: resources/templates/cpanel/qpool_home.html:172
-msgid "Edit #2"
-msgstr "Editează #2"
-
-#: resources/templates/cpanel/qpool_home.html:207
-#: resources/templates/cpanel/qpool_home.html:209
+#: resources/templates/cpanel/qpool_home.html:201
+#: resources/templates/cpanel/qpool_home.html:203
 msgid "active"
 msgstr "activ"
 
@@ -2198,16 +2218,15 @@ msgid "System Message"
 msgstr "Mesaj de sistem"
 
 #: resources/templates/cpanel/system_message_group.html:22
-#: resources/templates/messaging/create.html:13
+#: resources/templates/messaging/create.html:19
 #: resources/templates/messaging/index.html:32
-#: resources/templates/messaging/index.html:49
-#: resources/templates/messaging/index.html:67
+#: resources/templates/messaging/index.html:58
 #: resources/templates/messaging/message.html:12
 msgid "To"
 msgstr "Către"
 
 #: resources/templates/cpanel/system_message_group.html:26
-#: resources/templates/messaging/create.html:25
+#: resources/templates/messaging/create.html:34
 msgid "Text"
 msgstr "Text"
 
@@ -2223,6 +2242,15 @@ msgstr "Adaugă grup"
 #: resources/templates/cpanel/races/all.html:59
 msgid "Message"
 msgstr "Mesaj"
+
+#: resources/templates/interface/forum_header.html:24
+#: resources/templates/interface/header.html:40
+msgid "Login"
+msgstr "Autentificare"
+
+#: resources/templates/interface/header.html:27
+msgid "Forum"
+msgstr "Discuții"
 
 #: resources/templates/interface/online_players.html:6
 #: resources/templates/interface/online_players.html:7
@@ -2243,15 +2271,26 @@ msgstr "Nu există jucătorii online."
 msgid "Search results"
 msgstr "Rezultatele căutării"
 
+#: resources/templates/interface/sidebar/search.html:11
+msgid "Search player"
+msgstr "Caută jucător"
+
 #: resources/templates/magic/artifact_hof.html:6
 #: resources/templates/magic/artifact_hof.html:7
-#: resources/templates/top/sidebar.html:39
+#: resources/templates/top/sidebar.html:40
 msgid "Achievements"
 msgstr "Achievements"
 
 #: resources/templates/magic/artifact_hof.html:14
 msgid "You haven't unlocked any achievements yet."
 msgstr "Nu ai obținut încă nici un achievement."
+
+#: resources/templates/magic/bazaar.html:17
+#: resources/templates/magic/bazaar_buy.html:4
+#: resources/templates/magic/bazaar_buy.html:7
+#: resources/templates/profile/cast.html:12
+msgid "Bazaar"
+msgstr "Bazar"
 
 #: resources/templates/magic/bazaar.html:19
 #: resources/templates/magic/bazaar.html:75
@@ -2266,6 +2305,11 @@ msgstr "Sumar"
 #: resources/templates/magic/bazaar.html:39
 msgid "1 day"
 msgstr "o zi"
+
+#: resources/templates/magic/bazaar.html:42
+#: resources/templates/profile/cast.html:46
+msgid "days"
+msgstr "zile"
 
 #: resources/templates/magic/bazaar.html:51
 msgid "Buy"
@@ -2334,46 +2378,42 @@ msgstr "Invocate de mine"
 msgid "Target"
 msgstr "Țintă"
 
-#: resources/templates/messaging/create.html:5
-#: resources/templates/messaging/create.html:9
+#: resources/templates/messaging/create.html:7
 msgid "Create message"
 msgstr "Compune mesaj"
 
-#: resources/templates/messaging/create.html:22
+#: resources/templates/messaging/create.html:21
+msgid "User"
+msgstr "Utilizator"
+
+#: resources/templates/messaging/create.html:27
+#: resources/templates/messaging/create.html:29
 #: resources/templates/messaging/index.html:33
-#: resources/templates/messaging/index.html:50
-#: resources/templates/messaging/index.html:68
+#: resources/templates/messaging/index.html:59
 #: resources/templates/messaging/message.html:15
 msgid "Subject"
 msgstr "Subiect"
 
-#: resources/templates/messaging/index.html:9
-#: resources/templates/messaging/sidebar.html:4
-msgid "Messaging"
-msgstr "Mesagerie"
-
-#: resources/templates/messaging/index.html:18
+#: resources/templates/messaging/index.html:10
 msgid "Compose"
 msgstr "Compune"
 
-#: resources/templates/messaging/index.html:22
+#: resources/templates/messaging/index.html:21
 msgid "Received"
 msgstr "Primite"
 
-#: resources/templates/messaging/index.html:23
+#: resources/templates/messaging/index.html:24
 msgid "Sent"
 msgstr "Trimise"
 
 #: resources/templates/messaging/index.html:31
-#: resources/templates/messaging/index.html:48
-#: resources/templates/messaging/index.html:66
+#: resources/templates/messaging/index.html:57
 #: resources/templates/messaging/message.html:8
 msgid "From"
 msgstr "De la"
 
-#: resources/templates/messaging/index.html:40
-#: resources/templates/messaging/index.html:58
-#: resources/templates/messaging/index.html:76
+#: resources/templates/messaging/index.html:48
+#: resources/templates/messaging/index.html:75
 #: resources/templates/messaging/message.html:30
 msgid "No messages."
 msgstr "Nici un mesaj"
@@ -2394,17 +2434,18 @@ msgstr "din"
 msgid "Older messages"
 msgstr "Mesaje anterioare"
 
-#: resources/templates/messaging/sidebar.html:9
-msgid "You received"
-msgstr "Ai primit"
+#: resources/templates/messaging/sidebar.html:10
+msgid "You have"
+msgstr "Ai"
 
-#: resources/templates/messaging/sidebar.html:9
-msgid "messages."
-msgstr "mesaje."
+#: resources/templates/messaging/sidebar.html:10
+msgid "new messages"
+msgstr "mesaje noi"
 
-#: resources/templates/messaging/sidebar.html:11
-msgid "You didn't receive any messages."
-msgstr "Nu ai primit nici un mesaj."
+#: resources/templates/pages/news_index.html:6
+#: resources/templates/pages/news_item.html:5
+msgid "News"
+msgstr "Știri"
 
 #: resources/templates/profile/cast.html:6
 #: resources/templates/profile/cast.html:7
@@ -2433,7 +2474,6 @@ msgid "for"
 msgstr "pentru"
 
 #: resources/templates/profile/group.html:18
-#: resources/templates/profile/profile.html:17
 msgid "rank"
 msgstr "rang"
 
@@ -2442,17 +2482,17 @@ msgid "part of"
 msgstr "parte din"
 
 #: resources/templates/profile/group.html:26
-#: resources/templates/profile/race.html:23
+#: resources/templates/profile/race.html:40
 msgid "members"
 msgstr "membri"
 
 #: resources/templates/profile/group.html:42
-#: resources/templates/profile/race.html:39
+#: resources/templates/profile/race.html:73
 msgid "Top users"
 msgstr "Top jucători"
 
 #: resources/templates/profile/group.html:44
-#: resources/templates/profile/race.html:41
+#: resources/templates/profile/race.html:79
 msgid "Evolution"
 msgstr "Evoluție"
 
@@ -2460,32 +2500,33 @@ msgstr "Evoluție"
 msgid "Top subgroups"
 msgstr "Top subgrupe"
 
-#: resources/templates/profile/group.html:58
+#: resources/templates/profile/group.html:59
 msgid "Top same kind"
 msgstr "Top de același fel"
 
-#: resources/templates/profile/group.html:77
+#: resources/templates/profile/group.html:79
 msgid "Sorry, no users in this group"
 msgstr "Ne pare rău, niciun jucător în acest grup"
 
-#: resources/templates/profile/group.html:88
-#: resources/templates/profile/profile.html:142
-#: resources/templates/profile/race.html:77
+#: resources/templates/profile/group.html:90
+#: resources/templates/profile/profile.html:28
+#: resources/templates/profile/profile.html:166
+#: resources/templates/profile/race.html:132
 msgid "Rank"
 msgstr "Rang"
 
-#: resources/templates/profile/group.html:89
-#: resources/templates/profile/race.html:78
+#: resources/templates/profile/group.html:91
+#: resources/templates/profile/race.html:133
 msgid "Global"
 msgstr "Global"
 
-#: resources/templates/profile/group.html:94
-#: resources/templates/profile/profile.html:170
-#: resources/templates/profile/race.html:80
+#: resources/templates/profile/group.html:96
+#: resources/templates/profile/profile.html:194
+#: resources/templates/profile/race.html:134
 msgid "Position evolution"
 msgstr "Evoluția poziției"
 
-#: resources/templates/profile/group.html:95
+#: resources/templates/profile/group.html:97
 msgid "Position evolution compared with groups of the same kind."
 msgstr "Evoluția poziției comparată cu grupuri de același tip"
 
@@ -2495,12 +2536,7 @@ msgstr "Evoluția poziției comparată cu grupuri de același tip"
 msgid "Groups"
 msgstr "Grupuri"
 
-#: resources/templates/profile/groups.html:18
-msgid "Name"
-msgstr "Nume"
-
 #: resources/templates/profile/groups.html:20
-#: resources/templates/profile/profile.html:118
 msgid "Position"
 msgstr "Poziție"
 
@@ -2512,71 +2548,78 @@ msgstr "Istoric punctaj"
 msgid "Scoring history for:"
 msgstr "Istoric punctare pentru:"
 
-#: resources/templates/profile/profile.html:49
-#: resources/templates/profile/profile.html:51
-msgid "Send a message"
-msgstr "Trimite mesaj"
+#: resources/templates/profile/profile.html:22
+msgid "Experience"
+msgstr "Experiență"
 
-#: resources/templates/profile/profile.html:54
-msgid "Cast a spell on this player"
-msgstr "Fă o vrajă acestui jucător"
-
-#: resources/templates/profile/profile.html:58
-msgid "Set your profile"
-msgstr "Editează profilul"
-
-#: resources/templates/profile/profile.html:74
-msgid "Special mate"
-msgstr "Coechipier special"
-
-#: resources/templates/profile/profile.html:76
-msgid "Other group"
-msgstr "Alt grup"
-
-#: resources/templates/profile/profile.html:78
-msgid "Invited"
-msgstr "Invitat"
-
-#: resources/templates/profile/profile.html:81
-msgid "Invite in my Special Quest group"
-msgstr "Invită în grupul meu de Quest Special"
-
-#: resources/templates/profile/profile.html:86
-msgid "Report"
-msgstr "Raportează jucător"
-
-#: resources/templates/profile/profile.html:94
+#: resources/templates/profile/profile.html:55
 #: resources/templates/top/challenge_top.html:43
 #: resources/templates/top/maintop.html:69
 msgid "Never"
 msgstr "Niciodată"
 
-#: resources/templates/profile/profile.html:111
+#: resources/templates/profile/profile.html:78
 msgid "Impersonate"
 msgstr "Impersonează"
 
-#: resources/templates/profile/profile.html:116
-msgid "Description"
-msgstr "Descriere"
+#: resources/templates/profile/profile.html:110
+#: resources/templates/profile/profile.html:112
+msgid "Send a message"
+msgstr "Trimite mesaj"
 
-#: resources/templates/profile/profile.html:191
+#: resources/templates/profile/profile.html:115
+msgid "Cast a spell on this player"
+msgstr "Fă o vrajă acestui jucător"
+
+#: resources/templates/profile/profile.html:119
+msgid "Set your profile"
+msgstr "Editează profilul"
+
+#: resources/templates/profile/profile.html:135
+msgid "Special mate"
+msgstr "Coechipier special"
+
+#: resources/templates/profile/profile.html:137
+msgid "Other group"
+msgstr "Alt grup"
+
+#: resources/templates/profile/profile.html:139
+msgid "Invited"
+msgstr "Invitat"
+
+#: resources/templates/profile/profile.html:142
+msgid "Invite in my Special Quest group"
+msgstr "Invită în grupul meu de Quest Special"
+
+#: resources/templates/profile/profile.html:147
+msgid "Report"
+msgstr "Raportează jucător"
+
+#: resources/templates/profile/profile.html:216
 msgid "No points registered for this player."
 msgstr "Niciun punct înregistrat pentru acest jucător."
 
-#: resources/templates/profile/profile.html:206
+#: resources/templates/profile/profile.html:232
 msgid "Weekly points evolution"
 msgstr "Evoluția săptămânală"
 
-#: resources/templates/profile/race.html:48
+#: resources/templates/profile/race.html:50
+#: resources/templates/profile/race.html:91
+#: resources/templates/profile/race.html:108
+msgid "Score"
+msgstr "Rezultat"
+
+#: resources/templates/profile/race.html:62
+#: resources/templates/profile/race.html:120
+msgid "Sorry, no users in this race"
+msgstr "Ne pare rău, nu există jucători în acest grup"
+
+#: resources/templates/profile/race.html:86
 #: resources/templates/top/sidebar_groups.html:4
 msgid "Top groups"
 msgstr "Top clase"
 
-#: resources/templates/profile/race.html:66
-msgid "Sorry, no users in this race"
-msgstr "Ne pare rău, nu există jucători în acest grup"
-
-#: resources/templates/profile/race.html:81
+#: resources/templates/profile/race.html:135
 msgid "Position evolution compared with races of the same kind."
 msgstr "Evoluția poziției comparată cu grupuri de același tip"
 
@@ -2585,18 +2628,21 @@ msgstr "Evoluția poziției comparată cu grupuri de același tip"
 msgid "Magic summary"
 msgstr "Sumar magie"
 
-#: resources/templates/registration/login.html:25
-msgid "Your username and password didn't match. Please try again."
-msgstr ""
-"Numele de utilizator sau parola nu se potrivesc. Te rog încearcă din nou."
-
-#: resources/templates/registration/login.html:28
+#: resources/templates/registration/login.html:9
 msgid "Authentication"
 msgstr "Autentificare"
 
-#: resources/templates/registration/login.html:40
-msgid "Enter"
-msgstr "Intră"
+#: resources/templates/registration/login.html:24
+msgid "Your username and password didn't match. Please try again."
+msgstr "Numele de utilizator sau parola nu se potrivesc. Te rog încearcă din nou."
+
+#: resources/templates/registration/password_change_done.html:10
+msgid "Password successfuly changed!"
+msgstr "Ai schimbat cu succes parola!"
+
+#: resources/templates/registration/password_change_done.html:11
+msgid "Back to profile"
+msgstr "Înapoi la profil"
 
 #: resources/templates/statistics/stats.html:3
 msgid "Statistics"
@@ -2607,7 +2653,7 @@ msgid "Top Challenge"
 msgstr "Clasament provocări"
 
 #: resources/templates/top/challenge_top.html:7
-#: resources/templates/top/sidebar.html:33
+#: resources/templates/top/sidebar.html:34
 msgid "Challenge Top"
 msgstr "Clasament provocări"
 
@@ -2629,7 +2675,7 @@ msgid "Top Groups"
 msgstr "Clasament grupuri"
 
 #: resources/templates/top/coin_top.html:6
-#: resources/templates/top/sidebar.html:48
+#: resources/templates/top/sidebar.html:49
 msgid "Top for"
 msgstr "Clasament pentru"
 
@@ -2655,7 +2701,7 @@ msgstr "Top rase"
 msgid "Races"
 msgstr "Rase"
 
-#: resources/templates/top/sidebar.html:10
+#: resources/templates/top/sidebar.html:11
 msgid "Leaderboard has been disabled"
 msgstr "Clasamentul a fost dezactivat"
 
@@ -2664,8 +2710,74 @@ msgid "Top races"
 msgstr "Top rase"
 
 #, fuzzy
-#~ msgid "You haven"
-#~ msgstr "Ai răspuns"
+#~ msgid "Categories"
+#~ msgstr "Administrează categorii"
+
+#~ msgid "Quiz"
+#~ msgstr "Test"
+
+#~ msgid "Your results"
+#~ msgstr "Rezultatele tale"
+
+#~ msgid "You haven't run any quiz yet."
+#~ msgstr "Nu ai rulat încă nici un test."
+
+#~ msgid "Results - "
+#~ msgstr "Rezultate - "
+
+#~ msgid "Quiz is already running"
+#~ msgstr "Testul deja rulează"
+
+#~ msgid "Back to quiz"
+#~ msgstr "Înapoi la test"
+
+#~ msgid "You may run this quiz again in"
+#~ msgstr "Poți rezolva acest test din nou în"
+
+#~ msgid "Run quiz"
+#~ msgstr "Rezolvă test"
+
+#~ msgid "Quiz will be enabled in"
+#~ msgstr "Testul va fi activat în"
+
+#~ msgid "Anonimous"
+#~ msgstr "Anonim"
+
+#~ msgid "Bookmarks"
+#~ msgstr "Scurtături"
+
+#~ msgid "All activities"
+#~ msgstr "Toate activitățile"
+
+#~ msgid "No news."
+#~ msgstr "Nici o știre"
+
+#~ msgid "All news"
+#~ msgstr "Toate știrile"
+
+#~ msgid "Add question #2"
+#~ msgstr "Adaugă întrebare #2"
+
+#~ msgid "Edit #2"
+#~ msgstr "Editează #2"
+
+#~ msgid "Messaging"
+#~ msgstr "Mesagerie"
+
+#~ msgid "You received"
+#~ msgstr "Ai primit"
+
+#~ msgid "messages."
+#~ msgstr "mesaje."
+
+#~ msgid "You didn't receive any messages."
+#~ msgstr "Nu ai primit nici un mesaj."
+
+#~ msgid "Description"
+#~ msgstr "Descriere"
+
+#~ msgid "Enter"
+#~ msgstr "Intră"
 
 #, fuzzy
 #~ msgid "Clasament"
