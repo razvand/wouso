@@ -3,13 +3,19 @@
 {% load ui %}
 
 <div class="about">
+        {% comment Do not use yet %}
 	<div class="col-md-12">
 		<a href="/about">About</a>
 	</div>
-	<div class="col-md-12 copyright">
-		<a href="/">© Copyright LeaderPark.ro</a>
+        {% endcomment %}
+	<div style="position: absolute; left: 30%; width: 110px; top: 5px;">
+            <a href="/">
+                <img style="width: 110px;" src="{{ basepath }}/static/img/csapcs-logo-small.png" />
+            </a>
 	</div>
 	<div class="logo-upb">
+                <a href="http://www.upb.ro/">
 		<img src="{{ basepath }}/static/img/upb-logo.png" />
+                </a>
 	</div>
 </div>

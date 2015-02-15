@@ -19,10 +19,10 @@
 			<div class="text-info col-md-12">
 				<img src="{% player_avatar profile %}" class="avatar pull-right" />
 				<h4 class="col-md-8">
-					Experience: {{ profile.points}}
+                                    {% trans 'Experience' %}: {{ profile.points}}
 				</h4>
 				<h4 class="col-md-8">
-					{% artifact_full profile.level %}
+                                    {% artifact_full profile.level %}
 				</h4>
 				<h4 class="col-md-8">
 					{% if top.disabled %}-{% else %}{% trans 'Rank' %}: {{ top.position }}{% endif %}
