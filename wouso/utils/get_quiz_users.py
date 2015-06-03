@@ -28,11 +28,7 @@ def main():
             if not attempts:
                 continue
             a = attempts[0]
-            user = uq.user
-            try:
-                player = Player.objects.get(user=user)
-            except Exception, e:
-                continue
+            player = uq.user
             print '"%s","%s","%s","%d"' %(q.name, player.race.title, player.full_name, a.points)
 
 if __name__ == "__main__":
