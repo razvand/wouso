@@ -8,7 +8,7 @@ from wouso.core.user.models import Player
 from wouso.core.scoring.models import History
 from wouso.interface.apps.messaging.models import Message
 from wouso.games.challenge.models import Challenge
-from wouso.core.magic.models import PlayerSpellDue, SpellHistory, Spell
+from wouso.core.magic.models import PlayerSpellDue, SpellHistory, Spell, Artifact
 from models import Activity
 from wouso.core.signals import addActivity, messageSignal
 
@@ -390,6 +390,12 @@ class Achievements(App):
                     cls.earn_achievement(player, 'ach-gold-300')
 
         if 'login' in action:
+            # Check if artifact exists
+            try:
+                a = Artifact.objects.get(name='ach-head-start')
+            except Artifact.DoesNotExist:
+                return
+
             # # Check if player got a head start login
             if not player.magic.has_modifier('ach-head-start'):
                 # (player, start_hour, start_day, start_month, hour_offset)
