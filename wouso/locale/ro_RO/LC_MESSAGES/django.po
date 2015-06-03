@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: wouso VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-02-16 11:33+0200\n"
+"POT-Creation-Date: 2015-04-15 22:31+0300\n"
 "PO-Revision-Date: 2012-10-30 23:28+0200\n"
 "Last-Translator: Matei Oprea <matei.oprea@rosedu.org>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,6 +25,7 @@ msgid "cast a spell on himself/herself"
 msgstr "a făcut o vrajă pe sine"
 
 #: core/magic/manager.py:187
+#, fuzzy, python-brace-format
 msgid "cast a spell on {to} "
 msgstr "a făcut o vrajă pe "
 
@@ -59,10 +60,12 @@ msgid "Invalid number of days"
 msgstr "Număr de zile nevalid"
 
 #: core/scoring/sm.py:159
+#, python-brace-format
 msgid "downgraded to level {level} and lost {amount} gold"
 msgstr "a coborât la nivelul {level} și a pierdut {amount} aur"
 
 #: core/scoring/sm.py:177
+#, python-brace-format
 msgid "upgraded to level {level} and received {amount} gold"
 msgstr "a promovat la nivelul {level} și a primit {amount} aur"
 
@@ -75,6 +78,7 @@ msgid "You"
 msgstr "Tu"
 
 #: games/challenge/models.py:85
+#, python-brace-format
 msgid "used {artifact} to enable one more challenge."
 msgstr "a folosit {artifact} pentru a activa încă o provocare."
 
@@ -83,6 +87,7 @@ msgid "expired"
 msgstr "expirată"
 
 #: games/challenge/models.py:409
+#, python-brace-format
 msgid "{seconds} seconds"
 msgstr "{seconds} secunde"
 
@@ -91,30 +96,37 @@ msgid "1 minute"
 msgstr "1 minut"
 
 #: games/challenge/models.py:413
+#, python-brace-format
 msgid "{minutes} minutes"
 msgstr "{minutes} minute"
 
 #: games/challenge/models.py:415
+#, python-brace-format
 msgid "1 minute and {s} seconds"
 msgstr "1 minut și {s} secunde"
 
 #: games/challenge/models.py:417
+#, python-brace-format
 msgid "{m} minutes and {s} seconds"
 msgstr "{m} minute și {s} secunde"
 
 #: games/challenge/models.py:418
+#, python-brace-format
 msgid "(in {time})"
 msgstr "(în {time})"
 
 #: games/challenge/models.py:579
+#, python-brace-format
 msgid "has refused challenge from {chall_from} (expired)"
 msgstr "a refuzat provocarea de la {chall_from} (expirată)"
 
 #: games/challenge/models.py:581
+#, python-brace-format
 msgid "has refused challenge from {chall_from}"
 msgstr "a refuzat provocarea de la {chall_from}"
 
 #: games/challenge/models.py:616
+#, python-brace-format
 msgid ""
 "draw result between {user_from} and {user_to}:\n"
 "{extra}"
@@ -123,6 +135,7 @@ msgstr ""
 "{extra}"
 
 #: games/challenge/models.py:626
+#, python-brace-format
 msgid "won challenge with {user_lost}: {extra}"
 msgstr "a câștigat provocarea cu {user_lost}: {extra}"
 
@@ -535,14 +548,17 @@ msgid "No question for today"
 msgstr "Nici o întrebare astăzi"
 
 #: games/quest/models.py:89
+#, python-brace-format
 msgid "has finished quest {quest}"
 msgstr "a terminat aventura {quest}"
 
 #: games/quest/models.py:116
+#, python-brace-format
 msgid "has started quest {quest}"
 msgstr "a început aventura {quest}"
 
 #: games/quest/models.py:386
+#, python-brace-format
 msgid "received bonus for reaching level {level} in the final quest"
 msgstr "a obținut bonus pentru atingerea nivelului {level} în aventura finală"
 
@@ -721,14 +737,16 @@ msgid "No quest active."
 msgstr "Nu există aventuri active."
 
 #: games/quiz/models.py:241
+#, python-brace-format
 msgid ""
 "received {points} points and {gold} gold bonus for beating his/her highscore "
 "at quiz {quiz_name}"
 msgstr ""
-"a primit {points} puncte și {gold} aur bonus pentru că și-a depăsșit cel mai "
+"a primit {points} puncte și {gold} aur bonus pentru că și-a depășit cel mai "
 "bun scor la testul {quiz_name}"
 
 #: games/quiz/models.py:247
+#, python-brace-format
 msgid ""
 "received {points} points and {gold} gold bonus for submitting quiz "
 "{quiz_name}"
@@ -737,6 +755,7 @@ msgstr ""
 "{quiz_name}"
 
 #: games/quiz/views.py:69
+#, python-brace-format
 msgid "You can replay this quiz in {days} day(s)!"
 msgstr "Poți rula din nou acest test în {days} zile."
 
@@ -1105,14 +1124,17 @@ msgid "More..."
 msgstr "Mai mult..."
 
 #: games/specialquest/cpanel.py:89
+#, python-brace-format
 msgid "received {gold} gold bonus for {comment}"
 msgstr "a primit {gold} aur bonsu pentru {comment}"
 
 #: games/specialquest/cpanel.py:136
+#, python-brace-format
 msgid "completed special quest {task_name} and earned {value} gold"
 msgstr "a încheiat aventura specială {task_name} și a câștigat {value} gold"
 
 #: games/specialquest/cpanel.py:155
+#, python-brace-format
 msgid "completed special quest {task_name}"
 msgstr "a încheiat aventura specială {task_name}"
 
@@ -1677,6 +1699,7 @@ msgid "Integrity Check"
 msgstr "Verificare de integritate"
 
 #: interface/activity/achievements.py:257
+#, python-brace-format
 msgid "earned {artifact}"
 msgstr "a dobândit {artifact}"
 
@@ -1801,6 +1824,7 @@ msgid "Sort tags in"
 msgstr "Sortează etichetele"
 
 #: interface/apps/magic/views.py:42
+#, python-brace-format
 msgid "Rate: 1 gold = {rate} points, {rate2} points = 1 gold"
 msgstr "Rata cumpărare: 1 aur = {rate} puncte; vânzare: 1 aur = {rate2} puncte"
 
@@ -1833,6 +1857,7 @@ msgid "Spell is not available"
 msgstr "Magia nu este disponibilă"
 
 #: interface/apps/magic/views.py:124
+#, python-brace-format
 msgid "Level {level} is required to buy this spell"
 msgstr "Nivelul {level} este necesar pentru a cumpăra acest spell"
 
@@ -1881,10 +1906,12 @@ msgid "Live stats"
 msgstr "Statistici live"
 
 #: interface/cpanel/views.py:1289
+#, python-brace-format
 msgid "received {amount} {coin} bonus for {reason}"
 msgstr "a primit {amount} {coin} bonus pentru {reason}"
 
 #: interface/cpanel/views.py:1351
+#, python-brace-format
 msgid "received {amount} {coin} bonus for {karma_points} Karma Points"
 msgstr "a primit {amount} {coin} bonus pentru {karma_points} puncte de karma"
 
@@ -2108,13 +2135,13 @@ msgstr "Editează"
 msgid "Import"
 msgstr "Importă fișier"
 
-#: resources/templates/cpanel/index.html:97
+#: resources/templates/cpanel/index.html:98
 #: resources/templates/interface/forum_header.html:22
 #: resources/templates/interface/header.html:35
 msgid "Logout"
 msgstr "Deconectare"
 
-#: resources/templates/cpanel/index.html:190
+#: resources/templates/cpanel/index.html:191
 #: resources/templates/cpanel/players.html:8
 msgid "Add player"
 msgstr "Adaugă jucător"
