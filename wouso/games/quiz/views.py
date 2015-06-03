@@ -71,6 +71,12 @@ class QuizView(View):
             # redirect to same page
             return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+        if self.quiz.is_inactive() and not self.quiz_user.user.is_staff:
+            messages.error(request,
+                           _('You cannot play this quiz!'),)
+            # redirect to same page
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
         return super(QuizView, self).dispatch(request, *args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -82,6 +88,12 @@ class QuizView(View):
             self.through.set_running()
 
         seconds_left = self.through.time_left
+
+        if self.quiz.is_inactive() and not self.quiz_user.user.is_staff:
+            messages.error(request,
+                           _('You cannot play this quiz!'),)
+            # redirect to same page
+            return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
         return render_to_response('quiz/quiz.html',
                                   {'quiz': self.quiz, 'form': form,
