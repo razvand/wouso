@@ -1,7 +1,7 @@
 #!/bin/bash
 
-toplevel_dir=/home/wouso/wouso-iulianr-fork.git
-virtualenv_dir=/home/wouso/wouso-iulianr-fork.git/sandbox
+toplevel_dir=/home/wouso/wouso.git
+virtualenv_dir=/home/wouso/wouso.git/sandbox
 
 cd $toplevel_dir
 source $virtualenv_dir/bin/activate
