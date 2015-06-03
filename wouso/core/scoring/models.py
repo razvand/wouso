@@ -62,6 +62,9 @@ class Formula(Item, models.Model):
             return formula
         return formula
 
+    def __unicode__(self):
+        return "%s (%d)" % (self.name, self.id)
+
 
 class History(models.Model):
     """ Scoring history keeps track of scoring events per user, saving
